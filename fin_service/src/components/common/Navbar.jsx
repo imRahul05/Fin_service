@@ -52,7 +52,9 @@ function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-xl font-bold text-blue-600">FinSage</Link>
+              <Link to="/" className="text-xl font-bold text-blue-600">
+                FinSage
+              </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               {/* Navigation Links */}
@@ -127,21 +129,30 @@ function Navbar() {
                     <span className="sr-only">Open user menu</span>
                     <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100">
                       <span className="text-sm font-medium leading-none text-blue-700">
-                        {currentUser.email && currentUser.email.charAt(0).toUpperCase()}
+                        {currentUser.email &&
+                          (() => {
+                            const username = currentUser.email.split("@")[0];
+                            return (
+                              username.charAt(0).toUpperCase() +
+                              username.charAt(username.length - 1)
+                            );
+                          })()}
                       </span>
                     </span>
                   </button>
                 </div>
                 {isProfileOpen && (
                   <div
-                    className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                    className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="user-menu"
                   >
                     <div className="block px-4 py-2 text-xs text-gray-500">
                       Signed in as
-                      <div className="font-bold text-gray-700 truncate">{currentUser.email}</div>
+                      <div className="font-bold text-gray-700 truncate">
+                        {currentUser.email}
+                      </div>
                     </div>
                     <Link
                       to="/profile"
@@ -149,7 +160,7 @@ function Navbar() {
                       role="menuitem"
                       onClick={() => setIsProfileOpen(false)}
                     >
-                     Profile
+                      Profile
                     </Link>
                     <Link
                       to="/finance-input"
@@ -305,7 +316,8 @@ function Navbar() {
               <div className="flex-shrink-0">
                 <span className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-blue-100">
                   <span className="text-sm font-medium leading-none text-blue-700">
-                    {currentUser.email && currentUser.email.charAt(0).toUpperCase()}
+                    {currentUser.email &&
+                      currentUser.email.charAt(0).toUpperCase()}
                   </span>
                 </span>
               </div>
