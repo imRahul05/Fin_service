@@ -299,7 +299,42 @@ function Dashboard() {
           />
         </div>
       </div>
-
+   {/* Quick Actions */}
+   <div className="mt-12">
+        <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <Link to="/scenarios" className="block hover:bg-gray-50">
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h3 className="text-lg font-medium text-blue-600">Run "What-If" Scenarios</h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  Simulate career changes, investment strategies, or major purchases
+                </p>
+              </div>
+            </div>
+          </Link>
+          <Link to="/analytics" className="block hover:bg-gray-50">
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h3 className="text-lg font-medium text-blue-600">Spending Analytics</h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  Analyze your spending habits and find opportunities to save
+                </p>
+              </div>
+            </div>
+          </Link>
+          <Link to="/advisor" className="block hover:bg-gray-50">
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h3 className="text-lg font-medium text-blue-600">Get More Financial Advice</h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  Ask our AI advisor for personalized financial guidance
+                </p>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </div>
       {/* Charts Section */}
       <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2">
         <div className="bg-white rounded-lg shadow px-5 py-6">
@@ -379,43 +414,6 @@ function Dashboard() {
               </div>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="mt-12">
-        <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <Link to="/scenarios" className="block hover:bg-gray-50">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <h3 className="text-lg font-medium text-blue-600">Run "What-If" Scenarios</h3>
-                <p className="mt-2 text-sm text-gray-500">
-                  Simulate career changes, investment strategies, or major purchases
-                </p>
-              </div>
-            </div>
-          </Link>
-          <Link to="/analytics" className="block hover:bg-gray-50">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <h3 className="text-lg font-medium text-blue-600">Spending Analytics</h3>
-                <p className="mt-2 text-sm text-gray-500">
-                  Analyze your spending habits and find opportunities to save
-                </p>
-              </div>
-            </div>
-          </Link>
-          <Link to="/advisor" className="block hover:bg-gray-50">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <h3 className="text-lg font-medium text-blue-600">Get More Financial Advice</h3>
-                <p className="mt-2 text-sm text-gray-500">
-                  Ask our AI advisor for personalized financial guidance
-                </p>
-              </div>
-            </div>
-          </Link>
         </div>
       </div>
     </div>

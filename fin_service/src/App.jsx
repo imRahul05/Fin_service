@@ -12,6 +12,7 @@ import Scenarios from './pages/Scenarios';
 import FinanceInput from './pages/FinanceInput';
 import './App.css';
 import Profile from './pages/Profile';
+import AIAdvisor from './pages/AIAdvisor';
 
 function App() {
   return (
@@ -62,6 +63,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/advisor" 
+              element={
+                <ProtectedRoute>
+                  <AIAdvisor />
                 </ProtectedRoute>
               } 
             />
