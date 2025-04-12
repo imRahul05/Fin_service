@@ -289,7 +289,18 @@ function AIAdvisor() {
         
         User's question: "${customPrompt}"
         
-        Provide a detailed, helpful response focused on Indian financial context. Format your response in markdown with headings, bullet points, and emphasis where appropriate.
+        Provide a detailed, helpful response focused on Indian financial context.
+        
+        Format your response in clear sections with:
+        - Use ## for main section headers
+        - Use ### for subsection headers
+        - Add blank lines between paragraphs and sections
+        - Use bullet points (- ) for listing items
+        - Bold important figures or key points using **text**
+        - Use tables for numeric data if applicable
+        - Highlight critical advice using > for blockquotes
+        
+        Make the layout spacious and easy to read with clear visual separation between sections.
       `;
       
       const result = await model.generateContent(prompt);

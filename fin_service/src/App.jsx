@@ -13,6 +13,7 @@ import FinanceInput from './pages/FinanceInput';
 import './App.css';
 import Profile from './pages/Profile';
 import AIAdvisor from './pages/AIAdvisor';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -74,6 +75,10 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+              <Route
+               path="*" 
+               element={<NotFound />} 
+               />
           </Routes>
         </div>
       </AuthProvider>

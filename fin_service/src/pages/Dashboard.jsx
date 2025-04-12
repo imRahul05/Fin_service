@@ -12,6 +12,7 @@ import {
   calculateNetWorth 
 } from "../utils/financialUtils";
 import { getFinancialAdvice } from "../services/AIService";
+import ReactMarkdown from 'react-markdown';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
@@ -408,10 +409,8 @@ function Dashboard() {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           ) : (
-            <div className="prose max-w-none">
-              <div className="whitespace-pre-line">
-                {aiAdvice}
-              </div>
+            <div className="prose max-w-none p-4 bg-white rounded-lg">
+              <ReactMarkdown>{aiAdvice}</ReactMarkdown>
             </div>
           )}
         </div>

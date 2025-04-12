@@ -26,7 +26,15 @@ export async function getFinancialAdvice(financialData) {
       3. Potential investment opportunities considering Indian market conditions
       4. Suggestions for expense optimization
       
-      Format your response in clear sections with bullet points where appropriate.
+      Format your response in clear sections with:
+      - Use ## for main section headers
+      - Use ### for subsection headers
+      - Add blank lines between paragraphs and sections
+      - Use bullet points (- ) for listing items
+      - Bold important figures or key points using **text**
+      - Highlight critical advice using > for blockquotes
+      
+      Make the layout spacious and easy to read with clear visual separation between sections.
     `;
 
     const result = await model.generateContent(prompt);
@@ -57,7 +65,17 @@ export async function simulateScenario(currentData, scenarioParams) {
       3. Pros and cons of this scenario
       4. Alternative approaches to consider
       
-      Please focus on realistic outcomes relevant to the Indian financial context.
+      Format your response in clear sections with:
+      - Use ## for main section headers
+      - Use ### for subsection headers
+      - Add blank lines between paragraphs and sections
+      - Use bullet points (- ) for listing items
+      - Bold important figures or key points using **text**
+      - Use tables for numeric projections with years as columns
+      - Highlight critical advice using > for blockquotes
+      
+      Make the layout spacious and easy to read with clear visual separation between sections.
+      Focus on realistic outcomes relevant to the Indian financial context.
     `;
 
     const result = await model.generateContent(prompt);
@@ -84,6 +102,16 @@ export async function analyzeSpendingBehavior(transactions) {
       3. 3-5 specific recommendations for saving money
       4. Categorize spending into essential vs non-essential
       
+      Format your response in clear sections with:
+      - Use ## for main section headers
+      - Use ### for subsection headers
+      - Add blank lines between paragraphs and sections
+      - Use bullet points (- ) for listing items
+      - Bold important figures or key points using **text**
+      - Use tables for category breakdowns if applicable
+      - Highlight critical advice using > for blockquotes
+      
+      Make the layout spacious and easy to read with clear visual separation between sections.
       Consider Indian context and local spending categories like UPI, e-commerce, etc.
     `;
 
@@ -111,6 +139,16 @@ export async function getBackwardAnalysis(historicalDecisions) {
       3. Lessons to learn from these past decisions
       4. Recommendations for similar future decisions
       
+      Format your response in clear sections with:
+      - Use ## for main section headers
+      - Use ### for subsection headers
+      - Add blank lines between paragraphs and sections
+      - Use bullet points (- ) for listing items
+      - Bold important figures or key points using **text**
+      - Use tables for comparing investment options or returns
+      - Highlight critical advice using > for blockquotes
+      
+      Make the layout spacious and easy to read with clear visual separation between sections.
       Focus on Indian financial context, including Nifty/Sensex performance, real estate trends, FD rates, etc.
     `;
 
