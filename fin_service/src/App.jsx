@@ -15,6 +15,7 @@ import './App.css';
 function App() {
   return (
     <Router>
+     
       <AuthProvider>
         <div className="min-h-screen bg-gray-50">
           <Navbar />
