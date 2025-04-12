@@ -3,7 +3,16 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { formatCurrency } from "../utils/financialUtils";
+
+// Import components
+import IncomeForm from "../components/finances/IncomeForm";
+import FixedExpensesForm from "../components/finances/FixedExpensesForm";
+import VariableExpensesForm from "../components/finances/VariableExpensesForm";
+import InvestmentsForm from "../components/finances/InvestmentsForm";
+import LoansForm from "../components/finances/LoansForm";
+import FinancialSummary from "../components/finances/FinancialSummary";
+import FormTabs from "../components/finances/FormTabs";
+import { SuccessAlert, ErrorAlert } from "../components/finances/Notifications";
 
 // Indian salary income tax brackets for 2024-25 (simplified)
 const TAX_BRACKETS = [
@@ -152,7 +161,7 @@ function FinanceInput() {
     const { name, value } = e.target;
     setIncome(prev => ({
       ...prev,
-      [name]: parseFloat(value) || 0
+      [name]: value === '' ? 0 : parseFloat(value) || 0
     }));
   };
   
@@ -160,7 +169,7 @@ function FinanceInput() {
     const { name, value } = e.target;
     setFixedExpenses(prev => ({
       ...prev,
-      [name]: parseFloat(value) || 0
+      [name]: value === '' ? 0 : parseFloat(value) || 0
     }));
   };
   
@@ -168,7 +177,7 @@ function FinanceInput() {
     const { name, value } = e.target;
     setVariableExpenses(prev => ({
       ...prev,
-      [name]: parseFloat(value) || 0
+      [name]: value === '' ? 0 : parseFloat(value) || 0
     }));
   };
   
@@ -176,7 +185,7 @@ function FinanceInput() {
     const { name, value } = e.target;
     setInvestments(prev => ({
       ...prev,
-      [name]: parseFloat(value) || 0
+      [name]: value === '' ? 0 : parseFloat(value) || 0
     }));
   };
   
@@ -184,7 +193,7 @@ function FinanceInput() {
     const { name, value } = e.target;
     setLoans(prev => ({
       ...prev,
-      [name]: parseFloat(value) || 0
+      [name]: value === '' ? 0 : parseFloat(value) || 0
     }));
   };
   
@@ -224,32 +233,6 @@ function FinanceInput() {
   const savingsRate = totalIncome > 0 ? (monthlySavings / totalIncome) * 100 : 0;
   const afterTaxSavingsRate = afterTaxIncome > 0 ? (afterTaxSavings / afterTaxIncome) * 100 : 0;
   
-  // Input field component for reuse
-  const InputField = ({ label, name, value, onChange, type = "number", min = "0", step = "1", prefix = "₹" }) => (
-    <div className="sm:col-span-1">
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <div className="mt-1 relative rounded-md shadow-sm">
-        {prefix && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 sm:text-sm">{prefix}</span>
-          </div>
-        )}
-        <input
-          type={type}
-          name={name}
-          id={name}
-          min={min}
-          step={step}
-          value={value}
-          onChange={onChange}
-          className={`${prefix ? 'pl-8' : 'pl-3'} block w-full pr-3 py-2 sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500`}
-        />
-      </div>
-    </div>
-  );
-  
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -271,334 +254,74 @@ function FinanceInput() {
         </div>
       </div>
 
-      {formSubmitted && success && (
-        <div className="rounded-md bg-green-50 p-4 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-green-800">
-                Financial information saved successfully! Redirecting to dashboard...
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      {formSubmitted && success && <SuccessAlert message="Financial information saved successfully! Redirecting to dashboard..." />}
+      {error && <ErrorAlert message={error} />}
 
-      {error && (
-        <div className="rounded-md bg-red-50 p-4 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-red-800">{error}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      <FinancialSummary 
+        totalIncome={totalIncome}
+        totalExpenses={totalExpenses}
+        totalFixedExpenses={totalFixedExpenses}
+        totalVariableExpenses={totalVariableExpenses}
+        monthlySavings={monthlySavings}
+        monthlyTax={monthlyTax}
+        afterTaxSavings={afterTaxSavings}
+        savingsRate={savingsRate}
+        afterTaxSavingsRate={afterTaxSavingsRate}
+      />
 
-      {/* Financial Summary */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-        <div className="px-4 py-5 sm:px-6 bg-blue-50">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
-            Monthly Financial Summary
-          </h3>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            Based on the information you've provided
-          </p>
-        </div>
-        <div className="border-t border-gray-200">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm font-medium text-gray-500">Total Income</p>
-              <p className="text-xl font-semibold text-blue-600">{formatCurrency(totalIncome)}</p>
-              <p className="text-xs text-gray-500">Before Tax: {formatCurrency(monthlyTax)} in estimated taxes</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm font-medium text-gray-500">Total Expenses</p>
-              <p className="text-xl font-semibold text-red-600">{formatCurrency(totalExpenses)}</p>
-              <p className="text-xs text-gray-500">Fixed: {formatCurrency(totalFixedExpenses)}, Variable: {formatCurrency(totalVariableExpenses)}</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm font-medium text-gray-500">Monthly Savings</p>
-              <p className={`text-xl font-semibold ${monthlySavings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(monthlySavings)}
-              </p>
-              <p className="text-xs text-gray-500">Savings Rate: {savingsRate.toFixed(1)}%</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm font-medium text-gray-500">After-Tax Savings</p>
-              <p className={`text-xl font-semibold ${afterTaxSavings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(afterTaxSavings)}
-              </p>
-              <p className="text-xs text-gray-500">After-Tax Rate: {afterTaxSavingsRate.toFixed(1)}%</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Form tabs */}
       <div className="bg-white shadow sm:rounded-lg mb-8">
-        <div className="sm:hidden">
-          <label htmlFor="tabs" className="sr-only">Select a tab</label>
-          <select
-            id="tabs"
-            name="tabs"
-            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-            value={activeTab}
-            onChange={(e) => setActiveTab(e.target.value)}
-          >
-            <option value="income">Income</option>
-            <option value="fixed-expenses">Fixed Expenses</option>
-            <option value="variable-expenses">Variable Expenses</option>
-            <option value="investments">Investments</option>
-            <option value="loans">Loans</option>
-          </select>
-        </div>
-        <div className="hidden sm:block">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex" aria-label="Tabs">
-              <button
-                onClick={() => setActiveTab("income")}
-                className={`${
-                  activeTab === "income"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                } w-1/5 py-4 px-1 text-center border-b-2 font-medium text-sm`}
-              >
-                Income
-              </button>
-              <button
-                onClick={() => setActiveTab("fixed-expenses")}
-                className={`${
-                  activeTab === "fixed-expenses"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                } w-1/5 py-4 px-1 text-center border-b-2 font-medium text-sm`}
-              >
-                Fixed Expenses
-              </button>
-              <button
-                onClick={() => setActiveTab("variable-expenses")}
-                className={`${
-                  activeTab === "variable-expenses"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                } w-1/5 py-4 px-1 text-center border-b-2 font-medium text-sm`}
-              >
-                Variable Expenses
-              </button>
-              <button
-                onClick={() => setActiveTab("investments")}
-                className={`${
-                  activeTab === "investments"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                } w-1/5 py-4 px-1 text-center border-b-2 font-medium text-sm`}
-              >
-                Investments
-              </button>
-              <button
-                onClick={() => setActiveTab("loans")}
-                className={`${
-                  activeTab === "loans"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                } w-1/5 py-4 px-1 text-center border-b-2 font-medium text-sm`}
-              >
-                Loans
-              </button>
-            </nav>
-          </div>
-        </div>
+        <FormTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
         <form onSubmit={handleSubmit}>
-          {/* Income Section */}
           <div className={activeTab === "income" ? "block" : "hidden"}>
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Monthly Income</h3>
-              <p className="mt-1 text-sm text-gray-500">Enter all your sources of monthly income</p>
-              
-              <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                <InputField label="Salary" name="salary" value={income.salary} onChange={handleIncomeChange} />
-                <InputField label="Business Income" name="business" value={income.business} onChange={handleIncomeChange} />
-                <InputField label="Rental Income" name="rental" value={income.rental} onChange={handleIncomeChange} />
-                <InputField label="Investment Income" name="investments" value={income.investments} onChange={handleIncomeChange} />
-                <InputField label="Other Income" name="other" value={income.other} onChange={handleIncomeChange} />
-              </div>
-              
-              <div className="mt-6 flex justify-between items-center border-t border-gray-200 pt-4">
-                <p className="text-sm font-medium text-gray-900">Total Monthly Income: <span className="font-bold">{formatCurrency(totalIncome)}</span></p>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("fixed-expenses")}
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Next: Fixed Expenses
-                </button>
-              </div>
-            </div>
+            <IncomeForm 
+              income={income} 
+              handleIncomeChange={handleIncomeChange} 
+              totalIncome={totalIncome}
+              setActiveTab={setActiveTab}
+            />
           </div>
 
-          {/* Fixed Expenses Section */}
           <div className={activeTab === "fixed-expenses" ? "block" : "hidden"}>
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Monthly Fixed Expenses</h3>
-              <p className="mt-1 text-sm text-gray-500">Enter your recurring monthly expenses</p>
-              
-              <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                <InputField label="Rent" name="rent" value={fixedExpenses.rent} onChange={handleFixedExpensesChange} />
-                <InputField label="Mortgage EMI" name="mortgage" value={fixedExpenses.mortgage} onChange={handleFixedExpensesChange} />
-                <InputField label="Utilities (Electricity, Water, etc.)" name="utilities" value={fixedExpenses.utilities} onChange={handleFixedExpensesChange} />
-                <InputField label="Insurance Premiums" name="insurance" value={fixedExpenses.insurance} onChange={handleFixedExpensesChange} />
-                <InputField label="Subscriptions (OTT, etc.)" name="subscriptions" value={fixedExpenses.subscriptions} onChange={handleFixedExpensesChange} />
-                <InputField label="Education (School/Tuition Fees)" name="education" value={fixedExpenses.education} onChange={handleFixedExpensesChange} />
-                <InputField label="Other Fixed Expenses" name="other" value={fixedExpenses.other} onChange={handleFixedExpensesChange} />
-              </div>
-              
-              <div className="mt-6 flex justify-between items-center border-t border-gray-200 pt-4">
-                <p className="text-sm font-medium text-gray-900">Total Fixed Expenses: <span className="font-bold">{formatCurrency(totalFixedExpenses)}</span></p>
-                <div className="flex space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("income")}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("variable-expenses")}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Next: Variable Expenses
-                  </button>
-                </div>
-              </div>
-            </div>
+            <FixedExpensesForm 
+              fixedExpenses={fixedExpenses} 
+              handleFixedExpensesChange={handleFixedExpensesChange} 
+              totalFixedExpenses={totalFixedExpenses}
+              setActiveTab={setActiveTab}
+            />
           </div>
 
-          {/* Variable Expenses Section */}
           <div className={activeTab === "variable-expenses" ? "block" : "hidden"}>
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Monthly Variable Expenses</h3>
-              <p className="mt-1 text-sm text-gray-500">Enter your average monthly spending in each category</p>
-              
-              <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                <InputField label="Groceries" name="groceries" value={variableExpenses.groceries} onChange={handleVariableExpensesChange} />
-                <InputField label="Dining Out" name="dining" value={variableExpenses.dining} onChange={handleVariableExpensesChange} />
-                <InputField label="Entertainment" name="entertainment" value={variableExpenses.entertainment} onChange={handleVariableExpensesChange} />
-                <InputField label="Shopping (Clothing, etc.)" name="shopping" value={variableExpenses.shopping} onChange={handleVariableExpensesChange} />
-                <InputField label="Transportation (Fuel, Taxi, etc.)" name="transportation" value={variableExpenses.transportation} onChange={handleVariableExpensesChange} />
-                <InputField label="Healthcare (Medical, Medicine)" name="healthcare" value={variableExpenses.healthcare} onChange={handleVariableExpensesChange} />
-                <InputField label="Travel" name="travel" value={variableExpenses.travel} onChange={handleVariableExpensesChange} />
-                <InputField label="Other Variable Expenses" name="other" value={variableExpenses.other} onChange={handleVariableExpensesChange} />
-              </div>
-              
-              <div className="mt-6 flex justify-between items-center border-t border-gray-200 pt-4">
-                <p className="text-sm font-medium text-gray-900">Total Variable Expenses: <span className="font-bold">{formatCurrency(totalVariableExpenses)}</span></p>
-                <div className="flex space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("fixed-expenses")}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("investments")}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Next: Investments
-                  </button>
-                </div>
-              </div>
-            </div>
+            <VariableExpensesForm 
+              variableExpenses={variableExpenses} 
+              handleVariableExpensesChange={handleVariableExpensesChange} 
+              totalVariableExpenses={totalVariableExpenses}
+              setActiveTab={setActiveTab}
+            />
           </div>
 
-          {/* Investments Section */}
           <div className={activeTab === "investments" ? "block" : "hidden"}>
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Monthly Investments</h3>
-              <p className="mt-1 text-sm text-gray-500">Enter your monthly contribution to each investment type</p>
-              
-              <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                <InputField label="Equity/Stocks" name="equity" value={investments.equity} onChange={handleInvestmentsChange} />
-                <InputField label="Mutual Funds/SIPs" name="mutual_funds" value={investments.mutual_funds} onChange={handleInvestmentsChange} />
-                <InputField label="Fixed Deposits" name="fd" value={investments.fd} onChange={handleInvestmentsChange} />
-                <InputField label="PPF (Public Provident Fund)" name="ppf" value={investments.ppf} onChange={handleInvestmentsChange} />
-                <InputField label="EPF (Employee Provident Fund)" name="epf" value={investments.epf} onChange={handleInvestmentsChange} />
-                <InputField label="NPS (National Pension Scheme)" name="nps" value={investments.nps} onChange={handleInvestmentsChange} />
-                <InputField label="Gold/Silver" name="gold" value={investments.gold} onChange={handleInvestmentsChange} />
-                <InputField label="Real Estate" name="real_estate" value={investments.real_estate} onChange={handleInvestmentsChange} />
-                <InputField label="Cryptocurrency" name="crypto" value={investments.crypto} onChange={handleInvestmentsChange} />
-                <InputField label="Other Investments" name="other" value={investments.other} onChange={handleInvestmentsChange} />
-              </div>
-              
-              <div className="mt-6 flex justify-between items-center border-t border-gray-200 pt-4">
-                <p className="text-sm font-medium text-gray-900">Total Monthly Investments: <span className="font-bold">{formatCurrency(totalInvestments)}</span></p>
-                <div className="flex space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("variable-expenses")}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("loans")}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Next: Loans
-                  </button>
-                </div>
-              </div>
-            </div>
+            <InvestmentsForm 
+              investments={investments} 
+              handleInvestmentsChange={handleInvestmentsChange} 
+              totalInvestments={totalInvestments}
+              setActiveTab={setActiveTab}
+            />
           </div>
 
-          {/* Loans Section */}
           <div className={activeTab === "loans" ? "block" : "hidden"}>
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Monthly Loan Repayments</h3>
-              <p className="mt-1 text-sm text-gray-500">Enter your monthly EMIs and other debt payments</p>
-              
-              <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                <InputField label="Home Loan EMI" name="home" value={loans.home} onChange={handleLoansChange} />
-                <InputField label="Car Loan EMI" name="car" value={loans.car} onChange={handleLoansChange} />
-                <InputField label="Education Loan EMI" name="education" value={loans.education} onChange={handleLoansChange} />
-                <InputField label="Personal Loan EMI" name="personal" value={loans.personal} onChange={handleLoansChange} />
-                <InputField label="Credit Card Payments" name="credit_card" value={loans.credit_card} onChange={handleLoansChange} />
-                <InputField label="Other Loan Payments" name="other" value={loans.other} onChange={handleLoansChange} />
-              </div>
-              
-              <div className="mt-6 flex justify-between items-center border-t border-gray-200 pt-4">
-                <p className="text-sm font-medium text-gray-900">Total Monthly Loan Payments: <span className="font-bold">{formatCurrency(totalLoans)}</span></p>
-                <div className="flex space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("investments")}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    {saving ? 'Saving...' : 'Save and Continue'}
-                  </button>
-                </div>
-              </div>
-            </div>
+            <LoansForm 
+              loans={loans} 
+              handleLoansChange={handleLoansChange} 
+              totalLoans={totalLoans}
+              setActiveTab={setActiveTab}
+              saving={saving}
+              // Pass all financial data to LoansForm
+              income={income}
+              fixedExpenses={fixedExpenses}
+              variableExpenses={variableExpenses}
+              investments={investments}
+            />
           </div>
         </form>
       </div>

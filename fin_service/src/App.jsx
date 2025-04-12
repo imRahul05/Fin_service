@@ -11,6 +11,7 @@ import Analytics from './pages/Analytics';
 import Scenarios from './pages/Scenarios';
 import FinanceInput from './pages/FinanceInput';
 import './App.css';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -53,6 +54,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <FinanceInput />
+                </ProtectedRoute>
+              } 
+            />
+             <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               } 
             />

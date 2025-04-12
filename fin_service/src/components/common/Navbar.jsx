@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -9,6 +9,26 @@ function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [error, setError] = useState("");
+  const profileRef = useRef(null);
+
+  // Handle click outside to close profile dropdown
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    }
+
+    // Add event listener when the profile dropdown is open
+    if (isProfileOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    // Clean up event listener
+    return () => {
+      document.addEventListener("mousedown", handleClickOutside);
+    };
+  }, [isProfileOpen]);
 
   // Handle logout
   const handleLogout = async () => {
@@ -95,7 +115,7 @@ function Navbar() {
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             {currentUser ? (
-              <div className="ml-3 relative">
+              <div className="ml-3 relative" ref={profileRef}>
                 <div>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -123,6 +143,14 @@ function Navbar() {
                       Signed in as
                       <div className="font-bold text-gray-700 truncate">{currentUser.email}</div>
                     </div>
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      role="menuitem"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                     Profile
+                    </Link>
                     <Link
                       to="/finance-input"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -190,7 +218,7 @@ function Navbar() {
                 className={`${isMenuOpen ? "block" : "hidden"} h-6 w-6`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
-                viewBox="0 0 24 24"
+                viewBox="0 24 24"
                 stroke="currentColor"
                 aria-hidden="true"
               >
