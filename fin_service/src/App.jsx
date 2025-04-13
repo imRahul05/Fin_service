@@ -14,6 +14,7 @@ import './App.css';
 import Profile from './pages/Profile';
 import AIAdvisor from './pages/AIAdvisor';
 import NotFound from './pages/NotFound';
+import ContactUsPage from './pages/ContactUsPage';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/contact" element={<ContactUsPage />} />
             <Route 
               path="/dashboard" 
               element={
