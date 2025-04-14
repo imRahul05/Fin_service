@@ -12,15 +12,14 @@ const Footer = () => {
             <footer className="bg-gray-800 text-white rounded-t-3xl shadow-lg">
                 <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Logo and Description */}
                         <div className="mb-4 md:mb-0">
                             <h2 className="text-lg font-bold">FinSage AI</h2>
                             <p className="mt-2 text-sm text-gray-400">
                                 Empowering your financial journey with AI-driven insights and personalized guidance.
                             </p>
                             <p className="mt-4 text-sm text-gray-400">
-                                <a href="mailto:contact@finsage-ai.com" className="hover:text-white">
-                                    contact@finsage-ai.com
+                                <a href="mailto:rahulkumar20000516@gmail.com" className="hover:text-white">
+                                    rahulkumar20000516@gmail.com
                                 </a>
                             </p>
                         </div>
