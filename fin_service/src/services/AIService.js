@@ -20,21 +20,31 @@ export async function getFinancialAdvice(financialData) {
       
       Financial Goals: ${financialData.goals || "Not specified"}
       
-      Please provide:
-      1. A brief analysis of current financial health
-      2. 3-5 specific actionable recommendations for improvement
-      3. Potential investment opportunities considering Indian market conditions
-      4. Suggestions for expense optimization
-      
-      Format your response in clear sections with:
-      - Use ## for main section headers
-      - Use ### for subsection headers
-      - Add blank lines between paragraphs and sections
-      - Use bullet points (- ) for listing items
-      - Bold important figures or key points using **text**
-      - Highlight critical advice using > for blockquotes
-      
-      Make the layout spacious and easy to read with clear visual separation between sections.
+      Return the analysis in clean Markdown format using exactly these sections:
+
+## Financial Summary
+Brief overview of overall financial health.
+
+## Key Insights
+- Bullet points highlighting notable observations
+
+## Risks
+- Bullet points identifying financial risks
+
+## Recommendations
+1. Numbered list of specific actionable steps
+
+## Action Plan
+Step-by-step improvements with clear priorities
+
+Rules:
+- Use ## for main section headers
+- Use ### for subsection headers where needed
+- Add a blank line between paragraphs and sections
+- Use bullet points (- ) for lists
+- Bold important figures or key points using **text**
+- Use > blockquotes for critical warnings
+- Keep spacing clean and easy to read
     `;
 
     const result = await model.generateContent(prompt);
