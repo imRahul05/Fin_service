@@ -12,7 +12,7 @@ import {
   calculateNetWorth 
 } from "../utils/financialUtils";
 import { getFinancialAdvice } from "../services/AIService";
-import ReactMarkdown from 'react-markdown';
+import FinancialAnalysis from "../components/analytics/FinancialAnalysis";
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
@@ -401,19 +401,8 @@ function Dashboard() {
       </div>
 
       {/* AI Advice Section */}
-      <div className="mt-12 bg-white rounded-lg shadow">
-        <div className="px-5 py-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">AI Financial Advisor</h3>
-          {aiLoading ? (
-            <div className="flex justify-center items-center h-48">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-          ) : (
-            <div className="prose max-w-none p-4 bg-white rounded-lg">
-              <ReactMarkdown>{aiAdvice}</ReactMarkdown>
-            </div>
-          )}
-        </div>
+      <div className="mt-12">
+        <FinancialAnalysis analysis={aiAdvice} loading={aiLoading} />
       </div>
     </div>
   );
