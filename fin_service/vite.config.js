@@ -21,4 +21,32 @@ export default defineConfig({
       "@lib": path.resolve(__dirname, "../src/lib")
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // Group Firebase packages together
+            if (id.includes('firebase')) {
+              return 'vendor-firebase';
+            }
+            // Group Chart.js & react-chartjs-2 together
+            if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
+              return 'vendor-charts';
+            }
+            // Group @google/generative-ai
+            if (id.includes('@google/generative-ai')) {
+              return 'vendor-gemini';
+            }
+            // Group icons
+            if (id.includes('react-icons') || id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            // Group other node_modules into a general vendor chunk
+            return 'vendor-core';
+          }
+        }
+      }
+    }
+  }
 })
