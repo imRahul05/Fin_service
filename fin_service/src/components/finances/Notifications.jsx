@@ -1,7 +1,5 @@
-import React from 'react';
-
 export const SuccessAlert = ({ message }) => (
-  <div className="rounded-md bg-green-50 p-4 mb-6">
+  <div className="rounded-md bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 p-4 mb-6">
     <div className="flex">
       <div className="flex-shrink-0">
         <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -9,14 +7,14 @@ export const SuccessAlert = ({ message }) => (
         </svg>
       </div>
       <div className="ml-3">
-        <p className="text-sm font-medium text-green-800">{message}</p>
+        <p className="text-sm font-medium text-green-800 dark:text-green-300">{message}</p>
       </div>
     </div>
   </div>
 );
 
 export const ErrorAlert = ({ message }) => (
-  <div className="rounded-md bg-red-50 p-4 mb-6">
+  <div className="rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 p-4 mb-6">
     <div className="flex">
       <div className="flex-shrink-0">
         <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -24,7 +22,7 @@ export const ErrorAlert = ({ message }) => (
         </svg>
       </div>
       <div className="ml-3">
-        <p className="text-sm font-medium text-red-800">{message}</p>
+        <p className="text-sm font-medium text-red-800 dark:text-red-300">{message}</p>
       </div>
     </div>
   </div>

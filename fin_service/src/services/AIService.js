@@ -1,14 +1,38 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateAIResponse } from "../config/ai.config.js";
+import { GEMINI_MODELS } from "../constants/ai.constants.js";
+import {
+  getAiCache,
+  setAiCache,
+  computeFinancialDataHash,
+  computeScenarioHash,
+  computeSpendingHash,
+  computeBackwardHash,
+  computeQuestionHash
+} from "../utils/aiCache.js";
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+/**
+ * Generates personalized financial advice based on user financial profile.
+ * Automatically checks and stores in client cache to prevent redundant Gemini API calls.
+ * 
+ * @param {Object} financialData - Financial information (income, expenses, investments, loans, goals).
+ * @param {Object} [options={}] - Options object.
+ * @param {string} [options.userId] - Current authenticated user ID for scoped caching.
+ * @param {boolean} [options.forceRefresh=false] - If true, bypasses cache and forces a new Gemini API request.
+ * @returns {Promise<string>} Markdown formatted advice.
+ */
+export async function getFinancialAdvice(financialData, options = {}) {
+  const { userId = "guest", forceRefresh = false } = options;
+  const dataHash = computeFinancialDataHash(financialData);
 
-// Initialize the Gemini API
-const genAI = new GoogleGenerativeAI(API_KEY);
+  // Check cache if not forcing refresh
+  if (!forceRefresh) {
+    const cachedResult = getAiCache(userId, "personal_advice", dataHash);
+    if (cachedResult) {
+      return cachedResult;
+    }
+  }
 
-export async function getFinancialAdvice(financialData) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite-preview-09-2025" });
-    
     const prompt = `
       As a financial advisor, provide personalized advice based on the following financial information:
       
@@ -47,19 +71,48 @@ Rules:
 - Keep spacing clean and easy to read
     `;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text();
+    const advice = await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are an expert financial advisor specializing in personal finance, investments, and budgeting for individuals in India.",
+    });
+
+    if (advice && typeof advice === "string" && !advice.startsWith("Sorry, I couldn't")) {
+      setAiCache(userId, "personal_advice", dataHash, advice, {
+        category: "personal_advice",
+        generatedAt: new Date().toISOString()
+      });
+    }
+
+    return advice;
   } catch (error) {
     console.error("Error getting AI financial advice:", error);
     return "Sorry, I couldn't generate financial advice at this moment. Please try again later.";
   }
 }
 
-export async function simulateScenario(currentData, scenarioParams) {
+/**
+ * Simulates a "What-If" financial scenario with caching.
+ * 
+ * @param {Object} currentData - Current financial data.
+ * @param {Object} scenarioParams - Scenario parameters to simulate.
+ * @param {Object} [options={}] - Options object.
+ * @param {string} [options.userId] - Current authenticated user ID.
+ * @param {boolean} [options.forceRefresh=false] - Force regenerate.
+ * @returns {Promise<string>} Markdown formatted simulation report.
+ */
+export async function simulateScenario(currentData, scenarioParams, options = {}) {
+  const { userId = "guest", forceRefresh = false } = options;
+  const dataHash = computeScenarioHash(currentData, scenarioParams);
+
+  if (!forceRefresh) {
+    const cachedResult = getAiCache(userId, "scenario", dataHash);
+    if (cachedResult) {
+      return cachedResult;
+    }
+  }
+
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite-preview-09-2025" });
-    
     const prompt = `
       As a financial simulator, analyze this "What If" scenario:
       
@@ -88,19 +141,48 @@ export async function simulateScenario(currentData, scenarioParams) {
       Focus on realistic outcomes relevant to the Indian financial context.
     `;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text();
+    const simulation = await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are a specialized financial projection and scenario planning expert.",
+    });
+
+    if (simulation && typeof simulation === "string" && !simulation.startsWith("Sorry, I couldn't")) {
+      setAiCache(userId, "scenario", dataHash, simulation, {
+        category: "scenario",
+        generatedAt: new Date().toISOString()
+      });
+    }
+
+    return simulation;
   } catch (error) {
     console.error("Error simulating financial scenario:", error);
     return "Sorry, I couldn't simulate this scenario at this moment. Please try again later.";
   }
 }
 
-export async function analyzeSpendingBehavior(transactions) {
+/**
+ * Analyzes transaction logs and spending behavior with caching.
+ * 
+ * @param {Array} transactions - User transaction logs.
+ * @param {Object} [options={}] - Options object.
+ * @param {string} [options.userId] - Current authenticated user ID.
+ * @param {string} [options.timeRange=""] - Selected time period filter.
+ * @param {boolean} [options.forceRefresh=false] - Force regenerate.
+ * @returns {Promise<string>} Markdown formatted spending breakdown.
+ */
+export async function analyzeSpendingBehavior(transactions, options = {}) {
+  const { userId = "guest", timeRange = "", forceRefresh = false } = options;
+  const dataHash = computeSpendingHash(transactions, timeRange);
+
+  if (!forceRefresh) {
+    const cachedResult = getAiCache(userId, "spending", dataHash);
+    if (cachedResult) {
+      return cachedResult;
+    }
+  }
+
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite-preview-09-2025" });
-    
     const prompt = `
       As a spending behavior analyst, review these transactions:
       
@@ -125,19 +207,47 @@ export async function analyzeSpendingBehavior(transactions) {
       Consider Indian context and local spending categories like UPI, e-commerce, etc.
     `;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text();
+    const analysis = await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are an expert expense and cash-flow analyst.",
+    });
+
+    if (analysis && typeof analysis === "string" && !analysis.startsWith("Sorry, I couldn't")) {
+      setAiCache(userId, "spending", dataHash, analysis, {
+        category: "spending",
+        generatedAt: new Date().toISOString()
+      });
+    }
+
+    return analysis;
   } catch (error) {
     console.error("Error analyzing spending behavior:", error);
     return "Sorry, I couldn't analyze your spending behavior at this moment. Please try again later.";
   }
 }
 
-export async function getBackwardAnalysis(historicalDecisions) {
+/**
+ * Analyzes historical financial decisions and produces retrospective insights with caching.
+ * 
+ * @param {Array} historicalDecisions - Past financial actions and outcomes.
+ * @param {Object} [options={}] - Options object.
+ * @param {string} [options.userId] - Current authenticated user ID.
+ * @param {boolean} [options.forceRefresh=false] - Force regenerate.
+ * @returns {Promise<string>} Markdown formatted retrospective report.
+ */
+export async function getBackwardAnalysis(historicalDecisions, options = {}) {
+  const { userId = "guest", forceRefresh = false } = options;
+  const dataHash = computeBackwardHash(historicalDecisions);
+
+  if (!forceRefresh) {
+    const cachedResult = getAiCache(userId, "backward_analysis", dataHash);
+    if (cachedResult) {
+      return cachedResult;
+    }
+  }
+
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite-preview-09-2025" });
-    
     const prompt = `
       As a financial analyst, review these past financial decisions:
       
@@ -162,11 +272,101 @@ export async function getBackwardAnalysis(historicalDecisions) {
       Focus on Indian financial context, including Nifty/Sensex performance, real estate trends, FD rates, etc.
     `;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text();
+    const analysis = await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are a quantitative financial analyst performing retrospective decision audits.",
+    });
+
+    if (analysis && typeof analysis === "string" && !analysis.startsWith("Sorry, I couldn't")) {
+      setAiCache(userId, "backward_analysis", dataHash, analysis, {
+        category: "backward_analysis",
+        generatedAt: new Date().toISOString()
+      });
+    }
+
+    return analysis;
   } catch (error) {
     console.error("Error getting backward analysis:", error);
     return "Sorry, I couldn't analyze these past decisions at this moment. Please try again later.";
+  }
+}
+
+/**
+ * Answers a custom user financial question with context from their financial profile with caching.
+ * 
+ * @param {string} customPrompt - Question entered by the user.
+ * @param {Object} finances - User's financial profile data.
+ * @param {Object} [options={}] - Options object.
+ * @param {string} [options.userId] - Current authenticated user ID.
+ * @param {boolean} [options.forceRefresh=false] - Force regenerate.
+ * @returns {Promise<string>} Markdown formatted answer.
+ */
+export async function askFinancialQuestion(customPrompt, finances = {}, options = {}) {
+  const { userId = "guest", forceRefresh = false } = options;
+  const dataHash = computeQuestionHash(customPrompt, finances);
+
+  if (!forceRefresh) {
+    const cachedResult = getAiCache(userId, "custom_question", dataHash);
+    if (cachedResult) {
+      return cachedResult;
+    }
+  }
+
+  try {
+    const totalIncome = finances?.income
+      ? Object.values(finances.income).reduce((sum, val) => sum + parseFloat(val || 0), 0)
+      : 0;
+
+    const totalFixed = finances?.fixedExpenses
+      ? Object.values(finances.fixedExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0)
+      : 0;
+
+    const totalVariable = finances?.variableExpenses
+      ? Object.values(finances.variableExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0)
+      : 0;
+
+    const prompt = `
+      As a financial advisor, answer the following question from a user with this financial profile:
+      
+      Monthly Income: ₹${totalIncome}
+      Fixed Expenses: ₹${totalFixed}
+      Variable Expenses: ₹${totalVariable}
+      Investments: ${JSON.stringify(finances?.investments || {})}
+      Loans: ${JSON.stringify(finances?.loans || {})}
+      
+      User's question: "${customPrompt}"
+      
+      Provide a detailed, helpful response focused on Indian financial context.
+      
+      Format your response in clear sections with:
+      - Use ## for main section headers
+      - Use ### for subsection headers
+      - Add blank lines between paragraphs and sections
+      - Use bullet points (- ) for listing items
+      - Bold important figures or key points using **text**
+      - Use tables for numeric data if applicable
+      - Highlight critical advice using > for blockquotes
+      
+      Make the layout spacious and easy to read with clear visual separation between sections.
+    `;
+
+    const answer = await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are a knowledgeable, friendly financial advisor providing clear and practical advice.",
+    });
+
+    if (answer && typeof answer === "string" && !answer.startsWith("Sorry, I couldn't")) {
+      setAiCache(userId, "custom_question", dataHash, answer, {
+        category: "custom_question",
+        generatedAt: new Date().toISOString()
+      });
+    }
+
+    return answer;
+  } catch (error) {
+    console.error("Error processing custom prompt:", error);
+    return "Sorry, I couldn't process your question at this moment. Please try again later.";
   }
 }

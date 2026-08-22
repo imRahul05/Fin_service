@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { useState } from 'react';
+import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -57,8 +57,8 @@ const LoansForm = ({
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
-    } catch (error) {
-      console.error("Error saving financial data:", error);
+    } catch (err) {
+      console.error("Error saving financial data:", err);
       setError("Failed to save your financial data. Please try again.");
     } finally {
       setSaving(false);
@@ -67,11 +67,11 @@ const LoansForm = ({
 
   return (
     <div className="px-4 py-5 sm:p-6">
-      <h3 className="text-lg leading-6 font-medium text-gray-900">Monthly Loan Repayments</h3>
-      <p className="mt-1 text-sm text-gray-500">Enter your monthly EMIs and other debt payments</p>
+      <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">Monthly Loan Repayments</h3>
+      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter your monthly EMIs and other debt payments</p>
       
       {error && (
-        <div className="mt-4 rounded-md bg-red-50 p-4">
+        <div className="mt-4 rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -79,14 +79,14 @@ const LoansForm = ({
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-red-800">{error}</p>
+              <p className="text-sm font-medium text-red-800 dark:text-red-300">{error}</p>
             </div>
           </div>
         </div>
       )}
       
       {success && (
-        <div className="mt-4 rounded-md bg-green-50 p-4">
+        <div className="mt-4 rounded-md bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -94,7 +94,7 @@ const LoansForm = ({
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-green-800">All financial data saved successfully! Redirecting to dashboard...</p>
+              <p className="text-sm font-medium text-green-800 dark:text-green-300">All financial data saved successfully! Redirecting to dashboard...</p>
             </div>
           </div>
         </div>
@@ -109,13 +109,15 @@ const LoansForm = ({
         <InputField label="Other Loan Payments" name="other" value={loans.other} onChange={handleLoansChange} />
       </div>
       
-      <div className="mt-6 flex justify-between items-center border-t border-gray-200 pt-4">
-        <p className="text-sm font-medium text-gray-900">Total Monthly Loan Payments: <span className="font-bold">{formatCurrency(totalLoans)}</span></p>
+      <div className="mt-6 flex justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-4">
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
+          Total Monthly Loan Payments: <span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(totalLoans)}</span>
+        </p>
         <div className="flex space-x-3">
           <button
             type="button"
             onClick={() => setActiveTab("investments")}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Previous
           </button>
@@ -123,7 +125,7 @@ const LoansForm = ({
             type="button"
             onClick={handleSubmit}
             disabled={saving || parentSaving}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save and Continue'}
           </button>

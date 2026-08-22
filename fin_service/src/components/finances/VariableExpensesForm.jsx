@@ -1,12 +1,11 @@
-import React from 'react';
 import InputField from './InputField';
 import { formatCurrency } from '../../utils/financialUtils';
 
 const VariableExpensesForm = ({ variableExpenses, handleVariableExpensesChange, totalVariableExpenses, setActiveTab }) => {
   return (
     <div className="px-4 py-5 sm:p-6">
-      <h3 className="text-lg leading-6 font-medium text-gray-900">Monthly Variable Expenses</h3>
-      <p className="mt-1 text-sm text-gray-500">Enter your average monthly spending in each category</p>
+      <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">Monthly Variable Expenses</h3>
+      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter your average monthly spending in each category</p>
       
       <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
         <InputField label="Groceries" name="groceries" value={variableExpenses.groceries} onChange={handleVariableExpensesChange} />
@@ -19,13 +18,15 @@ const VariableExpensesForm = ({ variableExpenses, handleVariableExpensesChange, 
         <InputField label="Other Variable Expenses" name="other" value={variableExpenses.other} onChange={handleVariableExpensesChange} />
       </div>
       
-      <div className="mt-6 flex justify-between items-center border-t border-gray-200 pt-4">
-        <p className="text-sm font-medium text-gray-900">Total Variable Expenses: <span className="font-bold">{formatCurrency(totalVariableExpenses)}</span></p>
+      <div className="mt-6 flex justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-4">
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
+          Total Variable Expenses: <span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(totalVariableExpenses)}</span>
+        </p>
         <div className="flex space-x-3">
           <button
             type="button"
             onClick={() => setActiveTab("fixed-expenses")}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Previous
           </button>

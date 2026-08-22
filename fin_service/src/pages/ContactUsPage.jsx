@@ -5,11 +5,11 @@ import emailjs from '@emailjs/browser';
 
 function ContactUsPage() {
   const { currentUser } = useAuth();
-  const formRef = useRef();
-  const nameRef = useRef();
-  const emailRef = useRef();
-  const subjectRef = useRef();
-  const messageRef = useRef();
+  const formRef = useRef(null);
+  const nameRef = useRef(null);
+  const emailRef = useRef(null);
+  const subjectRef = useRef(null);
+  const messageRef = useRef(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({
@@ -17,8 +17,6 @@ function ContactUsPage() {
     error: false,
     message: "",
   });
-  
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,20 +25,18 @@ function ContactUsPage() {
     setSubmitStatus({ success: false, error: false, message: "" });
     
     try {
-      // Prepare template parameters for EmailJS
       const templateParams = {
-        from_name: nameRef.current.value,
-        reply_to: emailRef.current.value,
-        subject: subjectRef.current.value,
-        message: messageRef.current.value,
-        to_email: `rahulkumar20000516@gmail.com, ${emailRef.current.value}`,
-        user_email: emailRef.current.value
+        from_name: nameRef.current?.value,
+        reply_to: emailRef.current?.value,
+        subject: subjectRef.current?.value,
+        message: messageRef.current?.value,
+        to_email: `rahulkumar20000516@gmail.com, ${emailRef.current?.value}`,
+        user_email: emailRef.current?.value
       };
-    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-    const publicID = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicID = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
       
-      // Send email using EmailJS
       const result = await emailjs.send(
         serviceId, 
         templateId, 
@@ -50,10 +46,8 @@ function ContactUsPage() {
       
       console.log('Email sent successfully:', result.text);
       
-      // Reset form
       e.target.reset();
       
-      // Show success message
       setSubmitStatus({
         success: true,
         error: false,
@@ -72,15 +66,15 @@ function ContactUsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Header section with gradient background */}
-      <div className="relative py-12 bg-gradient-to-b from-blue-800 to-blue-600">
+      <div className="relative py-12 bg-gradient-to-b from-blue-800 to-blue-600 dark:from-gray-950 dark:via-blue-950 dark:to-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-extrabold text-white tracking-tight sm:text-5xl">
               Contact Us
             </h1>
-            <p className="mt-4 text-xl text-blue-100 max-w-2xl mx-auto">
+            <p className="mt-4 text-xl text-blue-100 dark:text-blue-200 max-w-2xl mx-auto">
               Have questions about FinSage AI? We're here to help!
             </p>
           </div>
@@ -88,10 +82,10 @@ function ContactUsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors">
           <div className="lg:grid lg:grid-cols-2">
             {/* Contact information column */}
-            <div className="py-10 px-6 sm:px-10 lg:col-span-1 xl:p-12 bg-gradient-to-br from-blue-700 to-blue-900">
+            <div className="py-10 px-6 sm:px-10 lg:col-span-1 xl:p-12 bg-gradient-to-br from-blue-700 to-blue-900 dark:from-blue-950 dark:to-gray-900">
               <div className="mt-6">
                 <h3 className="text-lg font-medium text-white">Contact Information</h3>
                 <dl className="mt-8 space-y-6">
@@ -131,23 +125,23 @@ function ContactUsPage() {
             </div>
             
             {/* Contact form column */}
-            <div className="py-10 px-6 sm:px-10 lg:col-span-1 xl:p-12">
-              <h3 className="text-lg font-medium text-gray-900">Send us a message</h3>
+            <div className="py-10 px-6 sm:px-10 lg:col-span-1 xl:p-12 bg-white dark:bg-gray-800 transition-colors">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Send us a message</h3>
               {submitStatus.success && (
-                <div className="mt-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
+                <div className="mt-6 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 px-4 py-3 rounded-md text-sm">
                   {submitStatus.message}
                 </div>
               )}
               
               {submitStatus.error && (
-                <div className="mt-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+                <div className="mt-6 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-md text-sm">
                   {submitStatus.message}
                 </div>
               )}
               
               <form ref={formRef} onSubmit={handleSubmit} className="mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
                 <div className="sm:col-span-2">
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
                   <div className="mt-1">
                     <input
                       type="text"
@@ -156,12 +150,12 @@ function ContactUsPage() {
                       ref={nameRef}
                       autoComplete="name"
                       required
-                      className="py-3 px-4 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 border-gray-300 rounded-md"
+                      className="py-3 px-4 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md transition-colors"
                     />
                   </div>
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                   <div className="mt-1">
                     <input
                       id="email"
@@ -171,12 +165,12 @@ function ContactUsPage() {
                       autoComplete="email"
                       defaultValue={currentUser ? currentUser.email : ""}
                       required
-                      className="py-3 px-4 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 border-gray-300 rounded-md"
+                      className="py-3 px-4 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md transition-colors"
                     />
                   </div>
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700">Subject</label>
+                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
                   <div className="mt-1">
                     <input
                       type="text"
@@ -184,20 +178,20 @@ function ContactUsPage() {
                       id="subject"
                       ref={subjectRef}
                       required
-                      className="py-3 px-4 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 border-gray-300 rounded-md"
+                      className="py-3 px-4 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md transition-colors"
                     />
                   </div>
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message</label>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Message</label>
                   <div className="mt-1">
                     <textarea
                       id="message"
                       name="message"
                       ref={messageRef}
-                      rows="6"
+                      rows={6}
                       required
-                      className="py-3 px-4 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 border-gray-300 rounded-md"
+                      className="py-3 px-4 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md transition-colors"
                     ></textarea>
                   </div>
                 </div>
@@ -205,7 +199,7 @@ function ContactUsPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70"
+                    className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 transition-colors"
                   >
                     {isSubmitting ? (
                       <>
@@ -222,39 +216,6 @@ function ContactUsPage() {
             </div>
           </div>
         </div>
-        
-        {/* FAQ Section
-        <div className="mt-16">
-          <h2 className="text-2xl font-extrabold text-gray-900 text-center">Frequently Asked Questions</h2>
-          <div className="mt-6 max-w-3xl mx-auto">
-            <dl className="space-y-6 divide-y divide-gray-200">
-              <div className="pt-6">
-                <dt className="text-lg font-medium text-gray-900">How secure is my financial data?</dt>
-                <dd className="mt-2 text-base text-gray-500">
-                  Your data is encrypted both in transit and at rest. We use industry-standard security practices and regularly audit our systems to ensure your financial information remains protected.
-                </dd>
-              </div>
-              <div className="pt-6">
-                <dt className="text-lg font-medium text-gray-900">Can I export my financial data?</dt>
-                <dd className="mt-2 text-base text-gray-500">
-                  Yes, you can export your financial data in CSV format from your account settings at any time. You always maintain ownership of your data.
-                </dd>
-              </div>
-              <div className="pt-6">
-                <dt className="text-lg font-medium text-gray-900">Is FinSage AI available as a mobile app?</dt>
-                <dd className="mt-2 text-base text-gray-500">
-                  Currently, FinSage AI is a web application optimized for both desktop and mobile browsers. We're working on native mobile apps that will be available soon!
-                </dd>
-              </div>
-              <div className="pt-6">
-                <dt className="text-lg font-medium text-gray-900">How do I cancel my subscription?</dt>
-                <dd className="mt-2 text-base text-gray-500">
-                  You can cancel your subscription at any time from the billing section in your profile settings. There are no cancellation fees.
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </div> */}
       </div>
       
       <Footer />

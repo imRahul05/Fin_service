@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import { 
   Card, 
   CardContent, 
@@ -18,13 +19,14 @@ import { useToast } from "../hooks/use-toast";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { 
-  FiUser, FiSettings, FiLock, FiEdit, FiCamera, FiSave, 
+  FiUser, FiCamera, FiSave, FiEdit,
   FiRefreshCw, FiCreditCard, FiTrello, FiTarget, FiClipboard, 
-  FiMail, FiShield, FiDollarSign 
+  FiMail, FiShield, FiDollarSign, FiSun, FiMoon, FiMonitor
 } from "react-icons/fi";
 
 export default function Profile() {
   const { currentUser, updateUserProfile, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [photoURL, setPhotoURL] = useState(currentUser?.photoURL || "");
@@ -38,7 +40,7 @@ export default function Profile() {
     savingsTarget: 1000,
   });
   
-  const fileInputRef = useRef();
+  const fileInputRef = useRef(null);
   const { toast } = useToast();
   const db = getFirestore();
   const storage = getStorage();
@@ -52,7 +54,7 @@ export default function Profile() {
         if (docSnap.exists()) {
           const data = docSnap.data();
           setTwoFactorEnabled(data.twoFactorEnabled || false);
-          setEmailNotifications(data.emailNotifications || true);
+          setEmailNotifications(data.emailNotifications ?? true);
           if (data.financialPreferences) {
             setFinancialPreferences(data.financialPreferences);
           }
@@ -99,10 +101,8 @@ export default function Profile() {
     try {
       setLoading(true);
       
-      // Update profile in Firebase Authentication
       await updateUserProfile(displayName, photoURL);
       
-      // Save preferences to Firestore
       await setDoc(doc(db, "userPreferences", currentUser.uid), {
         twoFactorEnabled,
         emailNotifications,
@@ -129,8 +129,7 @@ export default function Profile() {
   const handleLogout = async () => {
     try {
       await logout();
-      // Redirection will be handled by ProtectedRoute
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to log out.",
@@ -163,16 +162,16 @@ export default function Profile() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-violet-600 text-transparent bg-clip-text">Profile Settings</h1>
-        <p className="text-muted-foreground">Manage your account settings and preferences</p>
+        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 text-transparent bg-clip-text">Profile Settings</h1>
+        <p className="text-gray-500 dark:text-gray-400">Manage your account settings, preferences, and security</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Profile Summary Card */}
-        <Card className="md:col-span-1 border-t-4 border-t-blue-500 shadow-md hover:shadow-lg transition-shadow">
+        <Card className="md:col-span-1 border-t-4 border-t-blue-500 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
           <CardHeader className="flex flex-col items-center text-center">
             <div className="relative mb-4 group">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/10 bg-gradient-to-br from-blue-50 to-indigo-50">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500/20 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700">
                 {photoURL ? (
                   <img 
                     src={photoURL} 
@@ -180,13 +179,14 @@ export default function Profile() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-primary/5">
-                    <FiUser className="w-16 h-16 text-primary/40" />
+                  <div className="w-full h-full flex items-center justify-center bg-blue-50 dark:bg-gray-700">
+                    <FiUser className="w-16 h-16 text-blue-500/60 dark:text-blue-400" />
                   </div>
                 )}
               </div>
               <button 
-                onClick={() => fileInputRef.current.click()}
+                type="button"
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
                 className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                 disabled={loading || !editMode}
               >
@@ -201,11 +201,11 @@ export default function Profile() {
                 disabled={loading || !editMode}
               />
             </div>
-            <CardTitle className="text-xl font-bold">{displayName || "User"}</CardTitle>
-            <CardDescription className="flex items-center justify-center gap-2">
-              <FiMail className="text-blue-500" /> {email}
+            <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">{displayName || "User"}</CardTitle>
+            <CardDescription className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400">
+              <FiMail className="text-blue-500 dark:text-blue-400" /> {email}
             </CardDescription>
-            <Badge variant="outline" className="mt-2 bg-blue-50 text-blue-700 border-blue-200">
+            <Badge variant="outline" className="mt-2 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
               {financialPreferences.riskTolerance === "conservative" && "Conservative Investor"}
               {financialPreferences.riskTolerance === "moderate" && "Balanced Investor"}
               {financialPreferences.riskTolerance === "aggressive" && "Growth Investor"}
@@ -215,7 +215,7 @@ export default function Profile() {
             <div className="grid grid-cols-2 gap-2 mb-4">
               <Button 
                 variant={editMode ? "secondary" : "outline"} 
-                className="w-full"
+                className="w-full border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200"
                 onClick={() => setEditMode(!editMode)}
               >
                 {editMode ? (
@@ -243,7 +243,7 @@ export default function Profile() {
                 )}
               </Button>
             </div>
-            <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
+            <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
               <p className="flex items-center justify-center gap-2 mb-1">
                 <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
                 Member since: {currentUser?.metadata?.creationTime ? new Date(currentUser.metadata.creationTime).toLocaleDateString() : "Unknown"}
@@ -257,12 +257,12 @@ export default function Profile() {
         </Card>
         
         {/* Profile Details Card */}
-        <Card className="md:col-span-2 border-t-4 border-t-indigo-500 shadow-md hover:shadow-lg transition-shadow">
+        <Card className="md:col-span-2 border-t-4 border-t-indigo-500 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
           <CardHeader className="pb-3">
             <Tabs defaultValue="personal" className="w-full">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-xl font-bold mb-1">Your Profile</CardTitle>
-                <TabsList className="grid w-full max-w-md grid-cols-3 mb-2">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Your Profile</CardTitle>
+                <TabsList className="grid w-full sm:max-w-md grid-cols-3 bg-gray-100 dark:bg-gray-700/60 p-1 border border-gray-200 dark:border-gray-700">
                   <TabsTrigger value="personal" className="text-xs sm:text-sm">
                     <FiUser className="mr-1 hidden sm:inline" /> Personal
                   </TabsTrigger>
@@ -270,23 +270,27 @@ export default function Profile() {
                     <FiDollarSign className="mr-1 hidden sm:inline" /> Financial
                   </TabsTrigger>
                   <TabsTrigger value="security" className="text-xs sm:text-sm">
-                    <FiShield className="mr-1 hidden sm:inline" /> Security
+                    <FiShield className="mr-1 hidden sm:inline" /> Settings
                   </TabsTrigger>
                 </TabsList>
               </div>
               
               <TabsContent value="personal" className="pt-4">
-                <CardDescription className="mb-4">Update your personal details</CardDescription>
+                <CardDescription className="mb-4 text-gray-500 dark:text-gray-400">Update your personal details</CardDescription>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="displayName" className="flex items-center gap-2">
+                    <Label htmlFor="displayName" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                       <FiUser className="text-blue-500" /> Display Name
                     </Label>
                     <div className="relative">
                       <input
                         id="displayName"
                         type="text"
-                        className={`w-full p-2 rounded-md border ${editMode ? 'bg-background focus:ring-2 focus:ring-blue-500 focus:border-blue-500' : 'bg-muted'}`}
+                        className={`w-full p-2.5 rounded-md border text-sm transition-colors ${
+                          editMode 
+                            ? 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500' 
+                            : 'bg-gray-100 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                        }`}
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
                         disabled={!editMode || loading}
@@ -294,13 +298,13 @@ export default function Profile() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2">
+                    <Label htmlFor="email" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                       <FiMail className="text-blue-500" /> Email
                     </Label>
                     <input
                       id="email"
                       type="email"
-                      className="w-full p-2 rounded-md border bg-muted"
+                      className="w-full p-2.5 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 text-sm cursor-not-allowed"
                       value={email}
                       disabled={true}
                     />
@@ -309,16 +313,20 @@ export default function Profile() {
               </TabsContent>
               
               <TabsContent value="financial" className="pt-4">
-                <CardDescription className="mb-4">Set your financial preferences</CardDescription>
+                <CardDescription className="mb-4 text-gray-500 dark:text-gray-400">Set your financial preferences</CardDescription>
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="riskTolerance" className="flex items-center gap-2">
+                      <Label htmlFor="riskTolerance" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                         <FiTarget className="text-indigo-500" /> Risk Tolerance
                       </Label>
                       <select
                         id="riskTolerance"
-                        className={`w-full p-2 rounded-md border ${editMode ? 'bg-background focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500' : 'bg-muted'}`}
+                        className={`w-full p-2.5 rounded-md border text-sm transition-colors ${
+                          editMode 
+                            ? 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500' 
+                            : 'bg-gray-100 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                        }`}
                         value={financialPreferences.riskTolerance}
                         onChange={handleRiskToleranceChange}
                         disabled={!editMode || loading}
@@ -329,12 +337,16 @@ export default function Profile() {
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="investmentGoals" className="flex items-center gap-2">
+                      <Label htmlFor="investmentGoals" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                         <FiTrello className="text-indigo-500" /> Investment Goals
                       </Label>
                       <select
                         id="investmentGoals"
-                        className={`w-full p-2 rounded-md border ${editMode ? 'bg-background focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500' : 'bg-muted'}`}
+                        className={`w-full p-2.5 rounded-md border text-sm transition-colors ${
+                          editMode 
+                            ? 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500' 
+                            : 'bg-gray-100 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                        }`}
                         value={financialPreferences.investmentGoals}
                         onChange={handleInvestmentGoalsChange}
                         disabled={!editMode || loading}
@@ -347,51 +359,101 @@ export default function Profile() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="savingsTarget" className="flex items-center gap-2">
+                    <Label htmlFor="savingsTarget" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                       <FiCreditCard className="text-indigo-500" /> Monthly Savings Target (₹)
                     </Label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500">₹</span>
+                        <span className="text-gray-500 dark:text-gray-400">₹</span>
                       </div>
                       <input
                         id="savingsTarget"
                         type="number"
-                        className={`w-full pl-8 p-2 rounded-md border ${editMode ? 'bg-background focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500' : 'bg-muted'}`}
+                        className={`w-full pl-8 p-2.5 rounded-md border text-sm transition-colors ${
+                          editMode 
+                            ? 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500' 
+                            : 'bg-gray-100 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                        }`}
                         value={financialPreferences.savingsTarget}
                         onChange={handleSavingsTargetChange}
                         disabled={!editMode || loading}
                         min="0"
                       />
                     </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Your annual savings goal: <span className="font-semibold text-indigo-600">₹{(financialPreferences.savingsTarget * 12).toLocaleString('en-IN')}</span>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Your annual savings goal: <span className="font-semibold text-indigo-600 dark:text-indigo-400">₹{(financialPreferences.savingsTarget * 12).toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                 </div>
               </TabsContent>
               
               <TabsContent value="security" className="pt-4">
-                <CardDescription className="mb-4">Manage your security settings</CardDescription>
+                <CardDescription className="mb-4 text-gray-500 dark:text-gray-400">Manage security and application appearance</CardDescription>
                 <div className="space-y-6">
-                  <div className="bg-blue-50 rounded-md p-4 mb-6">
-                    <h4 className="font-medium text-blue-700 mb-1 flex items-center gap-2">
-                      <FiClipboard className="text-blue-600" /> Security Status
+                  {/* Theme Selector Section */}
+                  <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <Label className="block font-medium text-gray-900 dark:text-white mb-2">
+                      Appearance Theme
+                    </Label>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                      Choose your preferred interface theme
+                    </p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setTheme("light")}
+                        className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-sm font-medium transition-all ${
+                          theme === "light"
+                            ? "bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-600 dark:text-blue-400 shadow-sm"
+                            : "bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        <FiSun className="w-4 h-4 text-amber-500" /> Light
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTheme("dark")}
+                        className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-sm font-medium transition-all ${
+                          theme === "dark"
+                            ? "bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-600 dark:text-blue-400 shadow-sm"
+                            : "bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        <FiMoon className="w-4 h-4 text-blue-400" /> Dark
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTheme("system")}
+                        className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-sm font-medium transition-all ${
+                          theme === "system"
+                            ? "bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-600 dark:text-blue-400 shadow-sm"
+                            : "bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        <FiMonitor className="w-4 h-4 text-gray-500 dark:text-gray-400" /> System
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 rounded-xl p-4">
+                    <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1 flex items-center gap-2">
+                      <FiClipboard className="text-blue-600 dark:text-blue-400" /> Security Status
                     </h4>
-                    <p className="text-sm text-blue-600">
+                    <p className="text-sm text-blue-600 dark:text-blue-300">
                       Your account has {twoFactorEnabled ? 'enhanced' : 'basic'} security. 
                       {!twoFactorEnabled && ' We recommend enabling two-factor authentication.'}
                     </p>
                   </div>
-                  <Separator />
+                  
+                  <Separator className="border-gray-200 dark:border-gray-700" />
                   
                   <div className="space-y-4 pt-2">
-                    <div className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm border">
+                    <div className="flex items-center justify-between bg-white dark:bg-gray-800 p-3.5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                       <div>
-                        <Label htmlFor="twoFactor" className="block font-medium flex items-center gap-2">
+                        <Label htmlFor="twoFactor" className="block font-medium text-gray-900 dark:text-white flex items-center gap-2">
                           <FiShield className="text-violet-500" /> Two-factor Authentication
                         </Label>
-                        <p className="text-sm text-muted-foreground">Add an extra layer of security to your account</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Add an extra layer of security to your account</p>
                       </div>
                       <Switch
                         id="twoFactor"
@@ -402,12 +464,12 @@ export default function Profile() {
                       />
                     </div>
                     
-                    <div className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm border">
+                    <div className="flex items-center justify-between bg-white dark:bg-gray-800 p-3.5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                       <div>
-                        <Label htmlFor="emailNotifications" className="block font-medium flex items-center gap-2">
+                        <Label htmlFor="emailNotifications" className="block font-medium text-gray-900 dark:text-white flex items-center gap-2">
                           <FiMail className="text-violet-500" /> Email Notifications
                         </Label>
-                        <p className="text-sm text-muted-foreground">Receive important financial updates and reports</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Receive important financial updates and reports</p>
                       </div>
                       <Switch
                         id="emailNotifications"
@@ -427,7 +489,7 @@ export default function Profile() {
               <Button
                 onClick={handleSaveProfile}
                 disabled={loading}
-                className="ml-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                className="ml-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
               >
                 {loading ? (
                   <>

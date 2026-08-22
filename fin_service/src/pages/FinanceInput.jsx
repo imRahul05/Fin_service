@@ -3,6 +3,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { clearAiCache } from "../utils/aiCache";
 
 // Import components
 import IncomeForm from "../components/finances/IncomeForm";
@@ -105,8 +106,8 @@ function FinanceInput() {
           if (data.investments) setInvestments(data.investments);
           if (data.loans) setLoans(data.loans);
         }
-      } catch (error) {
-        console.error("Error loading finances:", error);
+      } catch (err) {
+        console.error("Error loading finances:", err);
       } finally {
         setLoading(false);
       }
@@ -141,22 +142,23 @@ function FinanceInput() {
         finances: financesData
       });
       
+      // Invalidate existing cached personal advice so fresh advice is generated
+      clearAiCache(currentUser.uid, "personal_advice");
+
       setSuccess(true);
       setFormSubmitted(true);
       
-      // Navigate to dashboard after 2 seconds
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
-    } catch (error) {
-      console.error("Error saving finances:", error);
+    } catch (err) {
+      console.error("Error saving finances:", err);
       setError("Failed to save your financial data. Please try again.");
     } finally {
       setSaving(false);
     }
   };
   
-  // Handle numeric input changes for different financial categories
   const handleIncomeChange = (e) => {
     const { name, value } = e.target;
     setIncome(prev => ({
@@ -197,18 +199,14 @@ function FinanceInput() {
     }));
   };
   
-  // Calculate totals for each category
   const totalIncome = Object.values(income).reduce((sum, val) => sum + val, 0);
   const totalFixedExpenses = Object.values(fixedExpenses).reduce((sum, val) => sum + val, 0);
   const totalVariableExpenses = Object.values(variableExpenses).reduce((sum, val) => sum + val, 0);
   const totalInvestments = Object.values(investments).reduce((sum, val) => sum + val, 0);
   const totalLoans = Object.values(loans).reduce((sum, val) => sum + val, 0);
   const totalExpenses = totalFixedExpenses + totalVariableExpenses;
-  
-  // Calculate monthly savings
   const monthlySavings = totalIncome - totalExpenses;
   
-  // Calculate approximate income tax (simplified calculation)
   const calculateIncomeTax = (annualIncome) => {
     let tax = 0;
     let remainingIncome = annualIncome;
@@ -221,7 +219,7 @@ function FinanceInput() {
       remainingIncome -= taxableInThisBracket;
     }
     
-    return tax / 12; // Monthly tax amount
+    return tax / 12;
   };
   
   const annualSalary = income.salary * 12;
@@ -229,7 +227,6 @@ function FinanceInput() {
   const afterTaxIncome = totalIncome - monthlyTax;
   const afterTaxSavings = afterTaxIncome - totalExpenses;
   
-  // Calculate savings rate
   const savingsRate = totalIncome > 0 ? (monthlySavings / totalIncome) * 100 : 0;
   const afterTaxSavingsRate = afterTaxIncome > 0 ? (afterTaxSavings / afterTaxIncome) * 100 : 0;
   
@@ -245,10 +242,10 @@ function FinanceInput() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="md:flex md:items-center md:justify-between mb-8">
         <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          <h2 className="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:text-3xl sm:truncate">
             Financial Information
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Enter your financial details to get personalized insights and analysis
           </p>
         </div>
@@ -269,7 +266,7 @@ function FinanceInput() {
         afterTaxSavingsRate={afterTaxSavingsRate}
       />
 
-      <div className="bg-white shadow sm:rounded-lg mb-8">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40 rounded-xl mb-8 overflow-hidden transition-colors">
         <FormTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
         <form onSubmit={handleSubmit}>
@@ -316,7 +313,6 @@ function FinanceInput() {
               totalLoans={totalLoans}
               setActiveTab={setActiveTab}
               saving={saving}
-              // Pass all financial data to LoansForm
               income={income}
               fixedExpenses={fixedExpenses}
               variableExpenses={variableExpenses}
