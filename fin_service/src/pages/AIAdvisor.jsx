@@ -5,18 +5,16 @@ import { db } from "../firebase/config";
 import { 
   getFinancialAdvice, 
   simulateScenario, 
-  analyzeSpendingBehavior,
-  getBackwardAnalysis 
+  analyzeSpendingBehavior, 
+  getBackwardAnalysis,
+  askFinancialQuestion 
 } from "../services/AIService";
-import { formatCurrency } from "../utils/financialUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import ReactMarkdown from 'react-markdown';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 function AIAdvisor() {
   const { currentUser } = useAuth();
@@ -275,37 +273,8 @@ function AIAdvisor() {
     setAiResponse("");
     
     try {
-      const model = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY).getGenerativeModel({ model: "gemini-1.5-flash" });
-      
-      // Create a prompt that includes the user's question and their financial data
-      const prompt = `
-        As a financial advisor, answer the following question from a user with this financial profile:
-        
-        Monthly Income: ₹${finances.income ? Object.values(finances.income).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0}
-        Fixed Expenses: ₹${finances.fixedExpenses ? Object.values(finances.fixedExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0}
-        Variable Expenses: ₹${finances.variableExpenses ? Object.values(finances.variableExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0}
-        Investments: ${JSON.stringify(finances.investments || {})}
-        Loans: ${JSON.stringify(finances.loans || {})}
-        
-        User's question: "${customPrompt}"
-        
-        Provide a detailed, helpful response focused on Indian financial context.
-        
-        Format your response in clear sections with:
-        - Use ## for main section headers
-        - Use ### for subsection headers
-        - Add blank lines between paragraphs and sections
-        - Use bullet points (- ) for listing items
-        - Bold important figures or key points using **text**
-        - Use tables for numeric data if applicable
-        - Highlight critical advice using > for blockquotes
-        
-        Make the layout spacious and easy to read with clear visual separation between sections.
-      `;
-      
-      const result = await model.generateContent(prompt);
-      const response = result.response;
-      setAiResponse(response.text());
+      const response = await askFinancialQuestion(customPrompt, finances);
+      setAiResponse(response);
     } catch (error) {
       console.error("Error processing custom prompt:", error);
       setAiResponse("Sorry, I couldn't process your question at this moment. Please try again later.");

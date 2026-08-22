@@ -22,7 +22,7 @@ function Register() {
     try {
       setError("");
       setLoading(true);
-      const userCredential = await signup(emailRef.current.value, passwordRef.current.value);
+      await signup(emailRef.current.value, passwordRef.current.value);
       
       // Update the user's profile with display name
       await updateUserProfile(nameRef.current.value, "");

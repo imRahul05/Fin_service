@@ -130,7 +130,7 @@ export default function Profile() {
     try {
       await logout();
       // Redirection will be handled by ProtectedRoute
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to log out.",

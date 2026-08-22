@@ -36,7 +36,7 @@ function Navbar() {
     try {
       await logout();
       navigate("/login");
-    } catch (error) {
+    } catch {
       setError("Failed to log out");
     }
   };

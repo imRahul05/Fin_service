@@ -1,14 +1,14 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateAIResponse } from "../config/ai.config.js";
+import { GEMINI_MODELS } from "../constants/ai.constants.js";
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-
-// Initialize the Gemini API
-const genAI = new GoogleGenerativeAI(API_KEY);
-
+/**
+ * Generates personalized financial advice based on user financial profile.
+ * 
+ * @param {Object} financialData - Financial information (income, expenses, investments, loans, goals).
+ * @returns {Promise<string>} Markdown formatted advice.
+ */
 export async function getFinancialAdvice(financialData) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite-preview-09-2025" });
-    
     const prompt = `
       As a financial advisor, provide personalized advice based on the following financial information:
       
@@ -47,19 +47,26 @@ Rules:
 - Keep spacing clean and easy to read
     `;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text();
+    return await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are an expert financial advisor specializing in personal finance, investments, and budgeting for individuals in India.",
+    });
   } catch (error) {
     console.error("Error getting AI financial advice:", error);
     return "Sorry, I couldn't generate financial advice at this moment. Please try again later.";
   }
 }
 
+/**
+ * Simulates a "What-If" financial scenario.
+ * 
+ * @param {Object} currentData - Current financial data.
+ * @param {Object} scenarioParams - Scenario parameters to simulate.
+ * @returns {Promise<string>} Markdown formatted simulation report.
+ */
 export async function simulateScenario(currentData, scenarioParams) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite-preview-09-2025" });
-    
     const prompt = `
       As a financial simulator, analyze this "What If" scenario:
       
@@ -88,19 +95,25 @@ export async function simulateScenario(currentData, scenarioParams) {
       Focus on realistic outcomes relevant to the Indian financial context.
     `;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text();
+    return await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are a specialized financial projection and scenario planning expert.",
+    });
   } catch (error) {
     console.error("Error simulating financial scenario:", error);
     return "Sorry, I couldn't simulate this scenario at this moment. Please try again later.";
   }
 }
 
+/**
+ * Analyzes transaction logs and spending behavior.
+ * 
+ * @param {Array} transactions - User transaction logs.
+ * @returns {Promise<string>} Markdown formatted spending breakdown.
+ */
 export async function analyzeSpendingBehavior(transactions) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite-preview-09-2025" });
-    
     const prompt = `
       As a spending behavior analyst, review these transactions:
       
@@ -125,19 +138,25 @@ export async function analyzeSpendingBehavior(transactions) {
       Consider Indian context and local spending categories like UPI, e-commerce, etc.
     `;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text();
+    return await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are an expert expense and cash-flow analyst.",
+    });
   } catch (error) {
     console.error("Error analyzing spending behavior:", error);
     return "Sorry, I couldn't analyze your spending behavior at this moment. Please try again later.";
   }
 }
 
+/**
+ * Analyzes historical financial decisions and produces retrospective insights.
+ * 
+ * @param {Array} historicalDecisions - Past financial actions and outcomes.
+ * @returns {Promise<string>} Markdown formatted retrospective report.
+ */
 export async function getBackwardAnalysis(historicalDecisions) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite-preview-09-2025" });
-    
     const prompt = `
       As a financial analyst, review these past financial decisions:
       
@@ -162,11 +181,70 @@ export async function getBackwardAnalysis(historicalDecisions) {
       Focus on Indian financial context, including Nifty/Sensex performance, real estate trends, FD rates, etc.
     `;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text();
+    return await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are a quantitative financial analyst performing retrospective decision audits.",
+    });
   } catch (error) {
     console.error("Error getting backward analysis:", error);
     return "Sorry, I couldn't analyze these past decisions at this moment. Please try again later.";
+  }
+}
+
+/**
+ * Answers a custom user financial question with context from their financial profile.
+ * 
+ * @param {string} customPrompt - Question entered by the user.
+ * @param {Object} finances - User's financial profile data.
+ * @returns {Promise<string>} Markdown formatted answer.
+ */
+export async function askFinancialQuestion(customPrompt, finances = {}) {
+  try {
+    const totalIncome = finances?.income
+      ? Object.values(finances.income).reduce((sum, val) => sum + parseFloat(val || 0), 0)
+      : 0;
+
+    const totalFixed = finances?.fixedExpenses
+      ? Object.values(finances.fixedExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0)
+      : 0;
+
+    const totalVariable = finances?.variableExpenses
+      ? Object.values(finances.variableExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0)
+      : 0;
+
+    const prompt = `
+      As a financial advisor, answer the following question from a user with this financial profile:
+      
+      Monthly Income: ₹${totalIncome}
+      Fixed Expenses: ₹${totalFixed}
+      Variable Expenses: ₹${totalVariable}
+      Investments: ${JSON.stringify(finances?.investments || {})}
+      Loans: ${JSON.stringify(finances?.loans || {})}
+      
+      User's question: "${customPrompt}"
+      
+      Provide a detailed, helpful response focused on Indian financial context.
+      
+      Format your response in clear sections with:
+      - Use ## for main section headers
+      - Use ### for subsection headers
+      - Add blank lines between paragraphs and sections
+      - Use bullet points (- ) for listing items
+      - Bold important figures or key points using **text**
+      - Use tables for numeric data if applicable
+      - Highlight critical advice using > for blockquotes
+      
+      Make the layout spacious and easy to read with clear visual separation between sections.
+    `;
+
+    return await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are a knowledgeable, friendly financial advisor providing clear and practical advice.",
+    });
+  } catch (error) {
+    console.error("Error processing custom prompt:", error);
+    return "Sorry, I couldn't process your question at this moment. Please try again later.";
   }
 }

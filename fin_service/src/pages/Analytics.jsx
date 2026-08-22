@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { doc, getDoc, collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useAuth } from "../context/AuthContext";
 import { formatCurrency } from "../utils/financialUtils";
-import { analyzeSpendingBehavior } from "../services/AIService";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
 
@@ -14,13 +13,8 @@ function Analytics() {
   const { currentUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [finances, setFinances] = useState(null);
-  const [transactions, setTransactions] = useState([]);
   const [spendingAnalysis, setSpendingAnalysis] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
-  const [categoryTotals, setCategoryTotals] = useState({});
-  const [monthlySpending, setMonthlySpending] = useState([]);
-  const [paymentMethodBreakdown, setPaymentMethodBreakdown] = useState({});
-  const [timeRange, setTimeRange] = useState("month"); // "month", "quarter", or "year"
   const [financeAnalytics, setFinanceAnalytics] = useState({
     income: 0,
     expenses: 0,
@@ -118,6 +112,7 @@ function Analytics() {
         
         // Create a filter based on selected time range
         const now = new Date();
+        const timeRange = "month";
         let startDate;
         
         if (timeRange === "month") {
@@ -144,36 +139,6 @@ function Analytics() {
           transactionsData.push({ id: doc.id, ...doc.data() });
         });
         
-        setTransactions(transactionsData);
-        
-        // Process transactions to calculate category totals
-        const categories = {};
-        const methods = {};
-        const monthly = Array(12).fill(0);
-        
-        transactionsData.forEach(transaction => {
-          // Category totals
-          if (categories[transaction.category]) {
-            categories[transaction.category] += transaction.amount;
-          } else {
-            categories[transaction.category] = transaction.amount;
-          }
-          
-          // Payment method breakdown
-          if (methods[transaction.paymentMethod]) {
-            methods[transaction.paymentMethod] += transaction.amount;
-          } else {
-            methods[transaction.paymentMethod] = transaction.amount;
-          }
-          
-          // Monthly spending
-          const month = new Date(transaction.date).getMonth();
-          monthly[month] += transaction.amount;
-        });
-        
-        setCategoryTotals(categories);
-        setPaymentMethodBreakdown(methods);
-        setMonthlySpending(monthly);
       } catch (error) {
         console.error("Error loading user data:", error);
       } finally {
@@ -182,7 +147,7 @@ function Analytics() {
     }
     
     loadUserData();
-  }, [currentUser, timeRange]); // Add timeRange as dependency to reload data when it changes
+  }, [currentUser]);
 
   // Get AI spending analysis when transactions are loaded
   useEffect(() => {
@@ -294,8 +259,8 @@ function Analytics() {
       {
         label: 'Income Sources',
         data: Object.entries(financeAnalytics.incomeSources)
-          .filter(([source, amount]) => amount > 0)
-          .map(([source, amount]) => amount),
+          .filter(([, amount]) => amount > 0)
+          .map(([, amount]) => amount),
         backgroundColor: [
           'rgba(54, 162, 235, 0.6)',
           'rgba(75, 192, 192, 0.6)',
@@ -336,8 +301,8 @@ function Analytics() {
       {
         label: 'Expense Breakdown',
         data: Object.entries(financeAnalytics.expenseBreakdown)
-          .filter(([category, amount]) => amount > 0)
-          .map(([category, amount]) => amount),
+          .filter(([, amount]) => amount > 0)
+          .map(([, amount]) => amount),
         backgroundColor: [
           'rgba(255, 99, 132, 0.6)',
           'rgba(54, 162, 235, 0.6)',
@@ -353,7 +318,7 @@ function Analytics() {
     if (!finances || !finances.investments) return [];
     
     return Object.entries(finances.investments)
-      .filter(([type, amount]) => parseFloat(amount) > 0)
+      .filter(([, amount]) => parseFloat(amount) > 0)
       .map(([type, amount]) => ({
         type,
         amount: parseFloat(amount)

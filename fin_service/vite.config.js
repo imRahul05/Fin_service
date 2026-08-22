@@ -34,8 +34,8 @@ export default defineConfig({
             if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
               return 'vendor-charts';
             }
-            // Group @google/generative-ai
-            if (id.includes('@google/generative-ai')) {
+            // Group @google/genai
+            if (id.includes('@google/genai')) {
               return 'vendor-gemini';
             }
             // Group icons

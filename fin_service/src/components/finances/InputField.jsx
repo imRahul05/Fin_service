@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 
-const InputField = ({ label, name, value, onChange, type = "number", min = "0", step = "1", prefix = "₹" }) => {
+const InputField = ({ label, name, value, onChange, prefix = "₹" }) => {
   const inputRef = useRef(null);
   
   const handleInputChange = (e) => {
