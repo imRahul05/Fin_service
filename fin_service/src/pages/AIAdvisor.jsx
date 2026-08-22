@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import { doc, getDoc, collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "../firebase/config";
@@ -9,23 +9,35 @@ import {
   getBackwardAnalysis,
   askFinancialQuestion 
 } from "../services/AIService";
+import { 
+  computeFinancialDataHash, 
+  computeScenarioHash, 
+  computeSpendingHash, 
+  computeBackwardHash, 
+  getAiCacheInfo 
+} from "../utils/aiCache";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { CheckCircle2, RotateCcw, Sparkles } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 
 function AIAdvisor() {
   const { currentUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [finances, setFinances] = useState(null);
-  const [aiResponse, setAiResponse] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [activeTab, setActiveTab] = useState("personalAdvice");
   const [timeRange, setTimeRange] = useState("month");
-  const [customPrompt, setCustomPrompt] = useState("");
+
+  // Tab-specific response states to avoid cross-tab clobbering
+  const [adviceState, setAdviceState] = useState({ response: "", loading: false, info: null });
+  const [spendingState, setSpendingState] = useState({ response: "", loading: false, info: null });
+  const [scenarioState, setScenarioState] = useState({ response: "", loading: false, info: null });
+  const [backwardState, setBackwardState] = useState({ response: "", loading: false, info: null });
+  const [customState, setCustomState] = useState({ prompt: "", response: "", loading: false });
   
   // Scenario state variables
   const [scenarioType, setScenarioType] = useState("career");
@@ -80,7 +92,8 @@ function AIAdvisor() {
             
             setCareerParams(prev => ({
               ...prev,
-              currentSalary: totalIncome
+              currentSalary: totalIncome,
+              newSalary: prev.newSalary || totalIncome * 1.2
             }));
             
             setInvestmentParams(prev => ({
@@ -129,179 +142,232 @@ function AIAdvisor() {
     loadUserData();
   }, [currentUser, timeRange]);
 
-  const handleCustomPromptSubmit = async () => {
-    if (!customPrompt.trim() || !finances) return;
-    
-    setAiLoading(true);
-    setAiResponse("");
-    
-    try {
-      const financialContext = {
-        income: finances.income ? 
-          Object.values(finances.income).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
-        fixedExpenses: finances.fixedExpenses ? 
-          Object.values(finances.fixedExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
-        variableExpenses: finances.variableExpenses ? 
-          Object.values(finances.variableExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
-        investments: finances.investments || {},
-        loans: finances.loans || {}
-      };
-      
-      const response = await askFinancialQuestion(customPrompt, financialContext);
-      setAiResponse(response);
-    } catch (error) {
-      console.error("Error getting AI response:", error);
-      setAiResponse("Sorry, I couldn't process your question at this moment. Please try again later.");
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
-  const getPersonalAdvice = useCallback(async () => {
-    if (!finances) return;
-    
-    setAiLoading(true);
-    setAiResponse("");
-    
-    try {
-      const financialData = {
-        income: finances.income ? 
-          Object.values(finances.income).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
-        fixedExpenses: finances.fixedExpenses ? 
-          Object.values(finances.fixedExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
-        variableExpenses: finances.variableExpenses ? 
-          Object.values(finances.variableExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
-        investments: finances.investments,
-        loans: finances.loans,
-        goals: ""
-      };
-      
-      const advice = await getFinancialAdvice(financialData);
-      setAiResponse(advice);
-    } catch (error) {
-      console.error("Error getting AI advice:", error);
-      setAiResponse("Sorry, I couldn't generate financial advice at this moment. Please try again later.");
-    } finally {
-      setAiLoading(false);
-    }
+  // Derived financial data context for advice
+  const financialDataContext = useMemo(() => {
+    if (!finances) return null;
+    return {
+      income: finances.income ? 
+        Object.values(finances.income).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
+      fixedExpenses: finances.fixedExpenses ? 
+        Object.values(finances.fixedExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
+      variableExpenses: finances.variableExpenses ? 
+        Object.values(finances.variableExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
+      investments: finances.investments || {},
+      loans: finances.loans || {},
+      goals: finances.goals || ""
+    };
   }, [finances]);
 
-  const getSpendingAnalysis = useCallback(async () => {
+  // Handle personal advice fetch (with cache awareness)
+  const handleFetchPersonalAdvice = useCallback(async (forceRefresh = false) => {
+    if (!financialDataContext || !currentUser) return;
+    
+    const hash = computeFinancialDataHash(financialDataContext);
+    
+    if (!forceRefresh) {
+      const cacheInfo = getAiCacheInfo(currentUser.uid, "personal_advice", hash);
+      if (cacheInfo.cached) {
+        setAdviceState(prev => ({ ...prev, info: cacheInfo }));
+      }
+    }
+
+    setAdviceState(prev => ({ ...prev, loading: true }));
+    
+    try {
+      const advice = await getFinancialAdvice(financialDataContext, {
+        userId: currentUser.uid,
+        forceRefresh
+      });
+      const cacheInfo = getAiCacheInfo(currentUser.uid, "personal_advice", hash);
+      setAdviceState({ response: advice, loading: false, info: cacheInfo });
+    } catch (error) {
+      console.error("Error getting personal advice:", error);
+      setAdviceState(prev => ({ 
+        ...prev, 
+        loading: false, 
+        response: "Sorry, I couldn't generate financial advice at this moment. Please try again later." 
+      }));
+    }
+  }, [financialDataContext, currentUser]);
+
+  // On initial load when finances are ready, load personal advice (from cache or API)
+  useEffect(() => {
+    if (financialDataContext && currentUser && !adviceState.response) {
+      handleFetchPersonalAdvice(false);
+    }
+  }, [financialDataContext, currentUser, handleFetchPersonalAdvice, adviceState.response]);
+
+  // Handle spending analysis (with cache awareness)
+  const handleFetchSpendingAnalysis = useCallback(async (forceRefresh = false) => {
     if (transactions.length === 0) {
-      setAiResponse("No transaction data available for the selected time period. Please add transactions or select a different time range.");
+      setSpendingState({
+        response: "No transaction data available for the selected time period. Please add transactions or select a different time range.",
+        loading: false,
+        info: null
+      });
       return;
     }
     
-    setAiLoading(true);
-    setAiResponse("");
+    if (!currentUser) return;
+    const hash = computeSpendingHash(transactions, timeRange);
+
+    if (!forceRefresh) {
+      const cacheInfo = getAiCacheInfo(currentUser.uid, "spending", hash);
+      if (cacheInfo.cached) {
+        setSpendingState(prev => ({ ...prev, info: cacheInfo }));
+      }
+    }
+
+    setSpendingState(prev => ({ ...prev, loading: true }));
     
     try {
-      const analysis = await analyzeSpendingBehavior(transactions);
-      setAiResponse(analysis);
+      const analysis = await analyzeSpendingBehavior(transactions, {
+        userId: currentUser.uid,
+        timeRange,
+        forceRefresh
+      });
+      const cacheInfo = getAiCacheInfo(currentUser.uid, "spending", hash);
+      setSpendingState({ response: analysis, loading: false, info: cacheInfo });
     } catch (error) {
       console.error("Error analyzing spending behavior:", error);
-      setAiResponse("Sorry, I couldn't analyze your spending behavior at this moment. Please try again later.");
-    } finally {
-      setAiLoading(false);
+      setSpendingState(prev => ({ 
+        ...prev, 
+        loading: false, 
+        response: "Sorry, I couldn't analyze your spending behavior at this moment. Please try again later." 
+      }));
     }
-  }, [transactions]);
+  }, [transactions, timeRange, currentUser]);
 
-  const simulateFinancialScenario = useCallback(async () => {
-    if (!finances) return;
+  // Check cached spending when tab or transactions change
+  useEffect(() => {
+    if (activeTab === "spendingAnalysis" && currentUser && transactions.length > 0 && !spendingState.response) {
+      const hash = computeSpendingHash(transactions, timeRange);
+      const cacheInfo = getAiCacheInfo(currentUser.uid, "spending", hash);
+      if (cacheInfo.cached) {
+        handleFetchSpendingAnalysis(false);
+      }
+    }
+  }, [activeTab, currentUser, transactions, timeRange, spendingState.response, handleFetchSpendingAnalysis]);
+
+  // Handle Scenario Simulation (with cache awareness)
+  const handleSimulateScenario = useCallback(async (forceRefresh = false) => {
+    if (!finances || !currentUser) return;
     
-    setAiLoading(true);
-    setAiResponse("");
+    const currentData = {
+      income: finances.income ? 
+        Object.values(finances.income).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
+      expenses: {
+        fixed: finances.fixedExpenses ? 
+          Object.values(finances.fixedExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
+        variable: finances.variableExpenses ? 
+          Object.values(finances.variableExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0
+      },
+      investments: finances.investments || {},
+      loans: finances.loans || {}
+    };
+    
+    let scenarioData;
+    if (scenarioType === "career") {
+      scenarioData = { type: "career_change", params: careerParams };
+    } else if (scenarioType === "investment") {
+      scenarioData = { type: "investment_strategy", params: investmentParams };
+    } else if (scenarioType === "purchase") {
+      scenarioData = { type: "major_purchase", params: purchaseParams };
+    }
+
+    const hash = computeScenarioHash(currentData, scenarioData);
+    setScenarioState(prev => ({ ...prev, loading: true }));
     
     try {
-      const currentData = {
-        income: finances.income ? 
-          Object.values(finances.income).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
-        expenses: {
-          fixed: finances.fixedExpenses ? 
-            Object.values(finances.fixedExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0,
-          variable: finances.variableExpenses ? 
-            Object.values(finances.variableExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0
-        },
-        investments: finances.investments || {},
-        loans: finances.loans || {}
-      };
-      
-      let scenarioData;
-      if (scenarioType === "career") {
-        scenarioData = {
-          type: "career_change",
-          params: careerParams
-        };
-      } else if (scenarioType === "investment") {
-        scenarioData = {
-          type: "investment_strategy",
-          params: investmentParams
-        };
-      } else if (scenarioType === "purchase") {
-        scenarioData = {
-          type: "major_purchase",
-          params: purchaseParams
-        };
-      }
-      
-      const analysis = await simulateScenario(currentData, scenarioData);
-      setAiResponse(analysis);
+      const analysis = await simulateScenario(currentData, scenarioData, {
+        userId: currentUser.uid,
+        forceRefresh
+      });
+      const cacheInfo = getAiCacheInfo(currentUser.uid, "scenario", hash);
+      setScenarioState({ response: analysis, loading: false, info: cacheInfo });
     } catch (error) {
       console.error("Error simulating scenario:", error);
-      setAiResponse("Sorry, I couldn't simulate this scenario at this moment. Please try again later.");
-    } finally {
-      setAiLoading(false);
+      setScenarioState(prev => ({ 
+        ...prev, 
+        loading: false, 
+        response: "Sorry, I couldn't simulate this scenario at this moment. Please try again later." 
+      }));
     }
-  }, [finances, scenarioType, careerParams, investmentParams, purchaseParams]);
+  }, [finances, currentUser, scenarioType, careerParams, investmentParams, purchaseParams]);
 
-  const analyzeHistoricalDecisions = useCallback(async () => {
-    setAiLoading(true);
-    setAiResponse("");
-    
+  // Handle Backward Analysis (with cache awareness)
+  const handleAnalyzeHistoricalDecisions = useCallback(async (forceRefresh = false) => {
+    if (!currentUser) return;
+
     const validDecisions = historicalDecisions.filter(
       decision => decision.description && decision.amount > 0
     );
     
     if (validDecisions.length === 0) {
-      setAiResponse("Please add at least one past financial decision with description and amount to analyze.");
-      setAiLoading(false);
+      setBackwardState({
+        response: "Please add at least one past financial decision with description and amount to analyze.",
+        loading: false,
+        info: null
+      });
       return;
     }
     
+    const hash = computeBackwardHash(validDecisions);
+    setBackwardState(prev => ({ ...prev, loading: true }));
+    
     try {
-      const analysis = await getBackwardAnalysis(validDecisions);
-      setAiResponse(analysis);
+      const analysis = await getBackwardAnalysis(validDecisions, {
+        userId: currentUser.uid,
+        forceRefresh
+      });
+      const cacheInfo = getAiCacheInfo(currentUser.uid, "backward_analysis", hash);
+      setBackwardState({ response: analysis, loading: false, info: cacheInfo });
     } catch (error) {
       console.error("Error analyzing historical decisions:", error);
-      setAiResponse("Sorry, I couldn't analyze your past decisions at this moment. Please try again later.");
-    } finally {
-      setAiLoading(false);
+      setBackwardState(prev => ({ 
+        ...prev, 
+        loading: false, 
+        response: "Sorry, I couldn't analyze your past decisions at this moment. Please try again later." 
+      }));
     }
-  }, [historicalDecisions]);
+  }, [historicalDecisions, currentUser]);
 
-  useEffect(() => {
-    if (!loading && finances) {
-      if (activeTab === "personalAdvice" && !aiResponse) {
-        getPersonalAdvice();
-      } else if (activeTab === "spendingAnalysis") {
-        getSpendingAnalysis();
-      } else if (activeTab === "scenarios") {
-        simulateFinancialScenario();
-      } else if (activeTab === "backwardAnalysis") {
-        if (historicalDecisions.some(d => d.description && d.amount > 0)) {
-          analyzeHistoricalDecisions();
-        }
-      }
+  // Handle Custom Question
+  const handleCustomPromptSubmit = async () => {
+    if (!customState.prompt.trim() || !finances || !currentUser) return;
+    
+    setCustomState(prev => ({ ...prev, loading: true }));
+    
+    try {
+      const financialContext = {
+        income: finances.income,
+        fixedExpenses: finances.fixedExpenses,
+        variableExpenses: finances.variableExpenses,
+        investments: finances.investments || {},
+        loans: finances.loans || {}
+      };
+      
+      const response = await askFinancialQuestion(customState.prompt, financialContext, {
+        userId: currentUser.uid
+      });
+      setCustomState(prev => ({ ...prev, response, loading: false }));
+    } catch (error) {
+      console.error("Error getting AI response:", error);
+      setCustomState(prev => ({
+        ...prev,
+        response: "Sorry, I couldn't process your question at this moment. Please try again later.",
+        loading: false
+      }));
     }
-  }, [activeTab, finances, loading, timeRange, getPersonalAdvice, getSpendingAnalysis, simulateFinancialScenario, analyzeHistoricalDecisions, historicalDecisions, aiResponse]);
+  };
 
   const handleCareerParamChange = (e) => {
     const { name, value } = e.target;
     setCareerParams(prev => ({
       ...prev,
       [name]: name === "yearsToSimulate" || name === "annualGrowthRate" 
-        ? parseInt(value) 
-        : parseFloat(value)
+        ? parseInt(value) || 0
+        : parseFloat(value) || 0
     }));
   };
 
@@ -309,9 +375,9 @@ function AIAdvisor() {
     const { name, value } = e.target;
     setInvestmentParams(prev => ({
       ...prev,
-      [name]: name === "yearsToSimulate" ? parseInt(value) : 
+      [name]: name === "yearsToSimulate" ? parseInt(value) || 0 : 
               name === "currentStrategy" || name === "newStrategy" ? value :
-              parseFloat(value)
+              parseFloat(value) || 0
     }));
   };
 
@@ -320,8 +386,8 @@ function AIAdvisor() {
     setPurchaseParams(prev => ({
       ...prev,
       [name]: name === "itemType" ? value : 
-              name === "loanTermYears" ? parseInt(value) :
-              parseFloat(value)
+              name === "loanTermYears" ? parseInt(value) || 0 :
+              parseFloat(value) || 0
     }));
   };
 
@@ -329,7 +395,7 @@ function AIAdvisor() {
     const newDecisions = [...historicalDecisions];
     newDecisions[index] = {
       ...newDecisions[index],
-      [field]: field === "amount" ? parseFloat(value) : value
+      [field]: field === "amount" ? parseFloat(value) || 0 : value
     };
     setHistoricalDecisions(newDecisions);
   };
@@ -392,32 +458,46 @@ function AIAdvisor() {
         </div>
       </div>
 
+      {/* Ask AI Section */}
       <div className="max-w-7xl mx-auto mb-8">
         <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Ask a Financial Question</CardTitle>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <CardTitle className="text-gray-900 dark:text-white">Ask a Financial Question</CardTitle>
+            </div>
             <CardDescription className="text-gray-500 dark:text-gray-400">
               Get personalized answers to your specific financial questions
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row gap-4">
-              <textarea
-                className="flex-1 p-4 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md min-h-[100px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
-                placeholder="Ask me anything about your finances, investments, or financial planning..."
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-              />
-            </div>
+          <CardContent className="space-y-4">
+            <textarea
+              className="w-full p-4 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md min-h-[100px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+              placeholder="Ask me anything about your finances, investments, or financial planning..."
+              value={customState.prompt}
+              onChange={(e) => setCustomState(prev => ({ ...prev, prompt: e.target.value }))}
+            />
+
+            {customState.loading && (
+              <div className="flex justify-center items-center py-6">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            )}
+
+            {customState.response && !customState.loading && (
+              <div className="p-4 bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-lg prose dark:prose-invert max-w-none text-sm text-gray-800 dark:text-gray-200">
+                <ReactMarkdown>{customState.response}</ReactMarkdown>
+              </div>
+            )}
           </CardContent>
           <CardFooter className="flex justify-end">
             <Button
               variant="default"
               onClick={handleCustomPromptSubmit}
-              disabled={aiLoading || !customPrompt.trim()}
+              disabled={customState.loading || !customState.prompt.trim()}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              Get Answer
+              {customState.loading ? "Thinking..." : "Get Answer"}
             </Button>
           </CardFooter>
         </Card>
@@ -434,24 +514,37 @@ function AIAdvisor() {
         {/* Personal Advice Tab */}
         <TabsContent value="personalAdvice" className="space-y-4">
           <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
-            <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white">Personal Financial Advice</CardTitle>
-              <CardDescription className="text-gray-500 dark:text-gray-400">
-                Get tailored advice based on your current financial situation
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <div>
+                <CardTitle className="text-gray-900 dark:text-white">Personal Financial Advice</CardTitle>
+                <CardDescription className="text-gray-500 dark:text-gray-400">
+                  Get tailored advice based on your current financial situation
+                </CardDescription>
+              </div>
+              {adviceState.info?.cached && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+                  <CheckCircle2 className="w-3 h-3" />
+                  Cached ({adviceState.info.formattedTime})
+                </span>
+              )}
             </CardHeader>
             <CardContent>
-              {aiLoading ? (
-                <div className="flex justify-center items-center h-96">
+              {adviceState.loading ? (
+                <div className="flex flex-col justify-center items-center h-96 space-y-3">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Loading personalized financial advice...</p>
+                </div>
+              ) : adviceState.response ? (
+                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
+                  <ReactMarkdown>{adviceState.response}</ReactMarkdown>
                 </div>
               ) : (
-                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
-                  <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  Click "Generate Advice" to receive personalized financial recommendations.
                 </div>
               )}
             </CardContent>
-            <CardFooter className="flex justify-between">
+            <CardFooter className="flex justify-between border-t border-gray-100 dark:border-gray-700/60 pt-4">
               <Button 
                 variant="outline" 
                 onClick={() => window.location.href = "/finance-input"}
@@ -461,11 +554,12 @@ function AIAdvisor() {
               </Button>
               <Button 
                 variant="default" 
-                onClick={getPersonalAdvice}
-                disabled={aiLoading}
+                onClick={() => handleFetchPersonalAdvice(true)}
+                disabled={adviceState.loading}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Refresh Advice
+                <RotateCcw className={`w-4 h-4 mr-1.5 ${adviceState.loading ? "animate-spin" : ""}`} />
+                {adviceState.loading ? "Refreshing..." : "Refresh Advice"}
               </Button>
             </CardFooter>
           </Card>
@@ -474,11 +568,19 @@ function AIAdvisor() {
         {/* Spending Analysis Tab */}
         <TabsContent value="spendingAnalysis" className="space-y-4">
           <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
-            <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white">Spending Behavior Analysis</CardTitle>
-              <CardDescription className="text-gray-500 dark:text-gray-400">
-                Analyze your spending patterns and discover savings opportunities
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <div>
+                <CardTitle className="text-gray-900 dark:text-white">Spending Behavior Analysis</CardTitle>
+                <CardDescription className="text-gray-500 dark:text-gray-400">
+                  Analyze your spending patterns and discover savings opportunities
+                </CardDescription>
+              </div>
+              {spendingState.info?.cached && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+                  <CheckCircle2 className="w-3 h-3" />
+                  Cached ({spendingState.info.formattedTime})
+                </span>
+              )}
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -503,24 +605,30 @@ function AIAdvisor() {
                     No transactions found for the selected time period. Please add transactions or select a different time range.
                   </p>
                 </div>
-              ) : aiLoading ? (
-                <div className="flex justify-center items-center h-96">
+              ) : spendingState.loading ? (
+                <div className="flex flex-col justify-center items-center h-96 space-y-3">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Analyzing transactions with AI...</p>
+                </div>
+              ) : spendingState.response ? (
+                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
+                  <ReactMarkdown>{spendingState.response}</ReactMarkdown>
                 </div>
               ) : (
-                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
-                  <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  Click "Analyze Spending" to generate spending insights for this period.
                 </div>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end">
+            <CardFooter className="flex justify-end border-t border-gray-100 dark:border-gray-700/60 pt-4">
               <Button 
                 variant="default" 
-                onClick={getSpendingAnalysis}
-                disabled={aiLoading || transactions.length === 0}
+                onClick={() => handleFetchSpendingAnalysis(true)}
+                disabled={spendingState.loading || transactions.length === 0}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Analyze Spending
+                <RotateCcw className={`w-4 h-4 mr-1.5 ${spendingState.loading ? "animate-spin" : ""}`} />
+                {spendingState.loading ? "Analyzing..." : "Analyze Spending"}
               </Button>
             </CardFooter>
           </Card>
@@ -529,11 +637,19 @@ function AIAdvisor() {
         {/* Scenarios Tab */}
         <TabsContent value="scenarios" className="space-y-4">
           <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
-            <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white">Financial "What-If" Scenarios</CardTitle>
-              <CardDescription className="text-gray-500 dark:text-gray-400">
-                Simulate different financial scenarios to make better decisions
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <div>
+                <CardTitle className="text-gray-900 dark:text-white">Financial "What-If" Scenarios</CardTitle>
+                <CardDescription className="text-gray-500 dark:text-gray-400">
+                  Simulate different financial scenarios to make better decisions
+                </CardDescription>
+              </div>
+              {scenarioState.info?.cached && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+                  <CheckCircle2 className="w-3 h-3" />
+                  Cached ({scenarioState.info.formattedTime})
+                </span>
+              )}
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -764,24 +880,29 @@ function AIAdvisor() {
               
               <Separator className="my-6 border-gray-200 dark:border-gray-700" />
               
-              {aiLoading ? (
-                <div className="flex justify-center items-center h-96">
+              {scenarioState.loading ? (
+                <div className="flex flex-col justify-center items-center h-96 space-y-3">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Simulating scenario with AI...</p>
+                </div>
+              ) : scenarioState.response ? (
+                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
+                  <ReactMarkdown>{scenarioState.response}</ReactMarkdown>
                 </div>
               ) : (
-                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
-                  <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  Configure your parameters and click "Simulate Scenario" to see projections.
                 </div>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end">
+            <CardFooter className="flex justify-end border-t border-gray-100 dark:border-gray-700/60 pt-4">
               <Button 
                 variant="default" 
-                onClick={simulateFinancialScenario}
-                disabled={aiLoading}
+                onClick={() => handleSimulateScenario(true)}
+                disabled={scenarioState.loading}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Simulate Scenario
+                {scenarioState.loading ? "Simulating..." : "Simulate Scenario"}
               </Button>
             </CardFooter>
           </Card>
@@ -790,11 +911,19 @@ function AIAdvisor() {
         {/* Backward Analysis Tab */}
         <TabsContent value="backwardAnalysis" className="space-y-4">
           <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
-            <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white">Past Financial Decisions Analysis</CardTitle>
-              <CardDescription className="text-gray-500 dark:text-gray-400">
-                Analyze what could have happened differently with past financial decisions
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <div>
+                <CardTitle className="text-gray-900 dark:text-white">Past Financial Decisions Analysis</CardTitle>
+                <CardDescription className="text-gray-500 dark:text-gray-400">
+                  Analyze what could have happened differently with past financial decisions
+                </CardDescription>
+              </div>
+              {backwardState.info?.cached && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+                  <CheckCircle2 className="w-3 h-3" />
+                  Cached ({backwardState.info.formattedTime})
+                </span>
+              )}
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -885,24 +1014,29 @@ function AIAdvisor() {
               
               <Separator className="my-6 border-gray-200 dark:border-gray-700" />
               
-              {aiLoading ? (
-                <div className="flex justify-center items-center h-96">
+              {backwardState.loading ? (
+                <div className="flex flex-col justify-center items-center h-96 space-y-3">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Analyzing past decisions with AI...</p>
+                </div>
+              ) : backwardState.response ? (
+                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
+                  <ReactMarkdown>{backwardState.response}</ReactMarkdown>
                 </div>
               ) : (
-                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
-                  <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  Add past decisions and click "Analyze Decisions" to generate retrospective insights.
                 </div>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end">
+            <CardFooter className="flex justify-end border-t border-gray-100 dark:border-gray-700/60 pt-4">
               <Button 
                 variant="default" 
-                onClick={analyzeHistoricalDecisions}
-                disabled={aiLoading || !historicalDecisions.some(d => d.description && d.amount > 0)}
+                onClick={() => handleAnalyzeHistoricalDecisions(true)}
+                disabled={backwardState.loading || !historicalDecisions.some(d => d.description && d.amount > 0)}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Analyze Decisions
+                {backwardState.loading ? "Analyzing..." : "Analyze Decisions"}
               </Button>
             </CardFooter>
           </Card>

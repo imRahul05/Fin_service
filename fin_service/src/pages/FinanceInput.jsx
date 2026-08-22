@@ -3,6 +3,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { clearAiCache } from "../utils/aiCache";
 
 // Import components
 import IncomeForm from "../components/finances/IncomeForm";
@@ -141,6 +142,9 @@ function FinanceInput() {
         finances: financesData
       });
       
+      // Invalidate existing cached personal advice so fresh advice is generated
+      clearAiCache(currentUser.uid, "personal_advice");
+
       setSuccess(true);
       setFormSubmitted(true);
       

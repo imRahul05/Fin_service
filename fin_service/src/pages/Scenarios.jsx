@@ -7,11 +7,14 @@ import {
   formatCurrency, 
   calculateFutureValue, 
   calculateEMI,
-  calculateSection80CTaxBenefits
+  calculateSection80CTaxBenefits 
 } from "../utils/financialUtils";
 import { simulateScenario } from "../services/AIService";
+import { computeScenarioHash, getAiCacheInfo } from "../utils/aiCache";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { CheckCircle2, RotateCcw, Sparkles } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -27,6 +30,7 @@ function Scenarios() {
   const [simulationResult, setSimulationResult] = useState(null);
   const [aiAnalysis, setAiAnalysis] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  const [cacheInfo, setCacheInfo] = useState(null);
   
   // Career change scenario params
   const [careerParams, setCareerParams] = useState({
@@ -353,7 +357,7 @@ function Scenarios() {
   }, [purchaseParams, finances]);
 
   // Run simulation based on scenario type
-  const runSimulation = async () => {
+  const runSimulation = async (forceRefresh = false) => {
     let result = null;
     
     switch (scenarioType) {
@@ -372,38 +376,53 @@ function Scenarios() {
     
     setSimulationResult(result);
     
+    const currentData = {
+      income: finances?.income || {},
+      expenses: {
+        ...finances?.fixedExpenses || {},
+        ...finances?.variableExpenses || {}
+      },
+      investments: finances?.investments || {},
+      loans: finances?.loans || {}
+    };
+    
+    let scenarioData;
+    if (scenarioType === "career") {
+      scenarioData = {
+        type: "career_change",
+        params: careerParams
+      };
+    } else if (scenarioType === "investment") {
+      scenarioData = {
+        type: "investment_strategy",
+        params: investmentParams
+      };
+    } else if (scenarioType === "purchase") {
+      scenarioData = {
+        type: "major_purchase",
+        params: purchaseParams
+      };
+    }
+
+    const hash = computeScenarioHash(currentData, scenarioData);
+    if (!forceRefresh && currentUser) {
+      const info = getAiCacheInfo(currentUser.uid, "scenario", hash);
+      if (info.cached) {
+        setCacheInfo(info);
+      }
+    }
+
     setAiLoading(true);
     try {
-      const currentData = {
-        income: finances?.income || {},
-        expenses: {
-          ...finances?.fixedExpenses || {},
-          ...finances?.variableExpenses || {}
-        },
-        investments: finances?.investments || {},
-        loans: finances?.loans || {}
-      };
-      
-      let scenarioData;
-      if (scenarioType === "career") {
-        scenarioData = {
-          type: "career_change",
-          params: careerParams
-        };
-      } else if (scenarioType === "investment") {
-        scenarioData = {
-          type: "investment_strategy",
-          params: investmentParams
-        };
-      } else if (scenarioType === "purchase") {
-        scenarioData = {
-          type: "major_purchase",
-          params: purchaseParams
-        };
-      }
-      
-      const analysis = await simulateScenario(currentData, scenarioData);
+      const analysis = await simulateScenario(currentData, scenarioData, {
+        userId: currentUser?.uid,
+        forceRefresh
+      });
       setAiAnalysis(analysis);
+      if (currentUser) {
+        const info = getAiCacheInfo(currentUser.uid, "scenario", hash);
+        setCacheInfo(info);
+      }
     } catch (error) {
       console.error("Error getting AI analysis:", error);
       setAiAnalysis("Unable to generate AI analysis at this time. Please try again later.");
@@ -977,23 +996,50 @@ function Scenarios() {
 
           {/* AI Analysis */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-gray-950/40 overflow-hidden transition-colors">
-            <div className="px-4 py-5 sm:px-6 bg-blue-50 dark:bg-blue-950/30 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                AI Analysis
-              </h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
-                Personalized insights about this scenario
-              </p>
+            <div className="px-4 py-4 sm:px-6 bg-blue-50 dark:bg-blue-950/30 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <h3 className="text-lg leading-6 font-semibold text-gray-900 dark:text-white">
+                    AI Scenario Insights
+                  </h3>
+                </div>
+                <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                  Personalized projections and analysis for this scenario
+                </p>
+              </div>
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                {cacheInfo?.cached && cacheInfo?.formattedTime && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Cached ({cacheInfo.formattedTime})
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => runSimulation(true)}
+                  disabled={aiLoading}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                >
+                  <RotateCcw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin text-blue-500" : ""}`} />
+                  {aiLoading ? "Regenerating..." : "Re-analyze"}
+                </button>
+              </div>
             </div>
             <div className="px-4 py-5 sm:p-6">
               {aiLoading ? (
-                <div className="flex justify-center items-center h-40">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                <div className="flex flex-col justify-center items-center h-40 space-y-2">
+                  <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Generating scenario analysis...</p>
+                </div>
+              ) : aiAnalysis ? (
+                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed text-sm">
+                  <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
                 </div>
               ) : (
-                <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm whitespace-pre-line">
-                  {aiAnalysis}
-                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No analysis available for this simulation.
+                </p>
               )}
             </div>
           </div>

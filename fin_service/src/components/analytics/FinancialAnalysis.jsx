@@ -1,6 +1,8 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Card } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { RotateCcw, Sparkles, CheckCircle2 } from "lucide-react";
 
 const markdownComponents = {
   h2: ({ children }) => (
@@ -58,17 +60,53 @@ const markdownComponents = {
   ),
 };
 
-const FinancialAnalysis = ({ analysis, loading }) => {
+const FinancialAnalysis = ({ 
+  analysis, 
+  loading, 
+  onRefresh, 
+  isRefreshing = false, 
+  cacheInfo = null 
+}) => {
   return (
     <Card className="p-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
-      <h3 className="text-xl font-semibold mb-1 text-gray-900 dark:text-white">AI Financial Analysis</h3>
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
-        AI-powered analysis of your financial data and spending patterns
-      </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 pb-3 border-b border-gray-100 dark:border-gray-700/60">
+        <div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">AI Financial Analysis</h3>
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">
+            AI-powered analysis of your financial data and spending patterns
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          {cacheInfo?.cached && cacheInfo?.formattedTime && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+              <CheckCircle2 className="w-3 h-3" />
+              Cached ({cacheInfo.formattedTime})
+            </span>
+          )}
+
+          {onRefresh && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onRefresh}
+              disabled={loading || isRefreshing}
+              className="border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200"
+            >
+              <RotateCcw className={`w-3.5 h-3.5 mr-1.5 ${isRefreshing ? "animate-spin text-blue-500" : ""}`} />
+              {isRefreshing ? "Regenerating..." : "Refresh Advice"}
+            </Button>
+          )}
+        </div>
+      </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-48">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="flex flex-col justify-center items-center h-48 space-y-3">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading financial insights...</p>
         </div>
       ) : analysis ? (
         <div className="max-h-[600px] overflow-y-auto pr-1">
