@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
-import { doc, setDoc, getDoc } from "firebase/firestore";
-import { db } from "../firebase/config";
-import { useAuth } from "../context/AuthContext";
+import { useFinances } from "../hooks/useFinances";
 import { useNavigate } from "react-router-dom";
-import { clearAiCache } from "../utils/aiCache";
 
 // Import components
 import IncomeForm from "../components/finances/IncomeForm";
@@ -13,27 +10,20 @@ import InvestmentsForm from "../components/finances/InvestmentsForm";
 import LoansForm from "../components/finances/LoansForm";
 import FinancialSummary from "../components/finances/FinancialSummary";
 import FormTabs from "../components/finances/FormTabs";
+import ReceiptScannerModal from "../components/finances/ReceiptScannerModal";
 import { SuccessAlert, ErrorAlert } from "../components/finances/Notifications";
-
-// Indian salary income tax brackets for 2024-25 (simplified)
-const TAX_BRACKETS = [
-  { limit: 300000, rate: 0 },     // 0-3L: Nil
-  { limit: 600000, rate: 0.05 },  // 3L-6L: 5%
-  { limit: 900000, rate: 0.1 },   // 6L-9L: 10%
-  { limit: 1200000, rate: 0.15 }, // 9L-12L: 15%
-  { limit: 1500000, rate: 0.2 },  // 12L-15L: 20%
-  { limit: Infinity, rate: 0.3 }, // Above 15L: 30%
-];
+import { calculateNewRegimeTax } from "../utils/taxCalculator";
+import { Sparkles, Camera, ArrowRight } from "lucide-react";
 
 function FinanceInput() {
-  const { currentUser } = useAuth();
+  const { finances, loading, saving, saveFinances, addTransaction } = useFinances();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+
   const [activeTab, setActiveTab] = useState("income");
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   
   // Form data state
   const [income, setIncome] = useState({
@@ -86,84 +76,23 @@ function FinanceInput() {
     credit_card: 0,
     other: 0
   });
-  
-  // Load user's financial data when component mounts
-  useEffect(() => {
-    async function loadUserFinances() {
-      if (!currentUser) return;
-      
-      setLoading(true);
-      try {
-        const docRef = doc(db, "userFinances", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          const data = docSnap.data().finances;
-          
-          if (data.income) setIncome(data.income);
-          if (data.fixedExpenses) setFixedExpenses(data.fixedExpenses);
-          if (data.variableExpenses) setVariableExpenses(data.variableExpenses);
-          if (data.investments) setInvestments(data.investments);
-          if (data.loans) setLoans(data.loans);
-        }
-      } catch (err) {
-        console.error("Error loading finances:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    loadUserFinances();
-  }, [currentUser]);
-  
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!currentUser) {
-      setError("You must be logged in to save your financial data");
-      return;
-    }
-    
-    setSaving(true);
-    setError("");
-    
-    try {
-      const financesData = {
-        income,
-        fixedExpenses,
-        variableExpenses,
-        investments,
-        loans,
-        updatedAt: new Date().toISOString()
-      };
-      
-      await setDoc(doc(db, "userFinances", currentUser.uid), {
-        finances: financesData
-      });
-      
-      // Invalidate existing cached personal advice so fresh advice is generated
-      clearAiCache(currentUser.uid, "personal_advice");
 
-      setSuccess(true);
-      setFormSubmitted(true);
-      
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
-    } catch (err) {
-      console.error("Error saving finances:", err);
-      setError("Failed to save your financial data. Please try again.");
-    } finally {
-      setSaving(false);
+  // Populate from active finances (Firestore or Guest Sandbox)
+  useEffect(() => {
+    if (finances) {
+      if (finances.income) setIncome(finances.income);
+      if (finances.fixedExpenses) setFixedExpenses(finances.fixedExpenses);
+      if (finances.variableExpenses) setVariableExpenses(finances.variableExpenses);
+      if (finances.investments) setInvestments(finances.investments);
+      if (finances.loans) setLoans(finances.loans);
     }
-  };
+  }, [finances]);
   
   const handleIncomeChange = (e) => {
     const { name, value } = e.target;
     setIncome(prev => ({
       ...prev,
-      [name]: value === '' ? 0 : parseFloat(value) || 0
+      [name]: parseFloat(value) || 0
     }));
   };
   
@@ -171,7 +100,7 @@ function FinanceInput() {
     const { name, value } = e.target;
     setFixedExpenses(prev => ({
       ...prev,
-      [name]: value === '' ? 0 : parseFloat(value) || 0
+      [name]: parseFloat(value) || 0
     }));
   };
   
@@ -179,7 +108,7 @@ function FinanceInput() {
     const { name, value } = e.target;
     setVariableExpenses(prev => ({
       ...prev,
-      [name]: value === '' ? 0 : parseFloat(value) || 0
+      [name]: parseFloat(value) || 0
     }));
   };
   
@@ -187,7 +116,7 @@ function FinanceInput() {
     const { name, value } = e.target;
     setInvestments(prev => ({
       ...prev,
-      [name]: value === '' ? 0 : parseFloat(value) || 0
+      [name]: parseFloat(value) || 0
     }));
   };
   
@@ -195,8 +124,55 @@ function FinanceInput() {
     const { name, value } = e.target;
     setLoans(prev => ({
       ...prev,
-      [name]: value === '' ? 0 : parseFloat(value) || 0
+      [name]: parseFloat(value) || 0
     }));
+  };
+
+  const handleReceiptScanned = async (tx) => {
+    await addTransaction(tx);
+    // Optionally update matching variable expense category
+    const cat = (tx.category || "").toLowerCase();
+    if (cat.includes("grocer")) {
+      setVariableExpenses(prev => ({ ...prev, groceries: prev.groceries + tx.amount }));
+    } else if (cat.includes("din") || cat.includes("food")) {
+      setVariableExpenses(prev => ({ ...prev, dining: prev.dining + tx.amount }));
+    } else if (cat.includes("transport") || cat.includes("fuel") || cat.includes("travel")) {
+      setVariableExpenses(prev => ({ ...prev, transportation: prev.transportation + tx.amount }));
+    }
+    setSuccess(true);
+    setFormSubmitted(true);
+    setTimeout(() => setSuccess(false), 4000);
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormSubmitted(true);
+    setError("");
+    setSuccess(false);
+    
+    try {
+      const financialData = {
+        income,
+        fixedExpenses,
+        variableExpenses,
+        investments,
+        loans,
+        goals: finances?.goals || "",
+      };
+      
+      const ok = await saveFinances(financialData);
+      if (ok) {
+        setSuccess(true);
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1200);
+      } else {
+        setError("Failed to save financial information.");
+      }
+    } catch (err) {
+      console.error("Error saving finances:", err);
+      setError("Failed to save financial information: " + (err.message || "Unknown error"));
+    }
   };
   
   const totalIncome = Object.values(income).reduce((sum, val) => sum + val, 0);
@@ -207,23 +183,9 @@ function FinanceInput() {
   const totalExpenses = totalFixedExpenses + totalVariableExpenses;
   const monthlySavings = totalIncome - totalExpenses;
   
-  const calculateIncomeTax = (annualIncome) => {
-    let tax = 0;
-    let remainingIncome = annualIncome;
-    
-    for (const bracket of TAX_BRACKETS) {
-      if (remainingIncome <= 0) break;
-      
-      const taxableInThisBracket = Math.min(remainingIncome, bracket.limit);
-      tax += taxableInThisBracket * bracket.rate;
-      remainingIncome -= taxableInThisBracket;
-    }
-    
-    return tax / 12;
-  };
-  
-  const annualSalary = income.salary * 12;
-  const monthlyTax = calculateIncomeTax(annualSalary);
+  const annualSalary = (income.salary || 0) * 12;
+  const taxResult = calculateNewRegimeTax(annualSalary);
+  const monthlyTax = taxResult.totalTax / 12;
   const afterTaxIncome = totalIncome - monthlyTax;
   const afterTaxSavings = afterTaxIncome - totalExpenses;
   
@@ -240,8 +202,16 @@ function FinanceInput() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="md:flex md:items-center md:justify-between mb-8">
-        <div className="flex-1 min-w-0">
+      
+      {/* Receipt Scanner Modal */}
+      <ReceiptScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onAddTransaction={handleReceiptScanned}
+      />
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
           <h2 className="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:text-3xl sm:truncate">
             Financial Information
           </h2>
@@ -249,6 +219,15 @@ function FinanceInput() {
             Enter your financial details to get personalized insights and analysis
           </p>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setIsScannerOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition"
+        >
+          <Camera className="w-4 h-4" />
+          <span>Scan Receipt / UPI (AI OCR)</span>
+        </button>
       </div>
 
       {formSubmitted && success && <SuccessAlert message="Financial information saved successfully! Redirecting to dashboard..." />}

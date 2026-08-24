@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase/config";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useFinances } from "../hooks/useFinances";
+import TaxRegimeOptimizer from "../components/scenarios/TaxRegimeOptimizer";
 import { 
   formatCurrency, 
   calculateFutureValue, 
@@ -23,9 +23,8 @@ function Scenarios() {
   const { currentUser } = useAuth();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const { finances, loading } = useFinances();
 
-  const [loading, setLoading] = useState(true);
-  const [finances, setFinances] = useState(null);
   const [scenarioType, setScenarioType] = useState("career");
   const [simulationResult, setSimulationResult] = useState(null);
   const [aiAnalysis, setAiAnalysis] = useState("");
@@ -67,43 +66,23 @@ function Scenarios() {
     monthlyRent: 25000,
   });
   
-  // Load user's data when component mounts
+  // Sync parameters when finances load
   useEffect(() => {
-    async function loadUserFinances() {
-      if (!currentUser) return;
-      
-      setLoading(true);
-      try {
-        const docRef = doc(db, "userFinances", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          const userFinances = docSnap.data().finances;
-          setFinances(userFinances);
-          
-          if (userFinances.income && userFinances.income.salary) {
-            setCareerParams(prev => ({
-              ...prev,
-              currentSalary: userFinances.income.salary,
-              newSalary: userFinances.income.salary * 1.3,
-            }));
-          }
-          
-          const totalInvestments = Object.values(userFinances.investments || {}).reduce((sum, val) => sum + val, 0);
-          setInvestmentParams(prev => ({
-            ...prev,
-            monthlyAmount: totalInvestments > 0 ? totalInvestments : 5000,
-          }));
-        }
-      } catch (error) {
-        console.error("Error loading finances:", error);
-      } finally {
-        setLoading(false);
+    if (finances) {
+      if (finances.income?.salary) {
+        setCareerParams(prev => ({
+          ...prev,
+          currentSalary: finances.income.salary,
+          newSalary: finances.income.salary * 1.3,
+        }));
       }
+      const totalInvestments = Object.values(finances.investments || {}).reduce((sum, val) => sum + val, 0);
+      setInvestmentParams(prev => ({
+        ...prev,
+        monthlyAmount: totalInvestments > 0 ? totalInvestments : 5000,
+      }));
     }
-    
-    loadUserFinances();
-  }, [currentUser]);
+  }, [finances]);
   
   // Career change simulation
   const simulateCareerChange = useCallback(() => {
@@ -522,46 +501,64 @@ function Scenarios() {
           </h3>
         </div>
         <div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
             <button
               type="button"
               onClick={() => setScenarioType("career")}
-              className={`px-4 py-3 rounded-lg text-center font-medium transition-all ${
+              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-bold transition-all ${
                 scenarioType === "career" 
                   ? "bg-blue-600 text-white shadow-md" 
                   : "bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
             >
-              Career Change
+              💼 Career Growth
             </button>
             <button
               type="button"
               onClick={() => setScenarioType("investment")}
-              className={`px-4 py-3 rounded-lg text-center font-medium transition-all ${
+              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-bold transition-all ${
                 scenarioType === "investment" 
                   ? "bg-blue-600 text-white shadow-md" 
                   : "bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
             >
-              Investment Strategy
+              📈 Investments
             </button>
             <button
               type="button"
               onClick={() => setScenarioType("purchase")}
-              className={`px-4 py-3 rounded-lg text-center font-medium transition-all ${
+              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-bold transition-all ${
                 scenarioType === "purchase" 
                   ? "bg-blue-600 text-white shadow-md" 
                   : "bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
             >
-              Major Purchase
+              🏠 Major Purchase
+            </button>
+            <button
+              type="button"
+              onClick={() => setScenarioType("tax")}
+              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-bold transition-all ${
+                scenarioType === "tax" 
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md ring-2 ring-blue-400/30" 
+                  : "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100"
+              }`}
+            >
+              🛡️ Tax Optimizer
             </button>
           </div>
         </div>
       </div>
 
+      {/* Tax Regime Optimizer Component */}
+      {scenarioType === "tax" && (
+        <TaxRegimeOptimizer finances={finances} />
+      )}
+
       {/* Parameters Form */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40 rounded-xl mb-8 overflow-hidden transition-colors">
+      {scenarioType !== "tax" && (
+        <>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40 rounded-xl mb-8 overflow-hidden transition-colors">
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
             {scenarioType === "career" ? "Career Change Parameters" : 
@@ -1044,6 +1041,8 @@ function Scenarios() {
             </div>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );

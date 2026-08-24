@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/common/Navbar';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Loading from './components/common/Loading';
+import AICopilotDrawer from './components/aiadvisor/AICopilotDrawer';
 import './App.css';
 
 // Lazy-loaded page components for bundle size optimization
@@ -91,6 +92,7 @@ function App() {
                 </Routes>
               </Suspense>
             </main>
+            <AICopilotDrawer />
           </div>
         </AuthProvider>
       </ThemeProvider>

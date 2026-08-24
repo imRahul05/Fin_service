@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase/config";
-import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
-import { formatCurrency } from "../utils/financialUtils";
+import { useFinances } from "../hooks/useFinances";
+import { formatCurrency, aggregateFinancials } from "../utils/financialUtils";
+import SubscriptionRadar from "../components/analytics/SubscriptionRadar";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 
@@ -11,107 +10,17 @@ import { Pie } from 'react-chartjs-2';
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
 function Analytics() {
-  const { currentUser } = useAuth();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const { finances, transactions, loading } = useFinances();
 
-  const [loading, setLoading] = useState(true);
-  const [finances, setFinances] = useState(null);
   const [spendingAnalysis, setSpendingAnalysis] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
-  const [financeAnalytics, setFinanceAnalytics] = useState({
-    income: 0,
-    expenses: 0,
-    savings: 0,
-    savingsRate: 0,
-    expenseBreakdown: {},
-    investmentsTotal: 0,
-    loansTotal: 0,
-    incomeSources: {},
-    expenseCategories: {}
-  });
 
-  // Load user's financial data
-  useEffect(() => {
-    async function loadUserData() {
-      if (!currentUser) return;
-      
-      setLoading(true);
-      try {
-        const docRef = doc(db, "userFinances", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          const financeData = docSnap.data().finances;
-          setFinances(financeData);
-          
-          if (financeData) {
-            const totalIncome = financeData.income ? 
-              Object.values(financeData.income).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0;
-            
-            const totalFixedExpenses = financeData.fixedExpenses ? 
-              Object.values(financeData.fixedExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0;
-            
-            const totalVariableExpenses = financeData.variableExpenses ? 
-              Object.values(financeData.variableExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0;
-            
-            const totalInvestments = financeData.investments ? 
-              Object.values(financeData.investments).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0;
-            
-            const totalLoans = financeData.loans ? 
-              Object.values(financeData.loans).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0;
-            
-            const totalExpenses = totalFixedExpenses + totalVariableExpenses;
-            const savings = totalIncome - totalExpenses;
-            const savingsRate = totalIncome > 0 ? (savings / totalIncome) * 100 : 0;
-            
-            const incomeSources = financeData.income || {};
-            const expenseCategories = {};
-            
-            if (financeData.fixedExpenses) {
-              Object.entries(financeData.fixedExpenses).forEach(([category, amount]) => {
-                if (parseFloat(amount) > 0) {
-                  expenseCategories[`Fixed: ${category}`] = parseFloat(amount);
-                }
-              });
-            }
-            
-            if (financeData.variableExpenses) {
-              Object.entries(financeData.variableExpenses).forEach(([category, amount]) => {
-                if (parseFloat(amount) > 0) {
-                  expenseCategories[`Variable: ${category}`] = parseFloat(amount);
-                }
-              });
-            }
-            
-            const expenseBreakdown = {
-              'Fixed Expenses': totalFixedExpenses,
-              'Variable Expenses': totalVariableExpenses,
-              'Loan Payments': totalLoans
-            };
-            
-            setFinanceAnalytics({
-              income: totalIncome,
-              expenses: totalExpenses,
-              savings,
-              savingsRate,
-              expenseBreakdown,
-              investmentsTotal: totalInvestments,
-              loansTotal: totalLoans,
-              incomeSources,
-              expenseCategories
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error loading user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    loadUserData();
-  }, [currentUser]);
+  // Synchronously compute analytics metrics from finances (100% DRY)
+  const financeAnalytics = useMemo(() => {
+    return aggregateFinancials(finances);
+  }, [finances]);
 
   // Get AI spending analysis
   useEffect(() => {
@@ -571,6 +480,13 @@ function Analytics() {
               </div>
             </div>
           </div>
+
+          {/* AI Subscription & Recurring Leakage Radar */}
+          <SubscriptionRadar 
+            transactions={transactions} 
+            fixedExpenses={finances?.fixedExpenses} 
+            className="mt-8" 
+          />
 
           {/* Financial Details */}
           <div className="mt-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40 overflow-hidden rounded-xl transition-colors">

@@ -370,3 +370,98 @@ export async function askFinancialQuestion(customPrompt, finances = {}, options 
     return "Sorry, I couldn't process your question at this moment. Please try again later.";
   }
 }
+
+/**
+ * Multimodal OCR Parser for Receipts, Invoices, and UPI Payment Screenshots
+ * 
+ * @param {string} base64Data - Clean base64 string
+ * @param {string} mimeType - Image mime type
+ * @returns {Promise<Object>} Extracted JSON financial record
+ */
+export async function parseReceiptOrUpiImage(base64Data, mimeType = "image/jpeg") {
+  const prompt = `
+    Analyze this financial image (receipt, tax invoice, Google Pay, PhonePe, Paytm UPI screenshot, or bank notification).
+    Extract the transaction details into a STRICT JSON object with exactly these keys:
+    {
+      "merchant": "Merchant or payee name (e.g. Swiggy, Blinkit, D-Mart, Shell, HDFC)",
+      "amount": 1250,
+      "category": "Groceries",
+      "date": "YYYY-MM-DD",
+      "paymentMode": "UPI",
+      "description": "Brief description of items or payment",
+      "confidence": "High"
+    }
+
+    Rules for category: Must be one of ["Groceries", "Dining", "Subscriptions", "Utilities", "Transportation", "Healthcare", "Shopping", "Entertainment", "Fixed Expenses", "Other"]
+    Rules for paymentMode: Must be one of ["UPI", "Credit Card", "Debit Card", "Net Banking", "Cash", "Auto Debit"]
+
+    Return ONLY the raw JSON object without markdown fences, comments, or backticks.
+  `;
+
+  try {
+    const rawResponse = await generateAIResponse({
+      prompt,
+      image: {
+        data: base64Data,
+        mimeType,
+      },
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are an expert OCR financial extraction engine for Indian UPI receipts, bank screenshots, and merchant invoices.",
+      config: {
+        temperature: 0.1,
+      },
+    });
+
+    const cleaned = rawResponse
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
+
+    return JSON.parse(cleaned);
+  } catch (error) {
+    console.error("Error parsing receipt image with Gemini:", error);
+    throw new Error("Unable to parse receipt. Please verify image clarity and try again.");
+  }
+}
+
+/**
+ * Generates Tax Optimization Strategy comparing Old vs New Indian Tax Regime.
+ * 
+ * @param {Object} financialData - User financial profile
+ * @param {Object} taxComparison - Pre-calculated Old vs New tax comparison
+ * @returns {Promise<string>} Markdown formatted CA tax strategy
+ */
+export async function getTaxOptimizationAdvice(financialData, taxComparison) {
+  const prompt = `
+    As a Senior Indian Chartered Accountant & Tax Advisor, analyze this tax comparison for FY 2024-25 / 2025-26:
+
+    Income & Deductions Overview:
+    - Gross Total Income: ₹${taxComparison.grossIncome}
+    - Old Regime Deductions: ₹${taxComparison.oldRegime.totalDeductions} (80C: ₹${taxComparison.oldRegime.deductions.section80C}, 80D: ₹${taxComparison.oldRegime.deductions.section80D}, 80CCD: ₹${taxComparison.oldRegime.deductions.section80CCD1B}, HRA: ₹${taxComparison.oldRegime.deductions.hra})
+    - Old Regime Tax Payable: ₹${taxComparison.oldRegime.totalTax}
+    - New Regime Standard Deduction: ₹${taxComparison.newRegime.standardDeduction}
+    - New Regime Tax Payable: ₹${taxComparison.newRegime.totalTax}
+    - Recommendation: ${taxComparison.recommendedRegime} (Saves ₹${taxComparison.savings})
+
+    Provide a concise, practical breakdown in Markdown:
+    ## Strategic Verdict
+    Explain why ${taxComparison.recommendedRegime} is superior for this specific income profile.
+
+    ## Actionable Tax Optimization Steps
+    - Specific steps to further reduce tax liabilities (e.g. NPS ₹50k under 80CCD(1B), Family Health Insurance under 80D, HRA proof submissions).
+
+    ## Key Deadlines & Recommendations
+    - Action timeline for submitting investment declarations to employer.
+  `;
+
+  try {
+    return await generateAIResponse({
+      prompt,
+      model: GEMINI_MODELS.DEFAULT,
+      systemInstruction: "You are an expert Indian Chartered Accountant specializing in salary taxation, deductions optimization, and wealth preservation.",
+    });
+  } catch (err) {
+    console.error("Error getting tax advice:", err);
+    return "Unable to generate tax advice at this moment. Please consult a CA.";
+  }
+}
