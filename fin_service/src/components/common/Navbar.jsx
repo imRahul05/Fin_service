@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
 
 function Navbar() {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, isGuestMode, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -98,6 +98,15 @@ function Navbar() {
           <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-3">
             {/* Theme Toggle Button */}
             <ThemeToggle />
+
+            {isGuestMode && (
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 transition shadow-2xs"
+              >
+                <span>🚀 Claim Plan</span>
+              </Link>
+            )}
 
             {currentUser ? (
               <div className="ml-3 relative" ref={profileRef}>

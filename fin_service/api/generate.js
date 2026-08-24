@@ -12,7 +12,7 @@ const GEMINI_MODELS = {
 };
 
 const DEFAULT_AI_CONFIG = {
-  temperature: 0.7,
+  temperature: 0.4,
   topP: 0.95,
   maxOutputTokens: 2048,
 };
@@ -20,6 +20,7 @@ const DEFAULT_AI_CONFIG = {
 /**
  * Vercel Serverless Function: POST /api/generate
  * Executes securely on the server, keeping API keys hidden from the browser.
+ * Supports text and multimodal image/OCR payloads.
  */
 export default async function handler(req, res) {
   // Only allow POST requests
@@ -37,6 +38,7 @@ export default async function handler(req, res) {
 
   const {
     prompt,
+    image, // { data: string (base64), mimeType: string }
     model = GEMINI_MODELS.DEFAULT,
     systemInstruction,
     config = {},
@@ -57,11 +59,27 @@ export default async function handler(req, res) {
     generationConfig.systemInstruction = systemInstruction;
   }
 
+  // Construct multimodal or text contents
+  let contents = prompt;
+  if (image && image.data) {
+    contents = [
+      {
+        text: prompt,
+      },
+      {
+        inlineData: {
+          mimeType: image.mimeType || "image/jpeg",
+          data: image.data,
+        },
+      },
+    ];
+  }
+
   // Attempt generation with primary model
   try {
     const response = await ai.models.generateContent({
       model,
-      contents: prompt,
+      contents,
       config: generationConfig,
     });
 
@@ -77,7 +95,7 @@ export default async function handler(req, res) {
       try {
         const fallbackResponse = await ai.models.generateContent({
           model: fallbackModel,
-          contents: prompt,
+          contents,
           config: generationConfig,
         });
 

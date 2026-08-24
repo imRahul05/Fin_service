@@ -2,17 +2,19 @@ import { GEMINI_MODELS, DEFAULT_AI_CONFIG } from "../constants/ai.constants.js";
 
 /**
  * Robust AI content generation helper that securely calls the backend /api/generate endpoint.
- * This ensures that API keys are NEVER exposed in the client-side bundle or network tab.
+ * Supports text and multimodal image/OCR payloads.
  *
  * @param {Object} options
  * @param {string} options.prompt - The input prompt text for the AI.
+ * @param {Object} [options.image] - Optional image payload { data: string (base64), mimeType: string }.
  * @param {string} [options.model=GEMINI_MODELS.DEFAULT] - The target Gemini model name.
  * @param {string} [options.systemInstruction] - Optional system instructions/persona.
- * @param {Object} [options.config] - Optional overrides for generation parameters (temperature, maxOutputTokens, etc.)
+ * @param {Object} [options.config] - Optional overrides for generation parameters.
  * @returns {Promise<string>} Generated text response.
  */
 export async function generateAIResponse({
   prompt,
+  image,
   model = GEMINI_MODELS.DEFAULT,
   systemInstruction,
   config = {}
@@ -23,6 +25,7 @@ export async function generateAIResponse({
 
   const payload = {
     prompt,
+    image,
     model,
     systemInstruction,
     config: {

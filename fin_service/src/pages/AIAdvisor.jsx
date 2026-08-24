@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
-import { doc, getDoc, collection, query, where, getDocs, orderBy } from "firebase/firestore";
-import { db } from "../firebase/config";
+import { useFinances } from "../hooks/useFinances";
+import { aggregateFinancials } from "../utils/financialUtils";
 import { 
   getFinancialAdvice, 
   simulateScenario, 
@@ -26,9 +26,7 @@ import ReactMarkdown from 'react-markdown';
 
 function AIAdvisor() {
   const { currentUser } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [finances, setFinances] = useState(null);
-  const [transactions, setTransactions] = useState([]);
+  const { finances, transactions, loading } = useFinances();
   const [activeTab, setActiveTab] = useState("personalAdvice");
   const [timeRange, setTimeRange] = useState("month");
 
@@ -66,81 +64,21 @@ function AIAdvisor() {
     { type: "investment", description: "", amount: 0, date: "", outcome: "" }
   ]);
 
-  // Load user's financial data
+  // Sync simulation parameters when finances load
   useEffect(() => {
-    async function loadUserData() {
-      if (!currentUser) return;
-      
-      setLoading(true);
-      try {
-        const docRef = doc(db, "userFinances", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          const financeData = docSnap.data().finances;
-          setFinances(financeData);
-          
-          if (financeData) {
-            const totalIncome = financeData.income ? 
-              Object.values(financeData.income).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0;
-            
-            const totalExpenses = 
-              (financeData.fixedExpenses ? Object.values(financeData.fixedExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0) +
-              (financeData.variableExpenses ? Object.values(financeData.variableExpenses).reduce((sum, val) => sum + parseFloat(val || 0), 0) : 0);
-            
-            const monthlySavings = totalIncome - totalExpenses;
-            
-            setCareerParams(prev => ({
-              ...prev,
-              currentSalary: totalIncome,
-              newSalary: prev.newSalary || totalIncome * 1.2
-            }));
-            
-            setInvestmentParams(prev => ({
-              ...prev,
-              monthlySavings: monthlySavings > 0 ? monthlySavings : 0
-            }));
-          }
-        }
-        
-        const transactionsRef = collection(db, "transactions");
-        const now = new Date();
-        let startDate;
-        
-        if (timeRange === "month") {
-          startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-        } else if (timeRange === "quarter") {
-          startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
-        } else {
-          startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-        }
-        
-        const startDateString = startDate.toISOString().split('T')[0];
-        
-        const q = query(
-          transactionsRef, 
-          where("userId", "==", currentUser.uid),
-          where("date", ">=", startDateString),
-          orderBy("date", "desc")
-        );
-        
-        const querySnapshot = await getDocs(q);
-        const transactionsData = [];
-        
-        querySnapshot.forEach((document) => {
-          transactionsData.push({ id: document.id, ...document.data() });
-        });
-        
-        setTransactions(transactionsData);
-      } catch (error) {
-        console.error("Error loading user data:", error);
-      } finally {
-        setLoading(false);
-      }
+    if (finances) {
+      const { totalIncome, monthlySavings } = aggregateFinancials(finances);
+      setCareerParams(prev => ({
+        ...prev,
+        currentSalary: totalIncome,
+        newSalary: prev.newSalary || totalIncome * 1.2,
+      }));
+      setInvestmentParams(prev => ({
+        ...prev,
+        monthlySavings: monthlySavings > 0 ? monthlySavings : 0,
+      }));
     }
-    
-    loadUserData();
-  }, [currentUser, timeRange]);
+  }, [finances]);
 
   // Derived financial data context for advice
   const financialDataContext = useMemo(() => {
