@@ -195,7 +195,7 @@ function FinanceInput() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-slate-900 dark:border-slate-800 dark:border-t-white"></div>
       </div>
     );
   }
@@ -212,21 +212,21 @@ function FinanceInput() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:text-3xl sm:truncate">
+          <h2 className="text-2xl font-bold leading-7 text-slate-900 dark:text-white sm:text-3xl sm:truncate">
             Financial Information
           </h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Enter your financial details to get personalized insights and analysis
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Enter your financial details to get personalized strategic insights
           </p>
         </div>
 
         <button
           type="button"
           onClick={() => setIsScannerOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-xs font-semibold shadow-2xs transition cursor-pointer"
         >
           <Camera className="w-4 h-4" />
-          <span>Scan Receipt / UPI (AI OCR)</span>
+          <span>Scan Document / UPI</span>
         </button>
       </div>
 
@@ -245,7 +245,7 @@ function FinanceInput() {
         afterTaxSavingsRate={afterTaxSavingsRate}
       />
 
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40 rounded-xl mb-8 overflow-hidden transition-colors">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs rounded-2xl mb-8 overflow-hidden transition-colors">
         <FormTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
         <form onSubmit={handleSubmit}>

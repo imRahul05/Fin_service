@@ -153,13 +153,13 @@ function Analytics() {
           .filter(([, amount]) => amount > 0)
           .map(([, amount]) => amount),
         backgroundColor: [
-          'rgba(54, 162, 235, 0.7)',
-          'rgba(75, 192, 192, 0.7)',
-          'rgba(153, 102, 255, 0.7)',
-          'rgba(255, 159, 64, 0.7)',
-          'rgba(255, 99, 132, 0.7)',
+          '#0f172a',
+          '#334155',
+          '#475569',
+          '#64748b',
+          '#94a3b8'
         ],
-        borderColor: isDark ? '#1f2937' : '#ffffff',
+        borderColor: isDark ? '#090d14' : '#ffffff',
         borderWidth: 2,
       },
     ],
@@ -172,17 +172,17 @@ function Analytics() {
         label: 'Expense Categories',
         data: Object.values(financeAnalytics.expenseCategories),
         backgroundColor: [
-          'rgba(255, 99, 132, 0.7)',
-          'rgba(54, 162, 235, 0.7)',
-          'rgba(255, 206, 86, 0.7)',
-          'rgba(75, 192, 192, 0.7)',
-          'rgba(153, 102, 255, 0.7)',
-          'rgba(255, 159, 64, 0.7)',
-          'rgba(156, 163, 175, 0.7)',
-          'rgba(83, 102, 255, 0.7)',
-          'rgba(40, 159, 64, 0.7)',
+          '#1e293b',
+          '#334155',
+          '#475569',
+          '#64748b',
+          '#94a3b8',
+          '#0f766e',
+          '#b45309',
+          '#9f1239',
+          '#475569'
         ],
-        borderColor: isDark ? '#1f2937' : '#ffffff',
+        borderColor: isDark ? '#090d14' : '#ffffff',
         borderWidth: 2,
       },
     ],
@@ -197,11 +197,11 @@ function Analytics() {
           .filter(([, amount]) => amount > 0)
           .map(([, amount]) => amount),
         backgroundColor: [
-          'rgba(255, 99, 132, 0.7)',
-          'rgba(54, 162, 235, 0.7)',
-          'rgba(255, 206, 86, 0.7)',
+          '#334155',
+          '#64748b',
+          '#94a3b8',
         ],
-        borderColor: isDark ? '#1f2937' : '#ffffff',
+        borderColor: isDark ? '#090d14' : '#ffffff',
         borderWidth: 2,
       },
     ],
@@ -224,14 +224,14 @@ function Analytics() {
         label: 'Investment Allocation',
         data: investmentBreakdown.map(item => item.amount),
         backgroundColor: [
-          'rgba(75, 192, 192, 0.7)',
-          'rgba(54, 162, 235, 0.7)',
-          'rgba(153, 102, 255, 0.7)',
-          'rgba(255, 206, 86, 0.7)',
-          'rgba(255, 99, 132, 0.7)',
-          'rgba(255, 159, 64, 0.7)',
+          '#0f766e',
+          '#1e293b',
+          '#334155',
+          '#475569',
+          '#64748b',
+          '#94a3b8',
         ],
-        borderColor: isDark ? '#1f2937' : '#ffffff',
+        borderColor: isDark ? '#090d14' : '#ffffff',
         borderWidth: 2,
       },
     ],
@@ -245,7 +245,7 @@ function Analytics() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-slate-900 dark:border-slate-800 dark:border-t-white"></div>
       </div>
     );
   }
@@ -254,11 +254,11 @@ function Analytics() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="md:flex md:items-center md:justify-between mb-8">
         <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:text-3xl sm:truncate">
+          <h2 className="text-2xl font-bold leading-7 text-slate-900 dark:text-white sm:text-3xl sm:truncate">
             Financial Analytics
           </h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Analyze your financial profile and find ways to improve
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Analyze your financial profile and find ways to optimize
           </p>
         </div>
       </div>
@@ -268,159 +268,142 @@ function Analytics() {
       {finances && (
         <>
           {/* Financial Overview Cards */}
-          <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Monthly Income</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
-                  {formatCurrency(financeAnalytics.income)}
-                </dd>
-              </div>
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xs rounded-2xl p-5 transition-colors">
+              <dt className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Monthly Income</dt>
+              <dd className="mt-1 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+                {formatCurrency(financeAnalytics.income)}
+              </dd>
             </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Monthly Expenses</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
-                  {formatCurrency(financeAnalytics.expenses)}
-                </dd>
-              </div>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xs rounded-2xl p-5 transition-colors">
+              <dt className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Monthly Expenses</dt>
+              <dd className="mt-1 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+                {formatCurrency(financeAnalytics.expenses)}
+              </dd>
             </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Monthly Savings</dt>
-                <dd className={`mt-1 text-3xl font-semibold ${financeAnalytics.savings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {formatCurrency(financeAnalytics.savings)}
-                </dd>
-              </div>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xs rounded-2xl p-5 transition-colors">
+              <dt className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Monthly Savings</dt>
+              <dd className={`mt-1 text-2xl sm:text-3xl font-bold ${financeAnalytics.savings >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                {formatCurrency(financeAnalytics.savings)}
+              </dd>
             </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Savings Rate</dt>
-                <dd className="mt-1 text-3xl font-semibold text-blue-600 dark:text-blue-400">
-                  {financeAnalytics.savingsRate.toFixed(1)}%
-                </dd>
-              </div>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xs rounded-2xl p-5 transition-colors">
+              <dt className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Savings Rate</dt>
+              <dd className="mt-1 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+                {financeAnalytics.savingsRate.toFixed(1)}%
+              </dd>
             </div>
           </div>
 
           {/* Financial Health Indicators */}
           <div className="mt-8">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Financial Health Indicators</h3>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Financial Health Indicators</h3>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {/* Savings Rate Indicator */}
-              <div className={`bg-white dark:bg-gray-800 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl border ${
-                financeAnalytics.savingsRate >= 20 ? 'border-green-200 dark:border-green-800' : 
-                financeAnalytics.savingsRate >= 10 ? 'border-yellow-200 dark:border-yellow-800' : 'border-red-200 dark:border-red-800'
-              }`}>
-                <div className="px-4 py-5 sm:p-6">
-                  <div className="flex items-center">
-                    <div className={`flex-shrink-0 rounded-lg p-3 ${
-                      financeAnalytics.savingsRate >= 20 ? 'bg-green-100 dark:bg-green-950/50' : 
-                      financeAnalytics.savingsRate >= 10 ? 'bg-yellow-100 dark:bg-yellow-950/50' : 'bg-red-100 dark:bg-red-950/50'
-                    }`}>
-                      <svg className={`h-6 w-6 ${
-                        financeAnalytics.savingsRate >= 20 ? 'text-green-600 dark:text-green-400' : 
-                        financeAnalytics.savingsRate >= 10 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'
-                      }`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <div className="ml-5 w-0 flex-1">
-                      <dl>
-                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                          Savings Rate
-                        </dt>
-                        <dd>
-                          <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                            {financeAnalytics.savingsRate.toFixed(1)}%
-                          </div>
-                        </dd>
-                        <dd className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                          {financeAnalytics.savingsRate >= 20 ? 'Excellent' : 
-                           financeAnalytics.savingsRate >= 10 ? 'Good' : 
-                           financeAnalytics.savingsRate >= 0 ? 'Needs improvement' : 'Critical'}
-                        </dd>
-                      </dl>
-                    </div>
+              <div className="bg-white dark:bg-slate-900 overflow-hidden shadow-2xs rounded-2xl border border-slate-200 dark:border-slate-800 p-5 transition-colors">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 rounded-xl p-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4 w-0 flex-1">
+                    <dl>
+                      <dt className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
+                        Savings Rate
+                      </dt>
+                      <dd>
+                        <div className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
+                          {financeAnalytics.savingsRate.toFixed(1)}%
+                        </div>
+                      </dd>
+                      <dd className="mt-1 text-2xs font-semibold">
+                        <span className={`inline-block px-2 py-0.5 rounded-full border ${
+                          financeAnalytics.savingsRate >= 20 
+                            ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800" 
+                            : financeAnalytics.savingsRate >= 10 
+                              ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800" 
+                              : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800"
+                        }`}>
+                          {financeAnalytics.savingsRate >= 20 ? 'Optimal' : 
+                           financeAnalytics.savingsRate >= 10 ? 'Moderate' : 
+                           financeAnalytics.savingsRate >= 0 ? 'Needs Improvement' : 'Deficit'}
+                        </span>
+                      </dd>
+                    </dl>
                   </div>
                 </div>
               </div>
 
               {/* Debt-to-Income Ratio */}
-              {financeAnalytics.income > 0 && (
-                <div className={`bg-white dark:bg-gray-800 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl border ${
-                  (financeAnalytics.loansTotal / financeAnalytics.income) * 100 <= 20 ? 'border-green-200 dark:border-green-800' : 
-                  (financeAnalytics.loansTotal / financeAnalytics.income) * 100 <= 36 ? 'border-yellow-200 dark:border-yellow-800' : 'border-red-200 dark:border-red-800'
-                }`}>
-                  <div className="px-4 py-5 sm:p-6">
-                    <div className="flex items-center">
-                      <div className={`flex-shrink-0 rounded-lg p-3 ${
-                        (financeAnalytics.loansTotal / financeAnalytics.income) * 100 <= 20 ? 'bg-green-100 dark:bg-green-950/50' : 
-                        (financeAnalytics.loansTotal / financeAnalytics.income) * 100 <= 36 ? 'bg-yellow-100 dark:bg-yellow-950/50' : 'bg-red-100 dark:bg-red-950/50'
-                      }`}>
-                        <svg className={`h-6 w-6 ${
-                          (financeAnalytics.loansTotal / financeAnalytics.income) * 100 <= 20 ? 'text-green-600 dark:text-green-400' : 
-                          (financeAnalytics.loansTotal / financeAnalytics.income) * 100 <= 36 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'
-                        }`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <div className="ml-5 w-0 flex-1">
-                        <dl>
-                          <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                            Debt-to-Income Ratio
-                          </dt>
-                          <dd>
-                            <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                              {((financeAnalytics.loansTotal / financeAnalytics.income) * 100).toFixed(1)}%
-                            </div>
-                          </dd>
-                          <dd className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {(financeAnalytics.loansTotal / financeAnalytics.income) * 100 <= 20 ? 'Excellent' : 
-                             (financeAnalytics.loansTotal / financeAnalytics.income) * 100 <= 36 ? 'Good' : 'High'}
-                          </dd>
-                        </dl>
-                      </div>
+              {financeAnalytics.totalIncome > 0 && (
+                <div className="bg-white dark:bg-slate-900 overflow-hidden shadow-2xs rounded-2xl border border-slate-200 dark:border-slate-800 p-5 transition-colors">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 rounded-xl p-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                      <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="ml-4 w-0 flex-1">
+                      <dl>
+                        <dt className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
+                          Debt-to-Income Ratio
+                        </dt>
+                        <dd>
+                          <div className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
+                            {((financeAnalytics.totalLoans / financeAnalytics.totalIncome) * 100).toFixed(1)}%
+                          </div>
+                        </dd>
+                        <dd className="mt-1 text-2xs font-semibold">
+                          <span className={`inline-block px-2 py-0.5 rounded-full border ${
+                            (financeAnalytics.totalLoans / financeAnalytics.totalIncome) * 100 <= 20 
+                              ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800" 
+                              : (financeAnalytics.totalLoans / financeAnalytics.totalIncome) * 100 <= 36 
+                                ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800" 
+                                : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800"
+                          }`}>
+                            {(financeAnalytics.totalLoans / financeAnalytics.totalIncome) * 100 <= 20 ? 'Optimal' : 
+                             (financeAnalytics.totalLoans / financeAnalytics.totalIncome) * 100 <= 36 ? 'Acceptable' : 'High Leverage'}
+                          </span>
+                        </dd>
+                      </dl>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Investment Rate */}
-              {financeAnalytics.income > 0 && (
-                <div className={`bg-white dark:bg-gray-800 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl border ${
-                  (financeAnalytics.investmentsTotal / financeAnalytics.income) * 100 >= 15 ? 'border-green-200 dark:border-green-800' : 
-                  (financeAnalytics.investmentsTotal / financeAnalytics.income) * 100 >= 5 ? 'border-yellow-200 dark:border-yellow-800' : 'border-red-200 dark:border-red-800'
-                }`}>
-                  <div className="px-4 py-5 sm:p-6">
-                    <div className="flex items-center">
-                      <div className={`flex-shrink-0 rounded-lg p-3 ${
-                        (financeAnalytics.investmentsTotal / financeAnalytics.income) * 100 >= 15 ? 'bg-green-100 dark:bg-green-950/50' : 
-                        (financeAnalytics.investmentsTotal / financeAnalytics.income) * 100 >= 5 ? 'bg-yellow-100 dark:bg-yellow-950/50' : 'bg-red-100 dark:bg-red-950/50'
-                      }`}>
-                        <svg className={`h-6 w-6 ${
-                          (financeAnalytics.investmentsTotal / financeAnalytics.income) * 100 >= 15 ? 'text-green-600 dark:text-green-400' : 
-                          (financeAnalytics.investmentsTotal / financeAnalytics.income) * 100 >= 5 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'
-                        }`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                      </div>
-                      <div className="ml-5 w-0 flex-1">
-                        <dl>
-                          <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                            Investment Rate
-                          </dt>
-                          <dd>
-                            <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                              {((financeAnalytics.investmentsTotal / financeAnalytics.income) * 100).toFixed(1)}%
-                            </div>
-                          </dd>
-                          <dd className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {(financeAnalytics.investmentsTotal / financeAnalytics.income) * 100 >= 15 ? 'Excellent' : 
-                             (financeAnalytics.investmentsTotal / financeAnalytics.income) * 100 >= 5 ? 'Good' : 'Needs improvement'}
-                          </dd>
-                        </dl>
-                      </div>
+              {financeAnalytics.totalIncome > 0 && (
+                <div className="bg-white dark:bg-slate-900 overflow-hidden shadow-2xs rounded-2xl border border-slate-200 dark:border-slate-800 p-5 transition-colors">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 rounded-xl p-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                      <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                      </svg>
+                    </div>
+                    <div className="ml-4 w-0 flex-1">
+                      <dl>
+                        <dt className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
+                          Investment Rate
+                        </dt>
+                        <dd>
+                          <div className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
+                            {((financeAnalytics.totalInvestments / financeAnalytics.totalIncome) * 100).toFixed(1)}%
+                          </div>
+                        </dd>
+                        <dd className="mt-1 text-2xs font-semibold">
+                          <span className={`inline-block px-2 py-0.5 rounded-full border ${
+                            (financeAnalytics.totalInvestments / financeAnalytics.totalIncome) * 100 >= 15 
+                              ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800" 
+                              : (financeAnalytics.totalInvestments / financeAnalytics.totalIncome) * 100 >= 5 
+                                ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800" 
+                                : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800"
+                          }`}>
+                            {(financeAnalytics.totalInvestments / financeAnalytics.totalIncome) * 100 >= 15 ? 'Optimal' : 
+                             (financeAnalytics.totalInvestments / financeAnalytics.totalIncome) * 100 >= 5 ? 'Moderate' : 'Needs Attention'}
+                          </span>
+                        </dd>
+                      </dl>
                     </div>
                   </div>
                 </div>
@@ -429,10 +412,10 @@ function Analytics() {
           </div>
 
           {/* Chart Section */}
-          <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Income Sources */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-gray-950/40 px-5 py-6 transition-colors">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Income Sources</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs p-5 transition-colors">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Income Sources</h3>
               <div className="h-64">
                 <Pie 
                   data={incomeData}
@@ -442,8 +425,8 @@ function Analytics() {
             </div>
 
             {/* Expense Breakdown */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-gray-950/40 px-5 py-6 transition-colors">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Expense Distribution</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs p-5 transition-colors">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Expense Distribution</h3>
               <div className="h-64">
                 <Pie 
                   data={expenseBreakdownData}
@@ -453,8 +436,8 @@ function Analytics() {
             </div>
 
             {/* Expense Categories */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-gray-950/40 px-5 py-6 transition-colors">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Expense Categories</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs p-5 transition-colors">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Expense Categories</h3>
               <div className="h-64">
                 <Pie 
                   data={expenseCategoryData}
@@ -464,8 +447,8 @@ function Analytics() {
             </div>
 
             {/* Investment Allocation */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-gray-950/40 px-5 py-6 transition-colors">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Investment Allocation</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs p-5 transition-colors">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Investment Allocation</h3>
               <div className="h-64">
                 {investmentBreakdown.length > 0 ? (
                   <Pie 
@@ -474,7 +457,7 @@ function Analytics() {
                   />
                 ) : (
                   <div className="flex justify-center items-center h-full">
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">No investment data available</p>
+                    <p className="text-slate-400 text-xs">No investment data available</p>
                   </div>
                 )}
               </div>
@@ -489,64 +472,64 @@ function Analytics() {
           />
 
           {/* Financial Details */}
-          <div className="mt-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40 overflow-hidden rounded-xl transition-colors">
-            <div className="px-4 py-5 border-b border-gray-200 dark:border-gray-700 sm:px-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                Financial Details
+          <div className="mt-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden rounded-2xl transition-colors">
+            <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                Financial Details Summary
               </h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
-                Summary of your financial information
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                Detailed breakdown of recorded cash flows and asset distributions
               </p>
             </div>
 
             <div>
-              <dl className="divide-y divide-gray-200 dark:divide-gray-700">
-                <div className="bg-gray-50 dark:bg-gray-700/30 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Monthly Income</dt>
-                  <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100 sm:mt-0 sm:col-span-2">
-                    {formatCurrency(financeAnalytics.income)}
+              <dl className="divide-y divide-slate-100 dark:divide-slate-800">
+                <div className="bg-slate-50/50 dark:bg-slate-800/40 px-5 py-3.5 sm:grid sm:grid-cols-3 sm:gap-4">
+                  <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">Monthly Income</dt>
+                  <dd className="mt-1 text-xs font-semibold text-slate-900 dark:text-slate-100 sm:mt-0 sm:col-span-2">
+                    {formatCurrency(financeAnalytics.totalIncome)}
                   </dd>
                 </div>
-                <div className="bg-white dark:bg-gray-800 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Fixed Expenses</dt>
-                  <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100 sm:mt-0 sm:col-span-2">
+                <div className="bg-white dark:bg-slate-900 px-5 py-3.5 sm:grid sm:grid-cols-3 sm:gap-4">
+                  <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">Fixed Expenses</dt>
+                  <dd className="mt-1 text-xs font-semibold text-slate-900 dark:text-slate-100 sm:mt-0 sm:col-span-2">
                     {formatCurrency(financeAnalytics.expenseBreakdown['Fixed Expenses'] || 0)}
                   </dd>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-700/30 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Variable Expenses</dt>
-                  <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100 sm:mt-0 sm:col-span-2">
+                <div className="bg-slate-50/50 dark:bg-slate-800/40 px-5 py-3.5 sm:grid sm:grid-cols-3 sm:gap-4">
+                  <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">Variable Expenses</dt>
+                  <dd className="mt-1 text-xs font-semibold text-slate-900 dark:text-slate-100 sm:mt-0 sm:col-span-2">
                     {formatCurrency(financeAnalytics.expenseBreakdown['Variable Expenses'] || 0)}
                   </dd>
                 </div>
-                <div className="bg-white dark:bg-gray-800 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Loan Payments</dt>
-                  <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100 sm:mt-0 sm:col-span-2">
-                    {formatCurrency(financeAnalytics.loansTotal || 0)}
+                <div className="bg-white dark:bg-slate-900 px-5 py-3.5 sm:grid sm:grid-cols-3 sm:gap-4">
+                  <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">Loan Payments</dt>
+                  <dd className="mt-1 text-xs font-semibold text-slate-900 dark:text-slate-100 sm:mt-0 sm:col-span-2">
+                    {formatCurrency(financeAnalytics.totalLoans || 0)}
                   </dd>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-700/30 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Monthly Investments</dt>
-                  <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100 sm:mt-0 sm:col-span-2">
-                    {formatCurrency(financeAnalytics.investmentsTotal || 0)}
+                <div className="bg-slate-50/50 dark:bg-slate-800/40 px-5 py-3.5 sm:grid sm:grid-cols-3 sm:gap-4">
+                  <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">Monthly Investments</dt>
+                  <dd className="mt-1 text-xs font-semibold text-slate-900 dark:text-slate-100 sm:mt-0 sm:col-span-2">
+                    {formatCurrency(financeAnalytics.totalInvestments || 0)}
                   </dd>
                 </div>
-                <div className="bg-white dark:bg-gray-800 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Net Monthly Savings</dt>
-                  <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100 sm:mt-0 sm:col-span-2">
-                    {formatCurrency(financeAnalytics.savings || 0)}
+                <div className="bg-white dark:bg-slate-900 px-5 py-3.5 sm:grid sm:grid-cols-3 sm:gap-4">
+                  <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">Net Monthly Savings</dt>
+                  <dd className="mt-1 text-xs font-semibold text-slate-900 dark:text-slate-100 sm:mt-0 sm:col-span-2">
+                    {formatCurrency(financeAnalytics.monthlySavings || 0)}
                   </dd>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-700/30 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Savings Rate</dt>
-                  <dd className="mt-1 text-sm font-semibold text-blue-600 dark:text-blue-400 sm:mt-0 sm:col-span-2">
+                <div className="bg-slate-50/50 dark:bg-slate-800/40 px-5 py-3.5 sm:grid sm:grid-cols-3 sm:gap-4">
+                  <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">Savings Rate</dt>
+                  <dd className="mt-1 text-xs font-semibold text-slate-900 dark:text-white sm:mt-0 sm:col-span-2">
                     {financeAnalytics.savingsRate.toFixed(1)}%
                   </dd>
                 </div>
-                <div className="bg-white dark:bg-gray-800 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Last Updated</dt>
-                  <dd className="mt-1 text-sm text-gray-500 dark:text-gray-400 sm:mt-0 sm:col-span-2">
-                    {finances.updatedAt ? formatDate(finances.updatedAt) : 'Unknown'}
+                <div className="bg-white dark:bg-slate-900 px-5 py-3.5 sm:grid sm:grid-cols-3 sm:gap-4">
+                  <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">Last Updated</dt>
+                  <dd className="mt-1 text-xs text-slate-500 dark:text-slate-400 sm:mt-0 sm:col-span-2">
+                    {finances.updatedAt ? formatDate(finances.updatedAt) : 'Recent Session'}
                   </dd>
                 </div>
               </dl>
@@ -554,22 +537,22 @@ function Analytics() {
           </div>
 
           {/* AI Analysis */}
-          <div className="mt-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40 overflow-hidden rounded-xl transition-colors">
-            <div className="px-4 py-5 border-b border-gray-200 dark:border-gray-700 sm:px-6 bg-blue-50 dark:bg-blue-950/30">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                Financial Analysis
+          <div className="mt-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden rounded-2xl transition-colors">
+            <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                Strategic Assessment
               </h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                 Personalized insights about your financial profile
               </p>
             </div>
-            <div className="px-4 py-5 sm:p-6">
+            <div className="px-5 py-5">
               {aiLoading ? (
                 <div className="flex justify-center items-center h-40">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-200 border-t-slate-900 dark:border-slate-800 dark:border-t-white"></div>
                 </div>
               ) : (
-                <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm whitespace-pre-line">
+                <div className="text-slate-700 dark:text-slate-300 leading-relaxed text-xs whitespace-pre-line">
                   {spendingAnalysis}
                 </div>
               )}

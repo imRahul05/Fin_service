@@ -354,7 +354,7 @@ function AIAdvisor() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-slate-900 dark:border-slate-800 dark:border-t-white"></div>
       </div>
     );
   }
@@ -363,17 +363,17 @@ function AIAdvisor() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">
             No financial data found
           </h2>
-          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
-            You haven't added your financial information yet. Please add your details to use the AI Advisor.
+          <p className="mt-4 text-base text-slate-500 dark:text-slate-400">
+            You haven't added your financial information yet. Please add your details to use the Advisor.
           </p>
           <div className="mt-8">
             <Button
               variant="default"
               onClick={() => window.location.href = "/finance-input"}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
             >
               Add Financial Information
             </Button>
@@ -387,43 +387,42 @@ function AIAdvisor() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="md:flex md:items-center md:justify-between mb-8">
         <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:text-3xl sm:truncate">
-            AI Financial Advisor
+          <h2 className="text-2xl font-bold leading-7 text-slate-900 dark:text-white sm:text-3xl sm:truncate">
+            Financial Advisor
           </h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Get personalized financial guidance powered by AI
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Get personalized financial guidance and scenario simulation
           </p>
         </div>
       </div>
 
-      {/* Ask AI Section */}
+      {/* Ask Question Section */}
       <div className="max-w-7xl mx-auto mb-8">
-        <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xs">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <CardTitle className="text-gray-900 dark:text-white">Ask a Financial Question</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white text-base">Ask a Financial Question</CardTitle>
             </div>
-            <CardDescription className="text-gray-500 dark:text-gray-400">
+            <CardDescription className="text-slate-500 dark:text-slate-400">
               Get personalized answers to your specific financial questions
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <textarea
-              className="w-full p-4 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md min-h-[100px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
-              placeholder="Ask me anything about your finances, investments, or financial planning..."
+              className="w-full p-4 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl min-h-[100px] focus:ring-1 focus:ring-slate-900 dark:focus:ring-white focus:outline-none placeholder-slate-400 dark:placeholder-slate-500 text-xs transition-colors"
+              placeholder="Ask anything about your finances, investments, or tax optimization..."
               value={customState.prompt}
               onChange={(e) => setCustomState(prev => ({ ...prev, prompt: e.target.value }))}
             />
 
             {customState.loading && (
               <div className="flex justify-center items-center py-6">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-200 border-t-slate-900 dark:border-slate-800 dark:border-t-white"></div>
               </div>
             )}
 
             {customState.response && !customState.loading && (
-              <div className="p-4 bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-lg prose dark:prose-invert max-w-none text-sm text-gray-800 dark:text-gray-200">
+              <div className="p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl prose dark:prose-invert max-w-none text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
                 <ReactMarkdown>{customState.response}</ReactMarkdown>
               </div>
             )}
@@ -433,16 +432,16 @@ function AIAdvisor() {
               variant="default"
               onClick={handleCustomPromptSubmit}
               disabled={customState.loading || !customState.prompt.trim()}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-semibold cursor-pointer"
             >
-              {customState.loading ? "Thinking..." : "Get Answer"}
+              {customState.loading ? "Computing..." : "Get Answer"}
             </Button>
           </CardFooter>
         </Card>
       </div>
 
       <Tabs defaultValue="personalAdvice" className="w-full" onValueChange={setActiveTab} value={activeTab}>
-        <TabsList className="grid grid-cols-2 sm:grid-cols-4 mb-8 bg-gray-100 dark:bg-gray-800 p-1 border border-gray-200 dark:border-gray-700">
+        <TabsList className="grid grid-cols-2 sm:grid-cols-4 mb-8 bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700 rounded-xl">
           <TabsTrigger value="personalAdvice">Personal Advice</TabsTrigger>
           <TabsTrigger value="spendingAnalysis">Spending Analysis</TabsTrigger>
           <TabsTrigger value="scenarios">What-If Scenarios</TabsTrigger>
@@ -482,11 +481,11 @@ function AIAdvisor() {
                 </div>
               )}
             </CardContent>
-            <CardFooter className="flex justify-between border-t border-gray-100 dark:border-gray-700/60 pt-4">
+            <CardFooter className="flex justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
               <Button 
                 variant="outline" 
                 onClick={() => window.location.href = "/finance-input"}
-                className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200"
+                className="border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200"
               >
                 Update Financial Info
               </Button>
@@ -494,9 +493,9 @@ function AIAdvisor() {
                 variant="default" 
                 onClick={() => handleFetchPersonalAdvice(true)}
                 disabled={adviceState.loading}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 cursor-pointer"
               >
-                <RotateCcw className={`w-4 h-4 mr-1.5 ${adviceState.loading ? "animate-spin" : ""}`} />
+                <RotateCcw className={`w-3.5 h-3.5 mr-1.5 ${adviceState.loading ? "animate-spin" : ""}`} />
                 {adviceState.loading ? "Refreshing..." : "Refresh Advice"}
               </Button>
             </CardFooter>
@@ -505,11 +504,11 @@ function AIAdvisor() {
         
         {/* Spending Analysis Tab */}
         <TabsContent value="spendingAnalysis" className="space-y-4">
-          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
+          <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xs">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
-                <CardTitle className="text-gray-900 dark:text-white">Spending Behavior Analysis</CardTitle>
-                <CardDescription className="text-gray-500 dark:text-gray-400">
+                <CardTitle className="text-slate-900 dark:text-white">Spending Behavior Analysis</CardTitle>
+                <CardDescription className="text-slate-500 dark:text-slate-400">
                   Analyze your spending patterns and discover savings opportunities
                 </CardDescription>
               </div>
@@ -523,10 +522,10 @@ function AIAdvisor() {
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div className="space-y-2">
-                  <Label htmlFor="timeRange" className="text-gray-700 dark:text-gray-300">Time Period</Label>
+                  <Label htmlFor="timeRange" className="text-slate-700 dark:text-slate-300">Time Period</Label>
                   <select
                     id="timeRange"
-                    className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-slate-900 dark:focus:ring-white"
                     value={timeRange}
                     onChange={(e) => setTimeRange(e.target.value)}
                   >
@@ -538,34 +537,34 @@ function AIAdvisor() {
               </div>
               
               {transactions.length === 0 ? (
-                <div className="text-center p-8 bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800 rounded-md">
-                  <p className="text-yellow-700 dark:text-yellow-300">
+                <div className="text-center p-8 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
+                  <p className="text-amber-800 dark:text-amber-300 text-xs">
                     No transactions found for the selected time period. Please add transactions or select a different time range.
                   </p>
                 </div>
               ) : spendingState.loading ? (
                 <div className="flex flex-col justify-center items-center h-96 space-y-3">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Analyzing transactions with AI...</p>
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-200 border-t-slate-900 dark:border-slate-800 dark:border-t-white"></div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Analyzing transactions...</p>
                 </div>
               ) : spendingState.response ? (
-                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
+                <div className="prose dark:prose-invert max-w-none text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
                   <ReactMarkdown>{spendingState.response}</ReactMarkdown>
                 </div>
               ) : (
-                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                <div className="text-center py-12 text-xs text-slate-500 dark:text-slate-400">
                   Click "Analyze Spending" to generate spending insights for this period.
                 </div>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end border-t border-gray-100 dark:border-gray-700/60 pt-4">
+            <CardFooter className="flex justify-end border-t border-slate-100 dark:border-slate-800 pt-4">
               <Button 
                 variant="default" 
                 onClick={() => handleFetchSpendingAnalysis(true)}
                 disabled={spendingState.loading || transactions.length === 0}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 cursor-pointer text-xs font-semibold"
               >
-                <RotateCcw className={`w-4 h-4 mr-1.5 ${spendingState.loading ? "animate-spin" : ""}`} />
+                <RotateCcw className={`w-3.5 h-3.5 mr-1.5 ${spendingState.loading ? "animate-spin" : ""}`} />
                 {spendingState.loading ? "Analyzing..." : "Analyze Spending"}
               </Button>
             </CardFooter>
@@ -833,12 +832,12 @@ function AIAdvisor() {
                 </div>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end border-t border-gray-100 dark:border-gray-700/60 pt-4">
+            <CardFooter className="flex justify-end border-t border-slate-100 dark:border-slate-800 pt-4">
               <Button 
                 variant="default" 
                 onClick={() => handleSimulateScenario(true)}
                 disabled={scenarioState.loading}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-semibold cursor-pointer"
               >
                 {scenarioState.loading ? "Simulating..." : "Simulate Scenario"}
               </Button>
@@ -848,11 +847,11 @@ function AIAdvisor() {
         
         {/* Backward Analysis Tab */}
         <TabsContent value="backwardAnalysis" className="space-y-4">
-          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
+          <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xs">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
-                <CardTitle className="text-gray-900 dark:text-white">Past Financial Decisions Analysis</CardTitle>
-                <CardDescription className="text-gray-500 dark:text-gray-400">
+                <CardTitle className="text-slate-900 dark:text-white">Past Financial Decisions Analysis</CardTitle>
+                <CardDescription className="text-slate-500 dark:text-slate-400">
                   Analyze what could have happened differently with past financial decisions
                 </CardDescription>
               </div>
@@ -866,13 +865,13 @@ function AIAdvisor() {
             <CardContent>
               <div className="space-y-6">
                 {historicalDecisions.map((decision, index) => (
-                  <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-700/30 transition-colors">
+                  <div key={index} className="p-4 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/40 transition-colors">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor={`decisionType-${index}`} className="text-gray-700 dark:text-gray-300">Decision Type</Label>
+                        <Label htmlFor={`decisionType-${index}`} className="text-slate-700 dark:text-slate-300">Decision Type</Label>
                         <select
                           id={`decisionType-${index}`}
-                          className="w-full p-2 mt-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full p-2 mt-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-slate-900 dark:focus:ring-white"
                           value={decision.type}
                           onChange={(e) => handleHistoricalDecisionChange(index, 'type', e.target.value)}
                         >
@@ -885,42 +884,42 @@ function AIAdvisor() {
                         </select>
                       </div>
                       <div>
-                        <Label htmlFor={`amount-${index}`} className="text-gray-700 dark:text-gray-300">Amount (₹)</Label>
+                        <Label htmlFor={`amount-${index}`} className="text-slate-700 dark:text-slate-300">Amount (₹)</Label>
                         <input
                           type="number"
                           id={`amount-${index}`}
-                          className="w-full p-2 mt-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full p-2 mt-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-slate-900 dark:focus:ring-white"
                           value={decision.amount}
                           onChange={(e) => handleHistoricalDecisionChange(index, 'amount', e.target.value)}
                           min="0"
                         />
                       </div>
                       <div>
-                        <Label htmlFor={`date-${index}`} className="text-gray-700 dark:text-gray-300">Date (approximate)</Label>
+                        <Label htmlFor={`date-${index}`} className="text-slate-700 dark:text-slate-300">Date (approximate)</Label>
                         <input
                           type="date"
                           id={`date-${index}`}
-                          className="w-full p-2 mt-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full p-2 mt-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-slate-900 dark:focus:ring-white"
                           value={decision.date}
                           onChange={(e) => handleHistoricalDecisionChange(index, 'date', e.target.value)}
                         />
                       </div>
                       <div>
-                        <Label htmlFor={`outcome-${index}`} className="text-gray-700 dark:text-gray-300">Actual Outcome</Label>
+                        <Label htmlFor={`outcome-${index}`} className="text-slate-700 dark:text-slate-300">Actual Outcome</Label>
                         <input
                           type="text"
                           id={`outcome-${index}`}
-                          className="w-full p-2 mt-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full p-2 mt-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-slate-900 dark:focus:ring-white"
                           value={decision.outcome}
                           onChange={(e) => handleHistoricalDecisionChange(index, 'outcome', e.target.value)}
                           placeholder="e.g., +8% return, sold at loss, etc."
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <Label htmlFor={`description-${index}`} className="text-gray-700 dark:text-gray-300">Description</Label>
+                        <Label htmlFor={`description-${index}`} className="text-slate-700 dark:text-slate-300">Description</Label>
                         <textarea
                           id={`description-${index}`}
-                          className="w-full p-2 mt-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full p-2 mt-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-slate-900 dark:focus:ring-white"
                           value={decision.description}
                           onChange={(e) => handleHistoricalDecisionChange(index, 'description', e.target.value)}
                           rows="2"
@@ -933,6 +932,7 @@ function AIAdvisor() {
                           onClick={() => removeHistoricalDecision(index)}
                           disabled={historicalDecisions.length <= 1}
                           size="sm"
+                          className="cursor-pointer"
                         >
                           Remove
                         </Button>
@@ -944,35 +944,35 @@ function AIAdvisor() {
                 <Button 
                   variant="outline" 
                   onClick={addHistoricalDecision}
-                  className="w-full border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200"
+                  className="w-full border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
                   + Add Another Decision
                 </Button>
               </div>
               
-              <Separator className="my-6 border-gray-200 dark:border-gray-700" />
+              <Separator className="my-6 border-slate-200 dark:border-slate-700" />
               
               {backwardState.loading ? (
                 <div className="flex flex-col justify-center items-center h-96 space-y-3">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Analyzing past decisions with AI...</p>
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-200 border-t-slate-900 dark:border-slate-800 dark:border-t-white"></div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Analyzing past decisions...</p>
                 </div>
               ) : backwardState.response ? (
-                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
+                <div className="prose dark:prose-invert max-w-none text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
                   <ReactMarkdown>{backwardState.response}</ReactMarkdown>
                 </div>
               ) : (
-                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                <div className="text-center py-12 text-xs text-slate-500 dark:text-slate-400">
                   Add past decisions and click "Analyze Decisions" to generate retrospective insights.
                 </div>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end border-t border-gray-100 dark:border-gray-700/60 pt-4">
+            <CardFooter className="flex justify-end border-t border-slate-100 dark:border-slate-800 pt-4">
               <Button 
                 variant="default" 
                 onClick={() => handleAnalyzeHistoricalDecisions(true)}
                 disabled={backwardState.loading || !historicalDecisions.some(d => d.description && d.amount > 0)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 cursor-pointer text-xs font-semibold"
               >
                 {backwardState.loading ? "Analyzing..." : "Analyze Decisions"}
               </Button>

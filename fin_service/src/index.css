@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: #f0f9ff;
-  --color-primary-100: #e0f2fe;
-  --color-primary-200: #bae6fd;
-  --color-primary-300: #7dd3fc;
-  --color-primary-400: #38bdf8;
-  --color-primary-500: #0ea5e9;
-  --color-primary-600: #0284c7;
-  --color-primary-700: #0369a1;
-  --color-primary-800: #075985;
-  --color-primary-900: #0c4a6e;
-  --color-primary-950: #082f49;
+  --color-primary-50: #f8fafc;
+  --color-primary-100: #f1f5f9;
+  --color-primary-200: #e2e8f0;
+  --color-primary-300: #cbd5e1;
+  --color-primary-400: #94a3b8;
+  --color-primary-500: #64748b;
+  --color-primary-600: #475569;
+  --color-primary-700: #334155;
+  --color-primary-800: #1e293b;
+  --color-primary-900: #0f172a;
+  --color-primary-950: #020617;
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
 
@@ -29,14 +29,14 @@
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
 
-  --color-success-500: #10b981;
-  --color-success-600: #059669;
+  --color-success-500: #15803d;
+  --color-success-600: #166534;
 
-  --color-danger-500: #ef4444;
-  --color-danger-600: #dc2626;
+  --color-danger-500: #b91c1c;
+  --color-danger-600: #991b1b;
 
-  --color-warning-500: #f59e0b;
-  --color-warning-600: #d97706;
+  --color-warning-500: #b45309;
+  --color-warning-600: #92400e;
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -60,16 +60,19 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
+  --color-slate-750: #1a2333;
+  --color-slate-850: #0d131f;
+
   --color-chart-1: hsl(var(--chart-1));
   --color-chart-2: hsl(var(--chart-2));
   --color-chart-3: hsl(var(--chart-3));
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
 
-  --font-sans: "Inter", sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.06);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -80,7 +83,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -90,115 +93,59 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --background: 210 40% 98%;
-  --foreground: 222.2 84% 4.9%;
+  --background: 40 10% 98%;
+  --foreground: 222.2 47.4% 11.2%;
   --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
+  --card-foreground: 222.2 47.4% 11.2%;
   --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 221.2 83.2% 53.3%;
+  --popover-foreground: 222.2 47.4% 11.2%;
+  --primary: 222.2 47.4% 11.2%;
   --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
+  --secondary: 210 20% 96%;
   --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
+  --muted: 210 20% 96%;
   --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96.1%;
+  --accent: 210 20% 96%;
   --accent-foreground: 222.2 47.4% 11.2%;
-  --destructive: 0 84.2% 60.2%;
+  --destructive: 0 72% 51%;
   --destructive-foreground: 210 40% 98%;
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
-  --ring: 221.2 83.2% 53.3%;
-  --chart-1: 12 76% 61%;
-  --chart-2: 173 58% 39%;
-  --chart-3: 197 37% 24%;
-  --chart-4: 43 74% 66%;
-  --chart-5: 27 87% 67%;
+  --ring: 222.2 47.4% 11.2%;
+  --chart-1: 222 47% 20%;
+  --chart-2: 215 25% 45%;
+  --chart-3: 214 18% 65%;
+  --chart-4: 152 45% 35%;
+  --chart-5: 35 60% 45%;
   --radius: 0.5rem;
 }
 
 .dark {
   color-scheme: dark;
-  --background: 222.2 84% 4.9%;
+  --background: 224 71% 4%;
   --foreground: 210 40% 98%;
-  --card: 222.2 84% 7%;
+  --card: 222 47% 9%;
   --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 7%;
+  --popover: 222 47% 9%;
   --popover-foreground: 210 40% 98%;
-  --primary: 217.2 91.2% 59.8%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
+  --primary: 210 40% 98%;
+  --primary-foreground: 224 71% 4%;
+  --secondary: 217.2 32.6% 15%;
   --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
+  --muted: 217.2 32.6% 15%;
   --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
+  --accent: 217.2 32.6% 15%;
   --accent-foreground: 210 40% 98%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 210 40% 98%;
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
-  --ring: 224.3 76.3% 48%;
-  --chart-1: 220 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
-}
-
-a {
-  font-weight: 500;
-  color: #3b82f6;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #2563eb;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c5c5c5;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #111827;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #374151;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
-}
-
-/* Fix for Firefox scrollbar */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #c5c5c5 #f1f1f1;
-}
-
-.dark * {
-  scrollbar-color: #374151 #111827;
+  --ring: 210 40% 98%;
+  --chart-1: 210 40% 90%;
+  --chart-2: 215 20% 65%;
+  --chart-3: 217 32% 40%;
+  --chart-4: 152 45% 55%;
+  --chart-5: 35 60% 60%;
 }
 
 @layer base {
@@ -207,5 +154,53 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
   }
+  a {
+    font-weight: 500;
+    text-decoration: inherit;
+    transition: opacity 0.15s ease;
+  }
+  a:hover {
+    opacity: 0.85;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272a;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Fix for Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d8 transparent;
+}
+
+.dark * {
+  scrollbar-color: #27272a transparent;
 }

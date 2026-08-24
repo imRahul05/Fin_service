@@ -213,14 +213,22 @@ function Dashboard() {
           summaryData.totalExpenses, 
           summaryData.monthlySavings
         ],
-        backgroundColor: [
-          'rgba(59, 130, 246, 0.8)',
-          'rgba(239, 68, 68, 0.8)',
+        backgroundColor: isDark ? [
+          'rgba(248, 250, 252, 0.85)',
+          'rgba(148, 163, 184, 0.6)',
+          'rgba(52, 211, 153, 0.8)'
+        ] : [
+          'rgba(15, 23, 42, 0.85)',
+          'rgba(100, 116, 139, 0.75)',
           'rgba(16, 185, 129, 0.8)'
         ],
-        borderColor: [
-          'rgb(59, 130, 246)',
-          'rgb(239, 68, 68)',
+        borderColor: isDark ? [
+          'rgb(248, 250, 252)',
+          'rgb(148, 163, 184)',
+          'rgb(52, 211, 153)'
+        ] : [
+          'rgb(15, 23, 42)',
+          'rgb(100, 116, 139)',
           'rgb(16, 185, 129)'
         ],
         borderWidth: 1,
@@ -241,16 +249,16 @@ function Dashboard() {
           ...(finances?.variableExpenses ? Object.values(finances.variableExpenses) : [])
         ],
         backgroundColor: [
-          'rgba(239, 68, 68, 0.75)',
-          'rgba(249, 115, 22, 0.75)',
-          'rgba(245, 158, 11, 0.75)',
-          'rgba(16, 185, 129, 0.75)',
-          'rgba(6, 182, 212, 0.75)',
-          'rgba(59, 130, 246, 0.75)',
-          'rgba(139, 92, 246, 0.75)',
-          'rgba(236, 72, 153, 0.75)'
+          '#1e293b',
+          '#334155',
+          '#475569',
+          '#64748b',
+          '#94a3b8',
+          '#0f766e',
+          '#b45309',
+          '#9f1239'
         ],
-        borderColor: isDark ? '#1f2937' : '#ffffff',
+        borderColor: isDark ? '#0f172a' : '#ffffff',
         borderWidth: 2
       }
     ]
@@ -259,11 +267,8 @@ function Dashboard() {
   if (financesLoading) {
     return (
       <div className="flex flex-col justify-center items-center h-screen space-y-4">
-        <div className="relative">
-          <div className="animate-spin rounded-full h-14 w-14 border-4 border-blue-500/20 border-t-blue-600"></div>
-          <Sparkles className="w-5 h-5 text-blue-600 absolute inset-0 m-auto animate-pulse" />
-        </div>
-        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Loading your financial dashboard...</p>
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-slate-900 dark:border-slate-800 dark:border-t-white"></div>
+        <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Loading financial dashboard...</p>
       </div>
     );
   }
@@ -271,20 +276,20 @@ function Dashboard() {
   if (!finances) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 p-8 sm:p-12 shadow-sm">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 mb-6 shadow-sm">
-            <Sparkles className="h-8 w-8" />
+        <div className="text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sm:p-12 shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white mb-6 shadow-xs">
+            <Wallet className="h-6 w-6" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-            Welcome to FinSage AI Dashboard
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Welcome to FinSage Dashboard
           </h2>
-          <p className="mt-3 text-base text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-            You haven't added your financial profile yet. Add your income, expenses, and assets to unlock real-time AI strategic guidance.
+          <p className="mt-3 text-base text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+            You haven't added your financial profile yet. Add your income, expenses, and assets to unlock real-time strategic guidance.
           </p>
           <div className="mt-8">
             <Link
               to="/finance-input"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-transparent text-sm font-semibold rounded-xl shadow-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all hover:shadow-lg"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-transparent text-sm font-semibold rounded-xl shadow-xs text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 transition-all"
             >
               <span>Add Financial Information</span>
               <ArrowRight className="w-4 h-4" />
@@ -301,21 +306,20 @@ function Dashboard() {
       {/* Guest Mode Sandbox Bar */}
       {isGuestMode && (
         <div className="space-y-3">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 rounded-xl bg-blue-600 text-white shadow-md gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm gap-3 border border-slate-800">
             <div className="flex items-center gap-2.5">
-              <span className="text-xl">✨</span>
               <div>
                 <p className="text-xs sm:text-sm font-bold">
-                  You are currently exploring in Sandbox Guest Mode!
+                  You are currently exploring in Sandbox Guest Mode
                 </p>
-                <p className="text-2xs sm:text-xs text-blue-100">
+                <p className="text-2xs sm:text-xs text-slate-300 dark:text-slate-600">
                   Switch personas below to test scenarios with zero signup required.
                 </p>
               </div>
             </div>
             <Link
               to="/register"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-white text-blue-700 hover:bg-blue-50 rounded-lg shadow-sm transition shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white text-slate-900 hover:bg-slate-100 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800 rounded-lg shadow-2xs transition shrink-0"
             >
               <UserPlus className="w-3.5 h-3.5" />
               Claim & Save Plan
@@ -345,39 +349,37 @@ function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
               Financial Dashboard
             </h1>
-            <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/60 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300">
-              <Sparkles className="w-3 h-3 text-blue-500" />
-              AI Active
+            <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 text-2xs font-semibold text-slate-700 dark:text-slate-300">
+              Active Assessment
             </span>
           </div>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Real-time financial metrics, cash flow distribution, and AI intelligence
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Real-time financial metrics, cash flow distribution, and strategic intelligence
           </p>
         </div>
 
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setIsDossierOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
           >
-            <FileText className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <FileText className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
             <span>Export Dossier</span>
           </button>
 
           <button
             onClick={() => setIsDrawerOpen(true)}
-            className="lg:hidden inline-flex items-center gap-1.5 px-3.5 py-2 border border-blue-200 dark:border-blue-800 rounded-xl shadow-xs text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors cursor-pointer"
+            className="lg:hidden inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xs text-xs font-medium text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>AI Strategy</span>
+            <span>Strategy</span>
           </button>
 
           <Link
             to="/finance-input"
-            className="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl shadow-xs text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-xl shadow-2xs text-xs font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors"
           >
             Update Finances
           </Link>
@@ -398,114 +400,114 @@ function Dashboard() {
         onOpenFullAdvice={() => setIsDrawerOpen(true)}
       />
 
-      {/* Summary KPI Cards with Contextual AI Badges */}
+      {/* Summary KPI Cards with Contextual Badges */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         
         {/* Monthly Savings Card */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/80 overflow-hidden shadow-xs dark:shadow-gray-950/40 rounded-2xl p-5 transition-colors relative group">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xs rounded-2xl p-5 transition-colors relative group">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl p-2.5">
+              <div className="flex-shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl p-2.5 border border-slate-200 dark:border-slate-700">
                 <Wallet className="h-5 w-5" />
               </div>
               <div>
-                <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
                   Monthly Savings
                 </dt>
-                <dd className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">
+                <dd className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
                   {formatCurrency(summaryData.monthlySavings)}
                 </dd>
               </div>
             </div>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between text-2xs">
-            <span className="text-gray-500 dark:text-gray-400">Rate: {savingsRate.toFixed(1)}%</span>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-2xs">
+            <span className="text-slate-500 dark:text-slate-400">Rate: {savingsRate.toFixed(1)}%</span>
             <span className={`inline-flex items-center gap-1 font-semibold px-2 py-0.5 rounded-full ${
               savingsRate >= 20 
-                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400" 
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800" 
                 : savingsRate > 0 
-                  ? "bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400" 
-                  : "bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400"
+                  ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800" 
+                  : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800"
             }`}>
-              {savingsRate >= 20 ? "✨ Optimal" : savingsRate > 0 ? "⚠️ Fair" : "🚨 Deficit"}
+              {savingsRate >= 20 ? "Optimal" : savingsRate > 0 ? "Fair" : "Deficit"}
             </span>
           </div>
         </div>
 
         {/* Debt-to-Income Ratio Card */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/80 overflow-hidden shadow-xs dark:shadow-gray-950/40 rounded-2xl p-5 transition-colors relative group">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xs rounded-2xl p-5 transition-colors relative group">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-xl p-2.5">
+              <div className="flex-shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl p-2.5 border border-slate-200 dark:border-slate-700">
                 <AlertCircle className="h-5 w-5" />
               </div>
               <div>
-                <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
                   Debt-to-Income
                 </dt>
-                <dd className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">
+                <dd className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
                   {summaryData.debtToIncomeRatio.toFixed(1)}%
                 </dd>
               </div>
             </div>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between text-2xs">
-            <span className="text-gray-500 dark:text-gray-400">Threshold: &lt;36%</span>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-2xs">
+            <span className="text-slate-500 dark:text-slate-400">Threshold: &lt;36%</span>
             <span className={`inline-flex items-center gap-1 font-semibold px-2 py-0.5 rounded-full ${
               summaryData.debtToIncomeRatio <= 36 
-                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400" 
-                : "bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400"
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800" 
+                : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800"
             }`}>
-              {summaryData.debtToIncomeRatio <= 36 ? "🛡️ Healthy" : "⚠️ High Leverage"}
+              {summaryData.debtToIncomeRatio <= 36 ? "Healthy" : "High Leverage"}
             </span>
           </div>
         </div>
 
         {/* Net Worth Card */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/80 overflow-hidden shadow-xs dark:shadow-gray-950/40 rounded-2xl p-5 transition-colors relative group">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xs rounded-2xl p-5 transition-colors relative group">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl p-2.5">
+              <div className="flex-shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl p-2.5 border border-slate-200 dark:border-slate-700">
                 <TrendingUp className="h-5 w-5" />
               </div>
               <div>
-                <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
                   Est. Net Worth
                 </dt>
-                <dd className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">
+                <dd className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
                   {formatCurrency(summaryData.netWorth)}
                 </dd>
               </div>
             </div>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between text-2xs">
-            <span className="text-gray-500 dark:text-gray-400">Assets - Debts</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
-              {summaryData.netWorth >= 0 ? "📈 Positive" : "📉 Negative"}
+          <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-2xs">
+            <span className="text-slate-500 dark:text-slate-400">Assets - Debts</span>
+            <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
+              {summaryData.netWorth >= 0 ? "Positive" : "Negative"}
             </span>
           </div>
         </div>
 
         {/* Investment Ratio Card */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/80 overflow-hidden shadow-xs dark:shadow-gray-950/40 rounded-2xl p-5 transition-colors relative group">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xs rounded-2xl p-5 transition-colors relative group">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-xl p-2.5">
+              <div className="flex-shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl p-2.5 border border-slate-200 dark:border-slate-700">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
-                <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
                   Total Invested
                 </dt>
-                <dd className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">
+                <dd className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
                   {formatCurrency(summaryData.totalInvestments)}
                 </dd>
               </div>
             </div>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between text-2xs">
-            <span className="text-gray-500 dark:text-gray-400">Ratio vs Income</span>
-            <span className="text-indigo-600 dark:text-indigo-400 font-semibold">
+          <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-2xs">
+            <span className="text-slate-500 dark:text-slate-400">Ratio vs Income</span>
+            <span className="text-slate-800 dark:text-slate-200 font-semibold">
               {investmentRate.toFixed(0)}%
             </span>
           </div>
@@ -515,8 +517,8 @@ function Dashboard() {
       {/* Visual Charts Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Cash Flow Distribution */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/80 rounded-2xl p-5 shadow-xs transition-colors">
-          <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs transition-colors">
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-4">
             Monthly Cash Flow (Income vs Expenses vs Savings)
           </h2>
           <div className="h-64 sm:h-72">
@@ -525,15 +527,15 @@ function Dashboard() {
         </div>
 
         {/* Expense Category Distribution */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/80 rounded-2xl p-5 shadow-xs transition-colors">
-          <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs transition-colors">
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-4">
             Expense Category Breakdown
           </h2>
           <div className="h-64 sm:h-72">
             {expensesData.labels.length > 0 ? (
               <Pie data={expensesData} options={chartOptions.pie} />
             ) : (
-              <div className="flex h-full items-center justify-center text-xs text-gray-400">
+              <div className="flex h-full items-center justify-center text-xs text-slate-400">
                 No expense data available
               </div>
             )}

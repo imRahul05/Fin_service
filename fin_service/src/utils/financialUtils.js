@@ -27,12 +27,17 @@ export const aggregateFinancials = (finances) => {
   if (!finances) {
     return {
       totalIncome: 0,
+      income: 0,
       totalFixedExpenses: 0,
       totalVariableExpenses: 0,
       totalExpenses: 0,
+      expenses: 0,
       totalInvestments: 0,
+      investmentsTotal: 0,
       totalLoans: 0,
+      loansTotal: 0,
       monthlySavings: 0,
+      savings: 0,
       savingsRate: 0,
       debtToIncomeRatio: 0,
       netWorth: 0,
@@ -75,12 +80,17 @@ export const aggregateFinancials = (finances) => {
 
   return {
     totalIncome,
+    income: totalIncome,
     totalFixedExpenses,
     totalVariableExpenses,
     totalExpenses,
+    expenses: totalExpenses,
     totalInvestments,
+    investmentsTotal: totalInvestments,
     totalLoans,
+    loansTotal: totalLoans,
     monthlySavings,
+    savings: monthlySavings,
     savingsRate,
     debtToIncomeRatio,
     netWorth,
@@ -96,11 +106,15 @@ export const aggregateFinancials = (finances) => {
 
 // Format currency in INR
 export const formatCurrency = (amount) => {
+  const num = Number(amount);
+  if (isNaN(num) || amount === null || amount === undefined) {
+    return '₹0';
+  }
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 0
-  }).format(amount);
+  }).format(num);
 };
 
 // Calculate future value of investment

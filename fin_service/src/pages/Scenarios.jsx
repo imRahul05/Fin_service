@@ -131,16 +131,16 @@ function Scenarios() {
         {
           label: 'Current Career - Annual Income',
           data: currentPath,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.15)',
+          borderColor: '#64748b',
+          backgroundColor: 'rgba(100, 116, 139, 0.1)',
           fill: true,
           tension: 0.2
         },
         {
           label: 'New Career - Annual Income',
           data: newPath,
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.15)',
+          borderColor: '#0f766e',
+          backgroundColor: 'rgba(15, 118, 110, 0.1)',
           fill: true,
           tension: 0.2
         }
@@ -153,16 +153,16 @@ function Scenarios() {
         {
           label: 'Current Career - Cumulative Savings',
           data: currentSavings,
-          borderColor: '#6366f1',
-          backgroundColor: 'rgba(99, 102, 241, 0.15)',
+          borderColor: '#475569',
+          backgroundColor: 'rgba(71, 85, 105, 0.1)',
           fill: true,
           tension: 0.2
         },
         {
           label: 'New Career - Cumulative Savings',
           data: newSavings,
-          borderColor: '#8b5cf6',
-          backgroundColor: 'rgba(139, 92, 246, 0.15)',
+          borderColor: '#0f766e',
+          backgroundColor: 'rgba(15, 118, 110, 0.1)',
           fill: true,
           tension: 0.2
         }
@@ -223,16 +223,16 @@ function Scenarios() {
         {
           label: `${currentStrategy.toUpperCase()} Returns`,
           data: currentStrategyReturns,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.15)',
+          borderColor: '#64748b',
+          backgroundColor: 'rgba(100, 116, 139, 0.1)',
           fill: true,
           tension: 0.2
         },
         {
           label: `${newStrategy.toUpperCase()} Returns`,
           data: newStrategyReturns,
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.15)',
+          borderColor: '#0f766e',
+          backgroundColor: 'rgba(15, 118, 110, 0.1)',
           fill: true,
           tension: 0.2
         }
@@ -292,16 +292,16 @@ function Scenarios() {
         {
           label: 'Cumulative Cost of Buying',
           data: buyingCosts,
-          borderColor: '#ef4444',
-          backgroundColor: 'rgba(239, 68, 68, 0.15)',
+          borderColor: '#b45309',
+          backgroundColor: 'rgba(180, 83, 9, 0.1)',
           fill: true,
           tension: 0.2
         },
         {
           label: 'Cumulative Cost of Renting',
           data: rentingCosts,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.15)',
+          borderColor: '#475569',
+          backgroundColor: 'rgba(71, 85, 105, 0.1)',
           fill: true,
           tension: 0.2
         }
@@ -505,46 +505,46 @@ function Scenarios() {
             <button
               type="button"
               onClick={() => setScenarioType("career")}
-              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-bold transition-all ${
+              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 scenarioType === "career" 
-                  ? "bg-blue-600 text-white shadow-md" 
-                  : "bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs" 
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
               }`}
             >
-              💼 Career Growth
+              Career Growth
             </button>
             <button
               type="button"
               onClick={() => setScenarioType("investment")}
-              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-bold transition-all ${
+              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 scenarioType === "investment" 
-                  ? "bg-blue-600 text-white shadow-md" 
-                  : "bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs" 
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
               }`}
             >
-              📈 Investments
+              Investments
             </button>
             <button
               type="button"
               onClick={() => setScenarioType("purchase")}
-              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-bold transition-all ${
+              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 scenarioType === "purchase" 
-                  ? "bg-blue-600 text-white shadow-md" 
-                  : "bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs" 
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
               }`}
             >
-              🏠 Major Purchase
+              Major Purchase
             </button>
             <button
               type="button"
               onClick={() => setScenarioType("tax")}
-              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-bold transition-all ${
+              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 scenarioType === "tax" 
-                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md ring-2 ring-blue-400/30" 
-                  : "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100"
+                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs" 
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
               }`}
             >
-              🛡️ Tax Optimizer
+              Tax Optimizer
             </button>
           </div>
         </div>
@@ -819,7 +819,7 @@ function Scenarios() {
             <button
               type="button"
               onClick={runSimulation}
-              className="inline-flex justify-center py-2.5 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex justify-center py-2.5 px-6 border border-transparent shadow-xs text-xs font-semibold rounded-xl text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 focus:outline-none transition cursor-pointer"
             >
               Run Simulation
             </button>
@@ -991,17 +991,16 @@ function Scenarios() {
             )}
           </div>
 
-          {/* AI Analysis */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-gray-950/40 overflow-hidden transition-colors">
-            <div className="px-4 py-4 sm:px-6 bg-blue-50 dark:bg-blue-950/30 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          {/* Scenario Analysis */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs overflow-hidden transition-colors">
+            <div className="px-4 py-4 sm:px-6 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                  <h3 className="text-lg leading-6 font-semibold text-gray-900 dark:text-white">
-                    AI Scenario Insights
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    Scenario Insights & Strategy
                   </h3>
                 </div>
-                <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                   Personalized projections and analysis for this scenario
                 </p>
               </div>
@@ -1016,9 +1015,9 @@ function Scenarios() {
                   type="button"
                   onClick={() => runSimulation(true)}
                   disabled={aiLoading}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors cursor-pointer"
                 >
-                  <RotateCcw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin text-blue-500" : ""}`} />
+                  <RotateCcw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin text-slate-900 dark:text-white" : ""}`} />
                   {aiLoading ? "Regenerating..." : "Re-analyze"}
                 </button>
               </div>
@@ -1026,15 +1025,15 @@ function Scenarios() {
             <div className="px-4 py-5 sm:p-6">
               {aiLoading ? (
                 <div className="flex flex-col justify-center items-center h-40 space-y-2">
-                  <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Generating scenario analysis...</p>
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-200 border-t-slate-900 dark:border-slate-800 dark:border-t-white"></div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Generating scenario analysis...</p>
                 </div>
               ) : aiAnalysis ? (
-                <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed text-sm">
+                <div className="prose dark:prose-invert max-w-none text-slate-800 dark:text-slate-200 leading-relaxed text-xs">
                   <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   No analysis available for this simulation.
                 </p>
               )}
