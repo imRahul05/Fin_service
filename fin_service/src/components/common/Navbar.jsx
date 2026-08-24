@@ -46,26 +46,26 @@ function Navbar() {
   const linkClass = (path) =>
     `${
       isActive(path)
-        ? "border-blue-500 text-gray-900 dark:text-white font-semibold"
-        : "border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200"
+        ? "border-slate-900 dark:border-white text-slate-900 dark:text-white font-semibold"
+        : "border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700 hover:text-slate-800 dark:hover:text-slate-200"
     } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors`;
 
   const mobileLinkClass = (path) =>
     `${
       isActive(path)
-        ? "bg-blue-50 dark:bg-blue-900/30 border-blue-500 text-blue-700 dark:text-blue-400 font-semibold"
-        : "border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200"
+        ? "bg-slate-100 dark:bg-slate-800 border-slate-900 dark:border-white text-slate-900 dark:text-white font-semibold"
+        : "border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:text-slate-800 dark:hover:text-slate-200"
     } block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors`;
 
   return (
-    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm transition-colors duration-200 sticky top-0 z-40">
+    <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-2xs transition-colors duration-200 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-xl font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+              <Link to="/" className="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
                 <span>FinSage</span>
-                <span className="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded font-normal">AI</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-slate-900 dark:bg-white inline-block"></span>
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -102,9 +102,9 @@ function Navbar() {
             {isGuestMode && (
               <Link
                 to="/register"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 transition shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
               >
-                <span>🚀 Claim Plan</span>
+                <span>Claim Plan</span>
               </Link>
             )}
 
@@ -113,14 +113,14 @@ function Navbar() {
                 <div>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="bg-white dark:bg-gray-800 rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
+                    className="bg-white dark:bg-slate-800 rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-white"
                     id="user-menu"
                     aria-expanded={isProfileOpen}
                     aria-haspopup="true"
                   >
                     <span className="sr-only">Open user menu</span>
-                    <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/60 ring-2 ring-transparent hover:ring-blue-400 transition-all">
-                      <span className="text-sm font-medium leading-none text-blue-700 dark:text-blue-300">
+                    <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-400 transition-all">
+                      <span className="text-xs font-bold leading-none text-slate-800 dark:text-slate-200">
                         {currentUser.email &&
                           (() => {
                             const username = currentUser.email.split("@")[0];
@@ -135,20 +135,20 @@ function Navbar() {
                 </div>
                 {isProfileOpen && (
                   <div
-                    className="origin-top-right absolute right-0 mt-2 w-52 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-50 animate-in fade-in zoom-in-95 duration-100"
+                    className="origin-top-right absolute right-0 mt-2 w-52 rounded-xl shadow-lg py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 ring-1 ring-black/5 focus:outline-none z-50 animate-in fade-in zoom-in-95 duration-100"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="user-menu"
                   >
-                    <div className="block px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                    <div className="block px-4 py-2.5 text-xs text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                       Signed in as
-                      <div className="font-bold text-gray-800 dark:text-gray-200 truncate mt-0.5">
+                      <div className="font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
                         {currentUser.email}
                       </div>
                     </div>
                     <Link
                       to="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="block px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                       role="menuitem"
                       onClick={() => setIsProfileOpen(false)}
                     >
@@ -156,19 +156,19 @@ function Navbar() {
                     </Link>
                     <Link
                       to="/finance-input"
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="block px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                       role="menuitem"
                       onClick={() => setIsProfileOpen(false)}
                     >
                       Your Finances
                     </Link>
-                    <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                    <div className="border-t border-slate-100 dark:border-slate-800 my-1"></div>
                     <button
                       onClick={() => {
                         setIsProfileOpen(false);
                         handleLogout();
                       }}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
+                      className="block w-full text-left px-4 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
                       role="menuitem"
                     >
                       Sign out
@@ -177,16 +177,16 @@ function Navbar() {
                 )}
               </div>
             ) : (
-              <div className="flex space-x-3">
+              <div className="flex space-x-2.5">
                 <Link
                   to="/login"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex items-center px-3.5 py-1.5 border border-slate-200 dark:border-slate-700 text-xs font-semibold rounded-lg text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
                 >
                   Log in
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm"
+                  className="inline-flex items-center px-3.5 py-1.5 border border-transparent text-xs font-semibold rounded-lg text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 shadow-xs transition"
                 >
                   Sign up
                 </Link>
@@ -199,7 +199,7 @@ function Navbar() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none"
               aria-expanded={isMenuOpen}
             >
               <span className="sr-only">Open main menu</span>
@@ -241,7 +241,7 @@ function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      <div className={`${isMenuOpen ? "block" : "hidden"} sm:hidden border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900`}>
+      <div className={`${isMenuOpen ? "block" : "hidden"} sm:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900`}>
         <div className="pt-2 pb-3 space-y-1">
           <Link
             to="/"
@@ -301,21 +301,21 @@ function Navbar() {
 
         {/* Mobile menu account section */}
         {currentUser ? (
-          <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-800">
+          <div className="pt-4 pb-3 border-t border-slate-200 dark:border-slate-800">
             <div className="flex items-center px-4">
               <div className="flex-shrink-0">
-                <span className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/60">
-                  <span className="text-sm font-medium leading-none text-blue-700 dark:text-blue-300">
+                <span className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <span className="text-sm font-semibold leading-none text-slate-800 dark:text-slate-200">
                     {currentUser.email &&
                       currentUser.email.charAt(0).toUpperCase()}
                   </span>
                 </span>
               </div>
               <div className="ml-3">
-                <div className="text-base font-medium text-gray-800 dark:text-gray-200 truncate max-w-[200px]">
+                <div className="text-base font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">
                   {currentUser.displayName || "User"}
                 </div>
-                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
+                <div className="text-sm font-medium text-slate-500 dark:text-slate-400 truncate max-w-[200px]">
                   {currentUser.email}
                 </div>
               </div>
@@ -333,18 +333,18 @@ function Navbar() {
             </div>
           </div>
         ) : (
-          <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-800">
+          <div className="pt-4 pb-3 border-t border-slate-200 dark:border-slate-800">
             <div className="flex flex-col space-y-2 px-4">
               <Link
                 to="/login"
-                className="block text-center w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50"
+                className="block text-center w-full py-2 px-4 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Log in
               </Link>
               <Link
                 to="/register"
-                className="block text-center w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                className="block text-center w-full py-2 px-4 border border-transparent rounded-lg text-sm font-semibold text-white bg-slate-900 dark:bg-white dark:text-slate-900 shadow-xs"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sign up

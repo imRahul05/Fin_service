@@ -154,41 +154,38 @@ export default function AICopilotDrawer({ finances: propFinances = null }) {
       {/* Floating Trigger Button (Bottom-Right) */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold text-xs shadow-xl shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all group"
-        title="Open AI Financial Copilot"
+        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold text-xs shadow-lg border border-slate-700/30 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
+        title="Open Financial Advisor"
       >
-        <div className="relative">
-          <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-        </div>
-        <span className="hidden sm:inline">FinSage AI Copilot</span>
+        <Bot className="w-4 h-4" />
+        <span className="hidden sm:inline">Ask Advisor</span>
       </button>
 
       {/* Slide-over Drawer Panel */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/40 backdrop-blur-2xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-2xs animate-in fade-in duration-200">
           <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
             <div className="w-screen max-w-md bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col">
               
               {/* Drawer Header */}
-              <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex items-center justify-between">
+              <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-blue-600 text-white shadow-xs">
-                    <Sparkles className="w-4 h-4" />
+                  <div className="p-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs">
+                    <Bot className="w-4 h-4" />
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                      FinSage AI Copilot
+                      Financial Advisor
                     </h3>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Live Conversational Financial Intelligence
+                      Conversational strategy & modeling
                     </p>
                   </div>
                 </div>
 
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -204,16 +201,16 @@ export default function AICopilotDrawer({ finances: propFinances = null }) {
                       className={`flex gap-2.5 ${isBot ? "items-start" : "items-end justify-end"}`}
                     >
                       {isBot && (
-                        <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 flex items-center justify-center shrink-0 mt-0.5">
-                          <Bot className="w-4 h-4" />
+                        <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 mt-0.5 border border-slate-200 dark:border-slate-700">
+                          <Bot className="w-3.5 h-3.5" />
                         </div>
                       )}
 
                       <div
                         className={`group relative max-w-[85%] rounded-2xl p-3.5 text-xs shadow-2xs ${
                           isBot
-                            ? "bg-slate-50 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-800"
-                            : "bg-blue-600 text-white rounded-br-none"
+                            ? "bg-slate-50 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                            : "bg-slate-900 text-white dark:bg-white dark:text-slate-900 rounded-br-none"
                         }`}
                       >
                         {isBot ? (
@@ -229,7 +226,7 @@ export default function AICopilotDrawer({ finances: propFinances = null }) {
                           {isBot && (
                             <button
                               onClick={() => handleCopy(msg.id, msg.text)}
-                              className="opacity-0 group-hover:opacity-100 transition p-0.5 hover:text-slate-600 dark:hover:text-slate-200"
+                              className="opacity-0 group-hover:opacity-100 transition p-0.5 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                               title="Copy response"
                             >
                               {copiedId === msg.id ? (
@@ -244,7 +241,7 @@ export default function AICopilotDrawer({ finances: propFinances = null }) {
 
                       {!isBot && (
                         <div className="w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center shrink-0">
-                          <User className="w-4 h-4" />
+                          <User className="w-3.5 h-3.5" />
                         </div>
                       )}
                     </div>
@@ -253,24 +250,24 @@ export default function AICopilotDrawer({ finances: propFinances = null }) {
 
                 {isLoading && (
                   <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 p-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                    <span>Analyzing your portfolio & calculating strategy...</span>
+                    <Loader2 className="w-4 h-4 animate-spin text-slate-600 dark:text-slate-400" />
+                    <span>Analyzing your portfolio & computing models...</span>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
               </div>
 
               {/* Quick Action Chips */}
-              <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                  Suggested Prompts
+              <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                <p className="text-2xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Suggested Questions
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {SUGGESTED_QUESTIONS.map((q, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSend(q)}
-                      className="text-[11px] text-left px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition line-clamp-1"
+                      className="text-[11px] text-left px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition line-clamp-1 cursor-pointer"
                     >
                       {q}
                     </button>
@@ -279,7 +276,7 @@ export default function AICopilotDrawer({ finances: propFinances = null }) {
               </div>
 
               {/* Input Box with Voice Mic */}
-              <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+              <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -290,10 +287,10 @@ export default function AICopilotDrawer({ finances: propFinances = null }) {
                   <button
                     type="button"
                     onClick={toggleVoiceInput}
-                    className={`p-2.5 rounded-xl border transition ${
+                    className={`p-2.5 rounded-xl border transition cursor-pointer ${
                       isListening
                         ? "bg-rose-500 text-white animate-pulse border-rose-600"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
                     }`}
                     title={isListening ? "Listening... click to stop" : "Voice input"}
                   >
@@ -304,14 +301,14 @@ export default function AICopilotDrawer({ finances: propFinances = null }) {
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    placeholder={isListening ? "Listening to your voice..." : "Ask your financial copilot..."}
-                    className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={isListening ? "Listening to your voice..." : "Ask your financial question..."}
+                    className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white"
                   />
 
                   <button
                     type="submit"
                     disabled={!inputValue.trim() || isLoading}
-                    className="p-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition shadow-xs shrink-0"
+                    className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 disabled:opacity-40 transition shadow-xs shrink-0 cursor-pointer"
                   >
                     <Send className="w-4 h-4" />
                   </button>
