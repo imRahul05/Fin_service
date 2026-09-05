@@ -72,8 +72,14 @@ export function useFinances() {
         if (savedSandbox) {
           try {
             const parsed = JSON.parse(savedSandbox);
-            setFinances(parsed.finances);
-            setTransactions(parsed.transactions || []);
+            if (parsed && parsed.finances && typeof parsed.finances === "object") {
+              setFinances(parsed.finances);
+              setTransactions(Array.isArray(parsed.transactions) ? parsed.transactions : []);
+            } else {
+              const defaultPersona = DEMO_PERSONAS[activeId] || DEMO_PERSONAS[DEFAULT_PERSONA_ID];
+              setFinances(defaultPersona.finances);
+              setTransactions(defaultPersona.transactions);
+            }
           } catch {
             const defaultPersona = DEMO_PERSONAS[activeId] || DEMO_PERSONAS[DEFAULT_PERSONA_ID];
             setFinances(defaultPersona.finances);

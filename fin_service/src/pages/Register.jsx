@@ -35,93 +35,86 @@ function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">Create a new account</h2>
+    <div className="min-h-screen bg-background text-foreground flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+        <h2 className="text-2xl sm:text-3xl font-black text-foreground">Create a new account</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Start your personalized wealth intelligence journey</p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow-md dark:shadow-gray-950/40 border border-gray-200 dark:border-gray-700 sm:rounded-xl sm:px-10 transition-colors">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-card py-8 px-6 sm:px-10 shadow-card border border-border/80 rounded-3xl transition-colors">
           {error && (
-            <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-md relative mb-4 text-sm" role="alert">
-              <span className="block sm:inline">{error}</span>
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-2xl relative mb-4 text-xs font-medium" role="alert">
+              <span>{error}</span>
             </div>
           )}
           
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="name" className="block text-xs font-semibold text-foreground/80 mb-1.5">
                 Full Name
               </label>
-              <div className="mt-1">
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  required
-                  ref={nameRef}
-                  className="appearance-none block w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
-                />
-              </div>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                required
+                ref={nameRef}
+                className="appearance-none block w-full px-3.5 py-2.5 border border-border rounded-2xl shadow-2xs placeholder-muted-foreground bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground text-xs transition"
+              />
             </div>
             
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="email" className="block text-xs font-semibold text-foreground/80 mb-1.5">
                 Email address
               </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  ref={emailRef}
-                  className="appearance-none block w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
-                />
-              </div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                ref={emailRef}
+                className="appearance-none block w-full px-3.5 py-2.5 border border-border rounded-2xl shadow-2xs placeholder-muted-foreground bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground text-xs transition"
+              />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="password" className="block text-xs font-semibold text-foreground/80 mb-1.5">
                 Password
               </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  ref={passwordRef}
-                  className="appearance-none block w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
-                />
-              </div>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                required
+                ref={passwordRef}
+                className="appearance-none block w-full px-3.5 py-2.5 border border-border rounded-2xl shadow-2xs placeholder-muted-foreground bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground text-xs transition"
+              />
             </div>
 
             <div>
-              <label htmlFor="password-confirm" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="password-confirm" className="block text-xs font-semibold text-foreground/80 mb-1.5">
                 Confirm Password
               </label>
-              <div className="mt-1">
-                <input
-                  id="password-confirm"
-                  name="password-confirm"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  ref={passwordConfirmRef}
-                  className="appearance-none block w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
-                />
-              </div>
+              <input
+                id="password-confirm"
+                name="password-confirm"
+                type="password"
+                autoComplete="new-password"
+                required
+                ref={passwordConfirmRef}
+                className="appearance-none block w-full px-3.5 py-2.5 border border-border rounded-2xl shadow-2xs placeholder-muted-foreground bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground text-xs transition"
+              />
             </div>
 
             <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60 transition-colors"
+                className="w-full mt-2 flex justify-center items-center gap-2 py-3 px-5 rounded-full shadow-xs text-xs font-semibold text-background bg-foreground hover:opacity-90 disabled:opacity-50 transition cursor-pointer"
               >
                 {loading ? "Creating Account..." : "Sign up"}
               </button>
@@ -129,9 +122,9 @@ function Register() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground">
               Already have an account?{" "}
-              <Link to="/login" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500">
+              <Link to="/login" className="font-semibold text-foreground hover:underline">
                 Sign in
               </Link>
             </p>

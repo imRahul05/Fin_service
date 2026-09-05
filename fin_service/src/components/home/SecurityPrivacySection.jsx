@@ -23,53 +23,53 @@ const TRUST_PILLARS = [
 
 export default function SecurityPrivacySection() {
   return (
-    <section className="py-20 sm:py-24 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 sm:py-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-semibold uppercase tracking-wider mb-3 border border-emerald-200 dark:border-emerald-800">
-            <ShieldCheck className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-card border border-border/80 text-foreground text-xs font-semibold uppercase tracking-wider mb-4 shadow-2xs">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
             <span>Privacy First</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
             Your Money. Your Privacy.
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-400">
+          <p className="mt-3 text-base sm:text-lg text-muted-foreground">
             Intelligent wealth guidance should never come at the cost of your personal data sovereignty.
           </p>
         </div>
 
         {/* Pillars Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TRUST_PILLARS.map((pillar) => {
             const Icon = pillar.icon;
             return (
               <div
                 key={pillar.title}
-                className="rounded-2xl p-6 sm:p-7 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 shadow-md transition-all flex flex-col justify-between"
+                className="rounded-3xl p-7 sm:p-8 bg-card border border-border/80 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-5">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 dark:border-emerald-800">
-                      <Icon className="w-5 h-5" />
+                    <div className="w-11 h-11 rounded-2xl bg-muted text-foreground flex items-center justify-center border border-border/80 shadow-2xs">
+                      <Icon className="w-5 h-5 text-foreground" />
                     </div>
-                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    <span className="text-2xs font-semibold px-3 py-1 rounded-full bg-muted text-foreground border border-border/70">
                       {pillar.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-bold text-foreground mb-2.5">
                     {pillar.title}
                   </h3>
 
-                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {pillar.description}
                   </p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
-                  <CheckCircle2 className="w-4 h-4" />
+                <div className="mt-8 pt-4 border-t border-border/70 flex items-center gap-1.5 text-xs text-foreground font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Strictly Enforced</span>
                 </div>
               </div>

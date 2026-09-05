@@ -26,66 +26,65 @@ function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">Reset Your Password</h2>
+    <div className="min-h-screen bg-background text-foreground flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+        <h2 className="text-2xl sm:text-3xl font-black text-foreground">Reset Your Password</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Enter your email address to receive password recovery instructions</p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow-md dark:shadow-gray-950/40 border border-gray-200 dark:border-gray-700 sm:rounded-xl sm:px-10 transition-colors">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-card py-8 px-6 sm:px-10 shadow-card border border-border/80 rounded-3xl transition-colors">
           {error && (
-            <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-md relative mb-4 text-sm" role="alert">
-              <span className="block sm:inline">{error}</span>
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-2xl relative mb-4 text-xs font-medium" role="alert">
+              <span>{error}</span>
             </div>
           )}
           
           {message && (
-            <div className="bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 px-4 py-3 rounded-md relative mb-4 text-sm" role="alert">
-              <span className="block sm:inline">{message}</span>
+            <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 px-4 py-3 rounded-2xl relative mb-4 text-xs font-medium" role="alert">
+              <span>{message}</span>
             </div>
           )}
           
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="email" className="block text-xs font-semibold text-foreground/80 mb-1.5">
                 Email address
               </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  ref={emailRef}
-                  className="appearance-none block w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
-                />
-              </div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                ref={emailRef}
+                className="appearance-none block w-full px-3.5 py-2.5 border border-border rounded-2xl shadow-2xs placeholder-muted-foreground bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground text-xs transition"
+              />
             </div>
 
             <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60 transition-colors"
+                className="w-full mt-2 flex justify-center py-3 px-5 shadow-xs text-xs font-semibold rounded-full text-background bg-foreground hover:opacity-90 disabled:opacity-50 transition cursor-pointer"
               >
                 {loading ? "Processing..." : "Reset Password"}
               </button>
             </div>
           </form>
 
-          <div className="mt-6 text-center">
-            <div className="flex flex-col space-y-2">
-              <Link to="/login" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 text-sm">
+          <div className="mt-6 text-center space-y-2">
+            <div>
+              <Link to="/login" className="text-xs font-semibold text-foreground hover:underline">
                 Back to Login
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Need an account?{" "}
-                <Link to="/register" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500">
-                  Sign up
-                </Link>
-              </p>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Need an account?{" "}
+              <Link to="/register" className="font-semibold text-foreground hover:underline">
+                Sign up
+              </Link>
+            </p>
           </div>
         </div>
       </div>

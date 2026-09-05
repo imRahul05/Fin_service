@@ -28,14 +28,14 @@ export default function ThemeToggle({ showDropdown = false, className = "" }) {
       <button
         type="button"
         onClick={toggleTheme}
-        className={`relative inline-flex items-center justify-center p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
+        className={`relative inline-flex items-center justify-center p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-foreground/20 cursor-pointer ${className}`}
         aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} theme`}
         title={`Current: ${theme} (Resolved: ${resolvedTheme}). Click to toggle.`}
       >
         {resolvedTheme === "dark" ? (
-          <Sun className="h-5 w-5 text-amber-400 transition-transform duration-200 hover:rotate-45" />
+          <Sun className="h-4.5 w-4.5 text-foreground transition-transform duration-200 hover:rotate-45" />
         ) : (
-          <Moon className="h-5 w-5 text-indigo-600 transition-transform duration-200 hover:-rotate-12" />
+          <Moon className="h-4.5 w-4.5 text-foreground transition-transform duration-200 hover:-rotate-12" />
         )}
       </button>
     );
@@ -52,22 +52,22 @@ export default function ThemeToggle({ showDropdown = false, className = "" }) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="inline-flex items-center justify-center px-3 py-1.5 rounded-full border border-border/80 bg-card text-foreground hover:bg-muted shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-foreground/20 cursor-pointer text-xs font-medium"
         aria-label="Select theme"
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         {resolvedTheme === "dark" ? (
-          <Moon className="h-4 w-4 text-indigo-400 mr-1.5" />
+          <Moon className="h-3.5 w-3.5 text-foreground mr-1.5" />
         ) : (
-          <Sun className="h-4 w-4 text-amber-500 mr-1.5" />
+          <Sun className="h-3.5 w-3.5 text-foreground mr-1.5" />
         )}
-        <span className="text-xs font-medium capitalize">{theme}</span>
+        <span className="capitalize">{theme}</span>
       </button>
 
       {isOpen && (
         <div
-          className="origin-top-right absolute right-0 mt-2 w-36 rounded-lg shadow-lg py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-50 animate-in fade-in zoom-in-95 duration-100"
+          className="origin-top-right absolute right-0 mt-2 w-36 rounded-2xl shadow-card py-1.5 bg-card border border-border/80 ring-1 ring-black/5 focus:outline-none z-50 animate-in fade-in zoom-in-95 duration-100"
           role="menu"
         >
           {themeOptions.map((option) => {
@@ -80,18 +80,18 @@ export default function ThemeToggle({ showDropdown = false, className = "" }) {
                   setTheme(option.value);
                   setIsOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-3 py-2 text-xs text-left transition-colors ${
+                className={`w-full flex items-center justify-between px-3.5 py-2 text-xs text-left transition-colors cursor-pointer ${
                   isSelected
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "bg-muted text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
                 role="menuitem"
               >
                 <div className="flex items-center gap-2">
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-3.5 w-3.5" />
                   <span>{option.label}</span>
                 </div>
-                {isSelected && <Check className="h-3.5 w-3.5" />}
+                {isSelected && <Check className="h-3 w-3 text-foreground" />}
               </button>
             );
           })}

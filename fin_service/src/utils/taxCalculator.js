@@ -1,4 +1,4 @@
-import { TAX_CONSTANTS } from "../constants/tax.constants";
+import { TAX_CONSTANTS } from "../constants/tax.constants.js";
 
 /**
  * Calculates Income Tax under the New Tax Regime (Section 115BAC)
@@ -7,13 +7,14 @@ import { TAX_CONSTANTS } from "../constants/tax.constants";
  * @returns {Object} Tax calculation details
  */
 export function calculateNewRegimeTax(grossIncome) {
+  const validIncome = Number.isFinite(Number(grossIncome)) ? Math.max(0, Number(grossIncome)) : 0;
   const standardDeduction = TAX_CONSTANTS.NEW_REGIME.standardDeduction;
-  const taxableIncome = Math.max(0, grossIncome - standardDeduction);
+  const taxableIncome = Math.max(0, validIncome - standardDeduction);
 
   // Section 87A rebate if taxable income <= 7 Lakhs
   if (taxableIncome <= TAX_CONSTANTS.NEW_REGIME.rebateLimit) {
     return {
-      grossIncome,
+      grossIncome: validIncome,
       standardDeduction,
       taxableIncome,
       baseTax: 0,
@@ -68,22 +69,23 @@ export function calculateNewRegimeTax(grossIncome) {
  * @returns {Object} Tax calculation details
  */
 export function calculateOldRegimeTax(grossIncome, deductions = {}) {
+  const validIncome = Number.isFinite(Number(grossIncome)) ? Math.max(0, Number(grossIncome)) : 0;
   const limits = TAX_CONSTANTS.OLD_REGIME.limits;
   const standardDeduction = TAX_CONSTANTS.OLD_REGIME.standardDeduction;
 
-  const sec80C = Math.min(limits.section80C, Number(deductions.section80C || 0));
-  const sec80D = Math.min(limits.section80D_self + limits.section80D_parents, Number(deductions.section80D || 0));
-  const sec80CCD1B = Math.min(limits.section80CCD_1B, Number(deductions.section80CCD1B || 0));
-  const sec24HomeLoan = Math.min(limits.section24_home_loan, Number(deductions.homeLoanInterest || 0));
-  const hra = Number(deductions.hra || 0);
+  const sec80C = Math.min(limits.section80C, Math.max(0, Number(deductions.section80C) || 0));
+  const sec80D = Math.min(limits.section80D_self + limits.section80D_parents, Math.max(0, Number(deductions.section80D) || 0));
+  const sec80CCD1B = Math.min(limits.section80CCD_1B, Math.max(0, Number(deductions.section80CCD1B) || 0));
+  const sec24HomeLoan = Math.min(limits.section24_home_loan, Math.max(0, Number(deductions.homeLoanInterest) || 0));
+  const hra = Math.max(0, Number(deductions.hra) || 0);
 
   const totalDeductions = standardDeduction + sec80C + sec80D + sec80CCD1B + sec24HomeLoan + hra;
-  const taxableIncome = Math.max(0, grossIncome - totalDeductions);
+  const taxableIncome = Math.max(0, validIncome - totalDeductions);
 
   // Section 87A rebate under Old Regime if taxable income <= 5 Lakhs
   if (taxableIncome <= TAX_CONSTANTS.OLD_REGIME.rebateLimit) {
     return {
-      grossIncome,
+      grossIncome: validIncome,
       standardDeduction,
       deductions: {
         section80C: sec80C,
@@ -124,10 +126,10 @@ export function calculateOldRegimeTax(grossIncome, deductions = {}) {
 
   const cess = baseTax * TAX_CONSTANTS.HEALTH_AND_EDUCATION_CESS;
   const totalTax = Math.round(baseTax + cess);
-  const effectiveRate = grossIncome > 0 ? Number(((totalTax / grossIncome) * 100).toFixed(2)) : 0;
+  const effectiveRate = validIncome > 0 ? Number(((totalTax / validIncome) * 100).toFixed(2)) : 0;
 
   return {
-    grossIncome,
+    grossIncome: validIncome,
     standardDeduction,
     deductions: {
       section80C: sec80C,
@@ -154,18 +156,19 @@ export function calculateOldRegimeTax(grossIncome, deductions = {}) {
  * @returns {Object} Comparison report
  */
 export function compareTaxRegimes(grossIncome, deductions = {}) {
-  const newRegime = calculateNewRegimeTax(grossIncome);
-  const oldRegime = calculateOldRegimeTax(grossIncome, deductions);
+  const validIncome = Number.isFinite(Number(grossIncome)) ? Math.max(0, Number(grossIncome)) : 0;
+  const newRegime = calculateNewRegimeTax(validIncome);
+  const oldRegime = calculateOldRegimeTax(validIncome, deductions);
 
   const diff = oldRegime.totalTax - newRegime.totalTax;
   const recommendedRegime = diff > 0 ? "New Regime" : diff < 0 ? "Old Regime" : "Either Regime (Same Tax)";
-  const savings = Math.abs(diff);
+  const savings = Number.isFinite(Math.abs(diff)) ? Math.abs(diff) : 0;
 
   return {
-    grossIncome,
+    grossIncome: validIncome,
     newRegime,
     oldRegime,
-    diff,
+    diff: Number.isFinite(diff) ? diff : 0,
     savings,
     recommendedRegime,
   };

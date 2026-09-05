@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle, Minus, Sparkles } from "lucide-react";
+import { CheckCircle2, XCircle, Minus } from "lucide-react";
 
 const COMPARISON_ROWS = [
   {
@@ -33,7 +33,7 @@ const COMPARISON_ROWS = [
   },
   {
     feature: "Automated Financial Health & Spending Leak Radar",
-    finsage: "Instant score (0-100), DTI & emergency runway audit",
+    finsage: "Instant score (0-1000), DTI & emergency runway audit",
     excel: "Must calculate formulas manually",
     traditional: "Basic historical bar charts only"
   }
@@ -41,76 +41,60 @@ const COMPARISON_ROWS = [
 
 export default function ComparisonMatrix() {
   return (
-    <section className="py-20 sm:py-24 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 sm:py-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold uppercase tracking-wider mb-3 border border-slate-200 dark:border-slate-700">
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-card border border-border/80 text-foreground text-xs font-semibold uppercase tracking-wider mb-4 shadow-2xs">
             <span>Platform Comparison</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
             How FinSage Compares
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-400">
+          <p className="mt-3 text-base sm:text-lg text-muted-foreground">
             See why forward-thinking Indian professionals are upgrading from spreadsheets and legacy apps.
           </p>
         </div>
 
         {/* Comparison Table */}
-        <div className="max-w-5xl mx-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden">
+        <div className="max-w-5xl mx-auto bg-card rounded-3xl border border-border/80 shadow-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800">
-                  <th className="py-4 px-4 sm:px-6 text-sm font-bold text-slate-900 dark:text-white w-1/3">
+                <tr className="border-b border-border/70 bg-muted/40">
+                  <th className="py-4 px-5 sm:px-6 text-xs font-bold uppercase tracking-wider text-muted-foreground w-1/3">
                     Feature & Capability
                   </th>
-                  <th className="py-4 px-4 sm:px-6 text-sm font-bold text-slate-900 dark:text-white bg-slate-100/80 dark:bg-slate-800/80 w-1/3 border-x border-slate-200 dark:border-slate-700">
-                    <span className="inline-flex items-center gap-1.5">
-                      <span>FinSage</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold">
-                        Optimized
-                      </span>
+                  <th className="py-4 px-5 sm:px-6 text-xs font-bold uppercase tracking-wider text-foreground bg-muted/70 w-1/3 border-x border-border/70">
+                    <span className="inline-flex items-center gap-1.5 font-extrabold">
+                      <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                      FinSage AI
                     </span>
                   </th>
-                  <th className="py-4 px-4 sm:px-6 text-sm font-semibold text-slate-500 dark:text-slate-400 w-1/6 hidden sm:table-cell">
-                    Spreadsheets
-                  </th>
-                  <th className="py-4 px-4 sm:px-6 text-sm font-semibold text-slate-500 dark:text-slate-400 w-1/6 hidden sm:table-cell">
-                    Generic Trackers
+                  <th className="py-4 px-5 sm:px-6 text-xs font-bold uppercase tracking-wider text-muted-foreground w-1/3">
+                    Excel & Legacy Apps
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs sm:text-sm">
+              <tbody className="divide-y divide-border/60 text-xs sm:text-sm">
                 {COMPARISON_ROWS.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
-                    
-                    <td className="py-3.5 px-4 sm:px-6 font-semibold text-slate-900 dark:text-slate-200">
+                  <tr key={idx} className="hover:bg-muted/20 transition-colors">
+                    <td className="py-4 px-5 sm:px-6 font-semibold text-foreground">
                       {row.feature}
                     </td>
-
-                    <td className="py-3.5 px-4 sm:px-6 font-medium text-slate-900 dark:text-white bg-slate-50/50 dark:bg-slate-800/40 border-x border-slate-200 dark:border-slate-700">
+                    <td className="py-4 px-5 sm:px-6 bg-muted/30 border-x border-border/70 text-foreground font-medium">
                       <div className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                         <span>{row.finsage}</span>
                       </div>
                     </td>
-
-                    <td className="py-3.5 px-4 sm:px-6 text-slate-500 dark:text-slate-400 hidden sm:table-cell">
-                      <div className="flex items-start gap-1.5">
-                        <Minus className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                    <td className="py-4 px-5 sm:px-6 text-muted-foreground">
+                      <div className="flex items-start gap-2">
+                        <XCircle className="w-4 h-4 text-muted-foreground/60 shrink-0 mt-0.5" />
                         <span>{row.excel}</span>
                       </div>
                     </td>
-
-                    <td className="py-3.5 px-4 sm:px-6 text-slate-500 dark:text-slate-400 hidden sm:table-cell">
-                      <div className="flex items-start gap-1.5">
-                        <XCircle className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                        <span>{row.traditional}</span>
-                      </div>
-                    </td>
-
                   </tr>
                 ))}
               </tbody>

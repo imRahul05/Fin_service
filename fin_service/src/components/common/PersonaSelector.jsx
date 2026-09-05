@@ -1,5 +1,5 @@
-import { DEMO_PERSONAS, PERSONA_LIST } from "../../constants/personas.constants";
-import { Sparkles, Users, RotateCcw } from "lucide-react";
+import { PERSONA_LIST } from "../../constants/personas.constants";
+import { Sparkles, RotateCcw } from "lucide-react";
 
 export default function PersonaSelector({
   activePersonaId,
@@ -10,23 +10,23 @@ export default function PersonaSelector({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-blue-200 dark:border-blue-900/50 bg-gradient-to-r from-blue-50/80 via-indigo-50/40 to-cyan-50/60 dark:from-blue-950/40 dark:via-indigo-950/20 dark:to-cyan-950/30 p-4 shadow-sm backdrop-blur-sm ${className}`}
+      className={`rounded-3xl border border-border/80 bg-card p-5 shadow-card ${className}`}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-blue-600 text-white shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 rounded-2xl bg-foreground text-background shadow-2xs">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              <h3 className="text-sm font-bold text-foreground">
                 Interactive Persona Sandbox
               </h3>
-              <span className="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
+              <span className="text-[10px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
                 Zero-Friction Demo
               </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Switch Indian financial life stages instantly with pre-calculated portfolios & transactions.
             </p>
           </div>
@@ -36,7 +36,7 @@ export default function PersonaSelector({
           <button
             onClick={onReset}
             type="button"
-            className="self-start sm:self-auto inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs hover:shadow transition"
+            className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-card rounded-full border border-border/80 shadow-2xs hover:bg-muted transition cursor-pointer"
             title="Reset sandbox numbers to default"
           >
             <RotateCcw className="w-3 h-3" />
@@ -46,7 +46,7 @@ export default function PersonaSelector({
       </div>
 
       {/* Persona Pill Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
         {PERSONA_LIST.map((persona) => {
           const isSelected = activePersonaId === persona.id;
           return (
@@ -54,37 +54,39 @@ export default function PersonaSelector({
               key={persona.id}
               onClick={() => onSelectPersona(persona.id)}
               type="button"
-              className={`group text-left p-2.5 rounded-xl border transition-all relative ${
+              className={`group text-left p-3 rounded-2xl border transition-all cursor-pointer ${
                 isSelected
-                  ? "bg-white dark:bg-slate-800 border-blue-500 dark:border-blue-400 shadow-md ring-2 ring-blue-500/20"
-                  : "bg-white/60 dark:bg-slate-900/50 border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-white dark:hover:bg-slate-800"
+                  ? "bg-foreground text-background border-foreground shadow-2xs"
+                  : "bg-muted/30 border-border/60 hover:bg-muted/70 hover:border-border text-foreground"
               }`}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <span className="text-xl group-hover:scale-110 transition-transform">
                   {persona.avatar}
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-1">
-                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    <p className={`text-xs font-bold truncate ${isSelected ? "text-background" : "text-foreground"}`}>
                       {persona.name}
                     </p>
                     {isSelected && (
-                      <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0 animate-pulse" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                  <p className={`text-[11px] truncate ${isSelected ? "text-background/80" : "text-muted-foreground"}`}>
                     {persona.role}
                   </p>
                 </div>
               </div>
 
               {!compact && (
-                <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                  <span className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                <div className={`mt-2.5 pt-2 border-t ${isSelected ? "border-background/20" : "border-border/60"}`}>
+                  <span className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                    isSelected ? "bg-background/20 text-background" : "bg-muted text-muted-foreground"
+                  }`}>
                     {persona.badge}
                   </span>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-1">
+                  <p className={`text-[10px] line-clamp-1 mt-1 ${isSelected ? "text-background/80" : "text-muted-foreground"}`}>
                     {persona.tagline}
                   </p>
                 </div>

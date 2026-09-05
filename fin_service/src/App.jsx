@@ -1,10 +1,11 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/common/Navbar';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Loading from './components/common/Loading';
+import AppLayout from './components/layout/AppLayout';
 import AICopilotDrawer from './components/aiadvisor/AICopilotDrawer';
 import './App.css';
 
@@ -22,78 +23,101 @@ const AIAdvisor = lazy(() => import('./pages/AIAdvisor'));
 const ContactUsPage = lazy(() => import('./pages/ContactUsPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
+function AppContent() {
+  const location = useLocation();
+  const isAppRoute = ['/dashboard', '/analytics', '/scenarios', '/finance-input', '/profile', '/advisor'].some(
+    (route) => location.pathname === route || location.pathname.startsWith(`${route}/`)
+  );
+
+  return (
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-200 flex flex-col">
+      {!isAppRoute && <Navbar />}
+      <main className="flex-1">
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/contact" element={<ContactUsPage />} />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Dashboard />
+                  </AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/analytics" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Analytics />
+                  </AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/scenarios" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Scenarios />
+                  </AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/finance-input" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <FinanceInput />
+                  </AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Profile />
+                  </AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/advisor" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <AIAdvisor />
+                  </AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route
+              path="*" 
+              element={<NotFound />} 
+            />
+          </Routes>
+        </Suspense>
+      </main>
+      <AICopilotDrawer />
+    </div>
+  );
+}
+
 function App() {
   return (
     <Router>
       <ThemeProvider>
         <AuthProvider>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200 flex flex-col">
-            <Navbar />
-            <main className="flex-1">
-              <Suspense fallback={<Loading />}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/contact" element={<ContactUsPage />} />
-                  <Route 
-                    path="/dashboard" 
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/analytics" 
-                    element={
-                      <ProtectedRoute>
-                        <Analytics />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/scenarios" 
-                    element={
-                      <ProtectedRoute>
-                        <Scenarios />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/finance-input" 
-                    element={
-                      <ProtectedRoute>
-                        <FinanceInput />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/profile" 
-                    element={
-                      <ProtectedRoute>
-                        <Profile />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/advisor" 
-                    element={
-                      <ProtectedRoute>
-                        <AIAdvisor />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route
-                    path="*" 
-                    element={<NotFound />} 
-                  />
-                </Routes>
-              </Suspense>
-            </main>
-            <AICopilotDrawer />
-          </div>
+          <AppContent />
         </AuthProvider>
       </ThemeProvider>
     </Router>

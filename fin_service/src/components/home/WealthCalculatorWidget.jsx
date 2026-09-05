@@ -4,7 +4,6 @@ import { useAuth } from "../../context/AuthContext";
 import { 
   Calculator, 
   TrendingUp, 
-  Sparkles, 
   ArrowRight, 
   Coins, 
   Clock, 
@@ -64,25 +63,25 @@ export default function WealthCalculatorWidget() {
   const gainPercent = totalWealth > 0 ? (wealthGain / totalWealth) * 100 : 50;
 
   return (
-    <section id="wealth-calculator" className="py-20 sm:py-24 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="wealth-calculator" className="py-20 sm:py-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold uppercase tracking-wider mb-3 border border-slate-200 dark:border-slate-700">
-            <Calculator className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-card border border-border/80 shadow-2xs text-foreground text-xs font-semibold uppercase tracking-wider mb-4">
+            <Calculator className="w-3.5 h-3.5 text-muted-foreground" />
             <span>Interactive Simulator</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
             See how your wealth compounds
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-400">
+          <p className="mt-3 text-base sm:text-lg text-muted-foreground">
             Adjust your monthly investment to visualize how consistent discipline builds substantial wealth.
           </p>
 
           {/* Quick Presets */}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <span className="text-xs text-slate-500 dark:text-slate-400 mr-1 font-medium">Quick Presets:</span>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <span className="text-xs text-muted-foreground mr-1 font-medium">Quick Presets:</span>
             {PRESETS.map((p) => {
               const isActive =
                 monthlyInvestment === p.monthly &&
@@ -96,10 +95,10 @@ export default function WealthCalculatorWidget() {
                     setExpectedRate(p.rate);
                     setTenureYears(p.years);
                   }}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
                     isActive
-                      ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold shadow-xs"
-                      : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
+                      ? "bg-foreground text-background font-semibold shadow-2xs"
+                      : "bg-card text-foreground border border-border/80 hover:bg-muted"
                   }`}
                 >
                   {p.label} (₹{(p.monthly / 1000).toFixed(0)}k/mo)
@@ -109,21 +108,21 @@ export default function WealthCalculatorWidget() {
           </div>
         </div>
 
-        {/* Calculator Main Card */}
-        <div className="max-w-5xl mx-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden">
+        {/* Calculator Main Bento Card */}
+        <div className="bg-card rounded-3xl border border-border/80 shadow-card overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12">
             
             {/* Controls */}
-            <div className="lg:col-span-7 p-6 sm:p-8 space-y-6 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800">
+            <div className="lg:col-span-7 p-6 sm:p-10 space-y-7 border-b lg:border-b-0 lg:border-r border-border/70">
               
               {/* Slider 1: Monthly Investment */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                    <Coins className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                <div className="flex justify-between items-center mb-2.5">
+                  <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Coins className="w-4 h-4 text-muted-foreground" />
                     Monthly Investment
                   </label>
-                  <span className="text-base font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-3 py-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <span className="text-sm font-bold text-foreground bg-muted/60 px-3 py-1 rounded-full border border-border/70">
                     ₹{monthlyInvestment.toLocaleString("en-IN")}
                   </span>
                 </div>
@@ -134,9 +133,9 @@ export default function WealthCalculatorWidget() {
                   step="1000"
                   value={monthlyInvestment}
                   onChange={(e) => setMonthlyInvestment(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-slate-900 dark:accent-white"
+                  className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer accent-foreground"
                 />
-                <div className="flex justify-between text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-medium">
+                <div className="flex justify-between text-[11px] text-muted-foreground mt-1.5 font-medium">
                   <span>₹1,000/mo</span>
                   <span>₹75,000/mo</span>
                   <span>₹1.5 Lakh/mo</span>
@@ -145,12 +144,12 @@ export default function WealthCalculatorWidget() {
 
               {/* Slider 2: Expected Return Rate */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                    <Percent className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                <div className="flex justify-between items-center mb-2.5">
+                  <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Percent className="w-4 h-4 text-muted-foreground" />
                     Expected Annual Return (CAGR)
                   </label>
-                  <span className="text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-0.5 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <span className="text-sm font-bold text-foreground bg-muted/60 px-3 py-1 rounded-full border border-border/70">
                     {expectedRate}% p.a.
                   </span>
                 </div>
@@ -161,9 +160,9 @@ export default function WealthCalculatorWidget() {
                   step="0.5"
                   value={expectedRate}
                   onChange={(e) => setExpectedRate(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-slate-900 dark:accent-white"
+                  className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer accent-foreground"
                 />
-                <div className="flex justify-between text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-medium">
+                <div className="flex justify-between text-[11px] text-muted-foreground mt-1.5 font-medium">
                   <span>6% (FD/Debt)</span>
                   <span>12% (Nifty Index)</span>
                   <span>22% (High Growth)</span>
@@ -172,12 +171,12 @@ export default function WealthCalculatorWidget() {
 
               {/* Slider 3: Time Horizon */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                <div className="flex justify-between items-center mb-2.5">
+                  <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-muted-foreground" />
                     Investment Period
                   </label>
-                  <span className="text-base font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-3 py-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <span className="text-sm font-bold text-foreground bg-muted/60 px-3 py-1 rounded-full border border-border/70">
                     {tenureYears} Years
                   </span>
                 </div>
@@ -188,9 +187,9 @@ export default function WealthCalculatorWidget() {
                   step="1"
                   value={tenureYears}
                   onChange={(e) => setTenureYears(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-slate-900 dark:accent-white"
+                  className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer accent-foreground"
                 />
-                <div className="flex justify-between text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-medium">
+                <div className="flex justify-between text-[11px] text-muted-foreground mt-1.5 font-medium">
                   <span>1 Year</span>
                   <span>15 Years</span>
                   <span>30 Years</span>
@@ -198,75 +197,73 @@ export default function WealthCalculatorWidget() {
               </div>
 
               {/* Note */}
-              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 flex items-start gap-2">
-                <p>
-                  FinSage automatically models tax-optimized allocations across Equity, PPF, and NPS to protect returns against tax drag.
-                </p>
+              <div className="p-4 rounded-2xl bg-muted/40 border border-border/60 text-xs text-muted-foreground leading-relaxed">
+                FinSage automatically models tax-optimized allocations across Equity, PPF, and NPS to protect returns against tax drag.
               </div>
 
             </div>
 
             {/* Results Column */}
-            <div className="lg:col-span-5 p-6 sm:p-8 bg-slate-50/80 dark:bg-slate-850 dark:bg-slate-900 flex flex-col justify-between border-t lg:border-t-0">
+            <div className="lg:col-span-5 p-6 sm:p-10 bg-muted/20 flex flex-col justify-between">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Projected Wealth
                 </span>
 
                 <div className="mt-2">
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Total Future Corpus</p>
-                  <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                  <p className="text-xs text-muted-foreground">Total Future Corpus</p>
+                  <p className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight mt-1">
                     {formatIndianNumber(totalWealth)}
                   </p>
                 </div>
 
                 {/* Ratio Bar */}
-                <div className="mt-5">
-                  <div className="h-3 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden flex">
+                <div className="mt-6">
+                  <div className="h-3 w-full bg-muted rounded-full overflow-hidden flex">
                     <div
                       style={{ width: `${investedPercent}%` }}
-                      className="bg-slate-800 dark:bg-slate-300 transition-all duration-300"
+                      className="bg-muted-foreground/60 transition-all duration-300"
                     />
                     <div
                       style={{ width: `${gainPercent}%` }}
-                      className="bg-emerald-600 dark:bg-emerald-500 transition-all duration-300"
+                      className="bg-foreground transition-all duration-300"
                     />
                   </div>
-                  <div className="flex justify-between items-center mt-2 text-xs font-medium">
-                    <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                      <span className="w-2 h-2 rounded-full bg-slate-800 dark:bg-slate-300" />
-                      <span>Invested: <strong>{formatIndianNumber(totalInvested)}</strong></span>
+                  <div className="flex justify-between items-center mt-2.5 text-xs font-medium">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <span className="w-2 h-2 rounded-full bg-muted-foreground/60" />
+                      <span>Invested: <strong className="text-foreground">{formatIndianNumber(totalInvested)}</strong></span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                      <span className="w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-500" />
-                      <span>Gain: <strong>{formatIndianNumber(wealthGain)}</strong></span>
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <span className="w-2 h-2 rounded-full bg-foreground" />
+                      <span>Gain: <strong className="text-foreground">{formatIndianNumber(wealthGain)}</strong></span>
                     </div>
                   </div>
                 </div>
 
-                {/* FinSage Boost */}
-                <div className="mt-5 p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1">
-                      <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> FinSage Strategic Alpha
+                {/* Strategic Alpha Pill Card */}
+                <div className="mt-6 p-4 rounded-2xl bg-card border border-border/80 shadow-2xs">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                      <TrendingUp className="w-3.5 h-3.5 text-emerald-500" /> FinSage Strategic Alpha
                     </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-md border border-emerald-200 dark:border-emerald-900">
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-muted text-foreground rounded-full border border-border/70">
                       +2.2% Alpha
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     By optimizing tax deductions and trimming leaks, you could reach{" "}
-                    <strong className="text-slate-900 dark:text-white font-bold">{formatIndianNumber(alphaWealth)}</strong>{" "}
-                    (<span className="text-emerald-600 dark:text-emerald-400 font-semibold">+{formatIndianNumber(extraGain)}</span> extra).
+                    <strong className="text-foreground font-bold">{formatIndianNumber(alphaWealth)}</strong>{" "}
+                    (<span className="text-emerald-600 dark:text-zinc-200 font-semibold">+{formatIndianNumber(extraGain)}</span> extra).
                   </p>
                 </div>
               </div>
 
               {/* Action Button */}
-              <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+              <div className="mt-8 pt-4 border-t border-border/70">
                 <Link
                   to={currentUser ? "/scenarios" : "/register"}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 shadow-sm transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-card transition-all"
                 >
                   <span>Build Your Personalized Plan</span>
                   <ArrowRight className="w-4 h-4" />

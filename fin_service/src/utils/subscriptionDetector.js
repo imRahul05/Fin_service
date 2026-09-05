@@ -29,9 +29,11 @@ const SUBSCRIPTION_PATTERNS = [
  */
 export function detectSubscriptions(transactions = [], fixedExpenses = {}) {
   const detected = new Map();
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
 
   // 1. Scan transactions for subscription keywords
-  transactions.forEach((tx) => {
+  safeTransactions.forEach((tx) => {
+    if (!tx || typeof tx !== "object") return;
     if (tx.type !== "expense" && tx.type !== "fixed") return;
 
     const textToMatch = `${tx.title || ""} ${tx.merchant || ""} ${tx.category || ""}`;
@@ -39,11 +41,12 @@ export function detectSubscriptions(transactions = [], fixedExpenses = {}) {
     for (const pattern of SUBSCRIPTION_PATTERNS) {
       if (pattern.match.test(textToMatch)) {
         if (!detected.has(pattern.name)) {
+          const rawAmount = Number(tx.amount);
           detected.set(pattern.name, {
             id: `sub_${pattern.name.toLowerCase().replace(/\s+/g, "_")}`,
             name: pattern.name,
             category: pattern.category,
-            amount: Number(tx.amount || 0),
+            amount: Number.isFinite(rawAmount) && rawAmount > 0 ? rawAmount : 0,
             period: pattern.defaultPeriod,
             lastBilled: tx.date || "Recent",
             paymentMode: tx.paymentMode || "Auto Mandate",
@@ -55,12 +58,13 @@ export function detectSubscriptions(transactions = [], fixedExpenses = {}) {
   });
 
   // 2. If transactions don't match or are empty, fallback to fixedExpenses subscriptions
-  if (detected.size === 0 && fixedExpenses?.subscriptions) {
+  const fixedSub = Number(fixedExpenses?.subscriptions);
+  if (detected.size === 0 && Number.isFinite(fixedSub) && fixedSub > 0) {
     detected.set("General Subscriptions", {
       id: "sub_general",
       name: "Bundled Digital Subscriptions",
       category: "Digital Services",
-      amount: Number(fixedExpenses.subscriptions),
+      amount: fixedSub,
       period: "monthly",
       lastBilled: "Current Month",
       paymentMode: "Auto Debit",

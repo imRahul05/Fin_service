@@ -3,9 +3,9 @@ import { formatCurrency } from '../../utils/financialUtils';
 
 const FixedExpensesForm = ({ fixedExpenses, handleFixedExpensesChange, totalFixedExpenses, setActiveTab }) => {
   return (
-    <div className="px-4 py-5 sm:p-6">
-      <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">Monthly Fixed Expenses</h3>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter your recurring monthly expenses</p>
+    <div className="p-6">
+      <h3 className="text-base font-bold text-foreground">Monthly Fixed Expenses</h3>
+      <p className="mt-0.5 text-xs text-muted-foreground">Enter your recurring monthly expenses</p>
       
       <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
         <InputField label="Rent" name="rent" value={fixedExpenses.rent} onChange={handleFixedExpensesChange} />
@@ -17,22 +17,22 @@ const FixedExpensesForm = ({ fixedExpenses, handleFixedExpensesChange, totalFixe
         <InputField label="Other Fixed Expenses" name="other" value={fixedExpenses.other} onChange={handleFixedExpensesChange} />
       </div>
       
-      <div className="mt-6 flex justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-4">
-        <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
-          Total Fixed Expenses: <span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(totalFixedExpenses)}</span>
+      <div className="mt-6 flex justify-between items-center border-t border-border pt-4">
+        <p className="text-xs font-semibold text-muted-foreground">
+          Total Fixed Expenses: <span className="font-bold text-foreground">{formatCurrency(totalFixedExpenses)}</span>
         </p>
-        <div className="flex space-x-3">
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => setActiveTab("income")}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-5 py-2.5 border border-border text-xs font-semibold rounded-full text-foreground bg-card hover:bg-muted transition cursor-pointer"
           >
             Previous
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("variable-expenses")}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-5 py-2.5 shadow-xs text-xs font-semibold rounded-full text-background bg-foreground hover:opacity-90 transition cursor-pointer"
           >
             Next: Variable Expenses
           </button>

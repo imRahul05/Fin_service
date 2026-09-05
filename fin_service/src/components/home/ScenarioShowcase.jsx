@@ -6,8 +6,7 @@ import {
   Briefcase, 
   Home as HomeIcon, 
   Flame, 
-  ArrowRight, 
-  Sparkles
+  ArrowRight
 } from "lucide-react";
 
 const SCENARIOS = [
@@ -63,26 +62,26 @@ export default function ScenarioShowcase() {
   const IconComponent = currentScenario.icon;
 
   return (
-    <section className="py-20 sm:py-24 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 sm:py-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold uppercase tracking-wider mb-3 border border-slate-200 dark:border-slate-700">
-            <GitFork className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-card border border-border/80 shadow-2xs text-foreground text-xs font-semibold uppercase tracking-wider mb-4">
+            <GitFork className="w-3.5 h-3.5 text-muted-foreground" />
             <span>Multi-Variable Modeling</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
             Simulate Decisions Before You Make Them
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-400">
+          <p className="mt-3 text-base sm:text-lg text-muted-foreground">
             Life changes fast. FinSage stress-tests your future so you can take bold career and lifestyle steps with clarity.
           </p>
         </div>
 
-        {/* Tab Selector */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-1.5 rounded-xl bg-slate-200/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+        {/* Pill Tab Selector */}
+        <div className="max-w-3xl mx-auto mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 rounded-full bg-card border border-border/80 shadow-2xs">
             {SCENARIOS.map((scenario) => {
               const isActive = activeTab === scenario.id;
               const TabIcon = scenario.icon;
@@ -90,13 +89,13 @@ export default function ScenarioShowcase() {
                 <button
                   key={scenario.id}
                   onClick={() => setActiveTab(scenario.id)}
-                  className={`flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
+                  className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                     isActive
-                      ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm border border-slate-900 dark:border-white"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                      ? "bg-foreground text-background shadow-2xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
-                  <TabIcon className={`w-4 h-4 ${isActive ? "text-white dark:text-slate-900" : "text-slate-400"}`} />
+                  <TabIcon className={`w-3.5 h-3.5 ${isActive ? "text-background" : "text-muted-foreground"}`} />
                   <span className="truncate">{scenario.title.split("(")[0]}</span>
                 </button>
               );
@@ -104,38 +103,38 @@ export default function ScenarioShowcase() {
           </div>
         </div>
 
-        {/* Scenario Card */}
-        <div className="max-w-4xl mx-auto rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden p-6 sm:p-8">
-          <div className="flex flex-col md:flex-row gap-7 items-start justify-between">
+        {/* Scenario Bento Card */}
+        <div className="max-w-4xl mx-auto rounded-3xl bg-card border border-border/80 shadow-card overflow-hidden p-6 sm:p-10">
+          <div className="flex flex-col md:flex-row gap-8 items-start justify-between">
             
             <div className="flex-1 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-center border border-slate-200 dark:border-slate-700">
-                  <IconComponent className="w-5 h-5" />
+                <div className="w-11 h-11 rounded-2xl bg-muted text-foreground flex items-center justify-center border border-border/80 shadow-2xs">
+                  <IconComponent className="w-5 h-5 text-foreground" />
                 </div>
                 <div>
-                  <span className="text-2xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground">
                     {currentScenario.badge}
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">
                     {currentScenario.title}
                   </h3>
                 </div>
               </div>
 
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                 {currentScenario.description}
               </p>
 
               {/* Metrics Grid */}
-              <div className="grid grid-cols-2 gap-3 pt-1">
+              <div className="grid grid-cols-2 gap-3 pt-2">
                 {currentScenario.metrics.map((m, idx) => (
                   <div
                     key={idx}
-                    className="p-3.5 rounded-xl border bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80"
+                    className="p-4 rounded-2xl border border-border/70 bg-muted/30"
                   >
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{m.label}</p>
-                    <p className="text-base sm:text-lg font-bold mt-0.5 text-slate-900 dark:text-white">
+                    <p className="text-xs text-muted-foreground font-medium">{m.label}</p>
+                    <p className="text-base sm:text-lg font-bold mt-1 text-foreground">
                       {m.val}
                     </p>
                   </div>
@@ -144,20 +143,21 @@ export default function ScenarioShowcase() {
             </div>
 
             {/* Strategy Recommendation Box */}
-            <div className="w-full md:w-80 shrink-0 p-5 rounded-xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+            <div className="w-full md:w-80 shrink-0 p-6 rounded-2xl bg-muted/40 border border-border/70 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-white mb-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-foreground mb-2.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                   <span>Scenario Analysis</span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   "{currentScenario.aiInsight}"
                 </p>
               </div>
 
-              <div className="mt-5 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <div className="mt-6 pt-4 border-t border-border/70">
                 <Link
                   to={currentUser ? "/scenarios" : "/register"}
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 shadow-sm transition-all"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-card transition-all"
                 >
                   <span>Simulate Your Scenario</span>
                   <ArrowRight className="w-3.5 h-3.5" />
