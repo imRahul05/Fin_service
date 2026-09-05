@@ -200,3 +200,72 @@ export function calculateFinScore(finances = {}) {
     improvements,
   };
 }
+
+/**
+ * Calculates Financial Health Score (0–100)
+ * 
+ * @param {Object} finances - Financial data object
+ * @param {Object} [metrics] - Pre-calculated metrics from calculateFinScore
+ * @returns {Object} Health score (0-100), label standing, and category sub-scores
+ */
+export function calculateHealthScore(finances = {}, metrics = null) {
+  let savingsRate = 0;
+  let debtRatio = 0;
+  let investmentRate = 0;
+  let emergencyMonths = 0;
+
+  if (metrics && typeof metrics === "object") {
+    savingsRate = Number.isFinite(metrics.savingsRate) ? metrics.savingsRate : 0;
+    debtRatio = Number.isFinite(metrics.debtRatio ?? metrics.dtiRatio) ? (metrics.debtRatio ?? metrics.dtiRatio) : 0;
+    investmentRate = Number.isFinite(metrics.investmentRate) ? metrics.investmentRate : 0;
+    emergencyMonths = Number.isFinite(metrics.emergencyMonths) ? metrics.emergencyMonths : 0;
+  } else {
+    const computed = calculateFinScore(finances);
+    savingsRate = computed.metrics.savingsRate;
+    debtRatio = computed.metrics.debtRatio;
+    investmentRate = computed.metrics.investmentRate;
+    emergencyMonths = computed.metrics.emergencyMonths;
+  }
+
+  let score = 0;
+
+  // 1. Savings Rate Score (0 - 30 pts)
+  if (savingsRate >= 25) score += 30;
+  else if (savingsRate >= 20) score += 26;
+  else if (savingsRate >= 10) score += 18;
+  else if (savingsRate > 0) score += 10;
+
+  // 2. Debt to Income Score (0 - 30 pts)
+  if (debtRatio === 0) score += 30;
+  else if (debtRatio <= 20) score += 28;
+  else if (debtRatio <= 36) score += 20;
+  else if (debtRatio <= 50) score += 10;
+
+  // 3. Investment Habit Score (0 - 20 pts)
+  if (investmentRate >= 15) score += 20;
+  else if (investmentRate >= 10) score += 15;
+  else if (investmentRate > 0) score += 8;
+
+  // 4. Cash Flow & Cushion (0 - 20 pts)
+  if (emergencyMonths >= 6) score += 20;
+  else if (emergencyMonths >= 3) score += 15;
+  else if (emergencyMonths > 0) score += 10;
+  else score += 5;
+
+  const finalScore = Math.min(100, Math.max(10, Math.round(score)));
+  let label = "Optimal Standing";
+  if (finalScore < 50) label = "Attention Required";
+  else if (finalScore < 65) label = "Optimization Needed";
+  else if (finalScore < 80) label = "Good Standing";
+
+  return {
+    score: finalScore,
+    label,
+    breakdown: {
+      savings: savingsRate >= 25 ? 30 : savingsRate >= 20 ? 26 : savingsRate >= 10 ? 18 : savingsRate > 0 ? 10 : 0,
+      debt: debtRatio === 0 ? 30 : debtRatio <= 20 ? 28 : debtRatio <= 36 ? 20 : debtRatio <= 50 ? 10 : 0,
+      investment: investmentRate >= 15 ? 20 : investmentRate >= 10 ? 15 : investmentRate > 0 ? 8 : 0,
+      cushion: emergencyMonths >= 6 ? 20 : emergencyMonths >= 3 ? 15 : emergencyMonths > 0 ? 10 : 5,
+    }
+  };
+}

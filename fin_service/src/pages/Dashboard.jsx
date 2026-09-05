@@ -30,7 +30,8 @@ import {
   Zap,
   ArrowUpRight,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  X
 } from "lucide-react";
 
 // Register ChartJS components
@@ -56,6 +57,27 @@ export default function Dashboard() {
   const [cacheInfo, setCacheInfo] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDossierOpen, setIsDossierOpen] = useState(false);
+  const [showStrategicGuidance, setShowStrategicGuidance] = useState(() => {
+    try {
+      const saved = localStorage.getItem("finsage_show_strategic_guidance");
+      return saved !== null ? saved === "true" : true;
+    } catch {
+      return true;
+    }
+  });
+
+  const handleToggleGuidance = () => {
+    setShowStrategicGuidance((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("finsage_show_strategic_guidance", String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
+
   const timeframe = "Last month";
 
   // Compute summary KPI metrics from finances
@@ -219,11 +241,35 @@ export default function Dashboard() {
       doughnut: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '72%',
+        cutout: '68%',
         plugins: {
           legend: {
             position: 'right',
-            labels: { color: textColor, font: { size: 11 }, boxWidth: 10 }
+            align: 'center',
+            labels: {
+              color: textColor,
+              font: { size: 11, weight: '500' },
+              boxWidth: 8,
+              boxHeight: 8,
+              padding: 8,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: isDark ? '#18181B' : '#0F172A',
+            titleColor: '#FAFAFA',
+            bodyColor: '#D4D4D8',
+            cornerRadius: 10,
+            padding: 8,
+            callbacks: {
+              label: function(context) {
+                const value = Number(context.parsed) || 0;
+                const total = context.dataset.data.reduce((a, b) => a + (Number(b) || 0), 0);
+                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                return ` ₹${value.toLocaleString('en-IN')} (${percentage}%)`;
+              }
+            }
           }
         }
       }
@@ -260,13 +306,22 @@ export default function Dashboard() {
     const fixedObj = (finances.fixedExpenses && typeof finances.fixedExpenses === "object" && !Array.isArray(finances.fixedExpenses)) ? finances.fixedExpenses : {};
     const varObj = (finances.variableExpenses && typeof finances.variableExpenses === "object" && !Array.isArray(finances.variableExpenses)) ? finances.variableExpenses : {};
 
-    const fixed = Object.entries(fixedObj)
-      .filter(([, v]) => Number.isFinite(Number(v)) && Number(v) > 0)
-      .map(([k, v]) => [String(k), Number(v)]);
-    const variable = Object.entries(varObj)
-      .filter(([, v]) => Number.isFinite(Number(v)) && Number(v) > 0)
-      .map(([k, v]) => [String(k), Number(v)]);
-    return [...fixed, ...variable];
+    const map = new Map();
+    const process = (obj) => {
+      Object.entries(obj).forEach(([k, v]) => {
+        const num = Number(v);
+        if (Number.isFinite(num) && num > 0) {
+          const formattedKey = String(k)
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, (l) => l.toUpperCase());
+          map.set(formattedKey, (map.get(formattedKey) || 0) + num);
+        }
+      });
+    };
+    process(fixedObj);
+    process(varObj);
+
+    return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
   }, [finances]);
 
   const expensesData = useMemo(() => {
@@ -290,14 +345,25 @@ export default function Dashboard() {
       '#F1F5F9'
     ];
 
+    if (expenseEntries.length === 0) {
+      return { labels: [], datasets: [] };
+    }
+
+    // Limit to top 5 categories, group the remainder into 'Other' to prevent legend cramp/clipping
+    let displayEntries = expenseEntries;
+    if (expenseEntries.length > 6) {
+      const top5 = expenseEntries.slice(0, 5);
+      const remaining = expenseEntries.slice(5);
+      const remainingTotal = remaining.reduce((sum, [, amt]) => sum + amt, 0);
+      displayEntries = [...top5, [`Other (${remaining.length} items)`, remainingTotal]];
+    }
+
     return {
-      labels: expenseEntries.map(([category]) =>
-        String(category).replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
-      ),
+      labels: displayEntries.map(([category]) => category),
       datasets: [
         {
-          data: expenseEntries.map(([, amount]) => amount),
-          backgroundColor: expenseEntries.map((_, i) => palette[i % palette.length]),
+          data: displayEntries.map(([, amount]) => amount),
+          backgroundColor: displayEntries.map((_, i) => palette[i % palette.length]),
           borderWidth: 2,
           borderColor: isDark ? '#121214' : '#FFFFFF'
         }
@@ -409,6 +475,34 @@ export default function Dashboard() {
         </div>
 
         <div className="flex items-center gap-2.5">
+          {/* Strategic Guidance Toggle Button */}
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined" && window.innerWidth < 1280) {
+                setIsDrawerOpen(true);
+              } else {
+                handleToggleGuidance();
+              }
+            }}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs font-semibold shadow-2xs transition-all cursor-pointer ${
+              showStrategicGuidance
+                ? "bg-foreground text-background border-foreground hover:bg-foreground/90"
+                : "bg-card text-foreground border-border/80 hover:bg-muted"
+            }`}
+            title={showStrategicGuidance ? "Collapse Strategic Guidance panel" : "Expand Strategic Guidance panel"}
+            aria-label="Toggle Strategic Guidance panel"
+          >
+            <Sparkles className={`w-3.5 h-3.5 ${showStrategicGuidance ? "text-background" : "text-amber-500"}`} />
+            <span>Strategic Guidance</span>
+            <span className={`hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+              showStrategicGuidance
+                ? "bg-background/20 text-background"
+                : "bg-muted text-muted-foreground border border-border/70"
+            }`}>
+              {showStrategicGuidance ? "Active" : "Off"}
+            </span>
+          </button>
+
           <button
             onClick={() => setIsDossierOpen(true)}
             className="inline-flex items-center gap-1.5 px-4 py-2 border border-border/80 rounded-full shadow-2xs text-xs font-semibold text-foreground bg-card hover:bg-muted transition cursor-pointer"
@@ -427,95 +521,99 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Dribbble-Style 3-Column Core Grid: Center (8 cols) + Right Strategic Panel (4 cols) */}
+      {/* Dribbble-Style Core Grid: Center Column + Collapsible Right Strategic Panel */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
         
-        {/* CENTER COLUMN (8 cols): Overview Card + Cash Flow Bar Chart + FinScore + AI Briefing */}
-        <div className="xl:col-span-8 space-y-6">
+        {/* CENTER COLUMN: 8 cols when Strategic Guidance is open, full 12 cols when collapsed */}
+        <div className={`${showStrategicGuidance ? "xl:col-span-8" : "xl:col-span-12"} space-y-6 transition-all duration-300 min-w-0`}>
           
-          {/* Reference Image 2: OVERVIEW BENTO CARD */}
-          <div className="bg-card rounded-3xl border border-border/80 p-6 sm:p-7 shadow-card space-y-6">
+          {/* OVERVIEW BENTO CARD (Streamlined & Compact Height) */}
+          <div className="bg-card rounded-3xl border border-border/80 p-4 sm:p-5 shadow-card space-y-3.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-foreground">Overview</h2>
+                <h2 className="text-sm sm:text-base font-bold text-foreground">Overview</h2>
                 <span className="text-2xs text-muted-foreground">Live telemetry</span>
               </div>
 
               {/* Timeframe selector pill */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/60 border border-border/70 text-xs font-medium text-foreground">
-                <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-muted/60 border border-border/70 text-2xs font-medium text-foreground">
+                <Calendar className="w-3 h-3 text-muted-foreground" />
                 <span>{timeframe}</span>
               </div>
             </div>
 
-            {/* Dual Bold Metric Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Dual Bold Metric Cards (Compact) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Monthly Savings Card */}
-              <div className="p-5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col justify-between">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-muted/30 border border-border/60 flex flex-col justify-between">
                 <div>
-                  <span className="text-xs font-semibold text-muted-foreground">
-                    Monthly Savings
-                  </span>
-                  <div className="flex items-baseline gap-2.5 mt-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-                      {formatCurrency(summaryData.monthlySavings)}
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Monthly Savings
                     </span>
-                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-2xs font-bold bg-muted text-foreground border border-border/70">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-muted text-foreground border border-border/70">
                       {savingsRate > 0 ? `+${savingsRate.toFixed(1)}%` : `${savingsRate.toFixed(1)}%`}
                     </span>
                   </div>
+                  <div className="mt-1">
+                    <span className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
+                      {formatCurrency(summaryData.monthlySavings)}
+                    </span>
+                  </div>
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-3">
+                <p className="text-2xs text-muted-foreground mt-1.5">
                   Cushion: {(summaryData.monthlySavings > 0 && summaryData.totalExpenses > 0 ? (summaryData.monthlySavings * 6 / summaryData.totalExpenses).toFixed(1) : "0")} months expenses
                 </p>
               </div>
 
               {/* Net Worth Card */}
-              <div className="p-5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col justify-between">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-muted/30 border border-border/60 flex flex-col justify-between">
                 <div>
-                  <span className="text-xs font-semibold text-muted-foreground">
-                    Estimated Net Worth
-                  </span>
-                  <div className="flex items-baseline gap-2.5 mt-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-                      {formatCurrency(summaryData.netWorth)}
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Estimated Net Worth
                     </span>
-                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-2xs font-bold bg-muted text-foreground border border-border/70">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-muted text-foreground border border-border/70">
                       Optimal
                     </span>
                   </div>
+                  <div className="mt-1">
+                    <span className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
+                      {formatCurrency(summaryData.netWorth)}
+                    </span>
+                  </div>
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-3">
+                <p className="text-2xs text-muted-foreground mt-1.5">
                   Assets minus recorded debts
                 </p>
               </div>
             </div>
 
-            {/* Avatar Stack & Insight Message */}
-            <div className="flex items-center justify-between pt-2 border-t border-border/60">
-              <div className="flex items-center gap-3">
-                <div className="flex -space-x-2 overflow-hidden">
-                  <div className="inline-block h-7 w-7 rounded-full bg-foreground text-background text-[10px] font-bold flex items-center justify-center ring-2 ring-card">
+            {/* Avatar Stack & Insight Message (Compact) */}
+            <div className="flex items-center justify-between pt-2.5 border-t border-border/60">
+              <div className="flex items-center gap-2.5">
+                <div className="flex -space-x-1.5 overflow-hidden">
+                  <div className="inline-flex h-5.5 w-5.5 rounded-full bg-foreground text-background text-[9px] font-bold items-center justify-center ring-1.5 ring-card">
                     AI
                   </div>
-                  <div className="inline-block h-7 w-7 rounded-full bg-muted text-foreground text-[10px] font-bold flex items-center justify-center ring-2 ring-card border border-border">
+                  <div className="inline-flex h-5.5 w-5.5 rounded-full bg-muted text-foreground text-[9px] font-bold items-center justify-center ring-1.5 ring-card border border-border">
                     CA
                   </div>
-                  <div className="inline-block h-7 w-7 rounded-full bg-muted text-foreground text-[10px] font-bold flex items-center justify-center ring-2 ring-card border border-border">
+                  <div className="inline-flex h-5.5 w-5.5 rounded-full bg-muted text-foreground text-[9px] font-bold items-center justify-center ring-1.5 ring-card border border-border">
                     FS
                   </div>
                 </div>
-                <span className="text-xs font-semibold text-foreground">
+                <span className="text-2xs sm:text-xs font-semibold text-foreground">
                   857 active insights computed today
                 </span>
               </div>
 
               <Link
                 to="/analytics"
-                className="inline-flex items-center gap-1 text-xs font-semibold text-foreground hover:underline"
+                className="inline-flex items-center gap-1 text-2xs sm:text-xs font-semibold text-foreground hover:underline"
               >
                 <span>Full Ledger</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
           </div>
@@ -523,7 +621,7 @@ export default function Dashboard() {
           {/* CASH FLOW & EXPENSES BENTO SECTION */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Monthly Cash Flow Rounded Bar Chart */}
-            <div className="lg:col-span-7 bg-card rounded-3xl border border-border/80 p-6 shadow-card">
+            <div className={`${showStrategicGuidance ? "lg:col-span-7" : "lg:col-span-6"} bg-card rounded-3xl border border-border/80 p-5 sm:p-6 shadow-card min-w-0 transition-all duration-300`}>
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-sm font-bold text-foreground">Monthly Cash Flow</h3>
@@ -544,11 +642,18 @@ export default function Dashboard() {
             </div>
 
             {/* Expense Distribution Doughnut */}
-            <div className="lg:col-span-5 bg-card rounded-3xl border border-border/80 p-6 shadow-card flex flex-col justify-between">
+            <div className={`${showStrategicGuidance ? "lg:col-span-5" : "lg:col-span-6"} bg-card rounded-3xl border border-border/80 p-5 sm:p-6 shadow-card flex flex-col justify-between min-w-0 transition-all duration-300`}>
               <div>
-                <h3 className="text-sm font-bold text-foreground mb-1">Expense Breakdown</h3>
-                <p className="text-2xs text-muted-foreground mb-4">Categorized monthly outflow</p>
-                <div className="h-44 flex items-center justify-center">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-sm font-bold text-foreground">Expense Breakdown</h3>
+                  {expenseEntries.length > 6 && (
+                    <span className="text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full border border-border/60">
+                      Top 5 + Other
+                    </span>
+                  )}
+                </div>
+                <p className="text-2xs text-muted-foreground mb-3">Categorized monthly outflow</p>
+                <div className="h-48 sm:h-52 flex items-center justify-center min-w-0">
                   {expenseEntries.length > 0 ? (
                     <Doughnut data={expensesData} options={chartOptions.doughnut} />
                   ) : (
@@ -558,7 +663,7 @@ export default function Dashboard() {
               </div>
 
               <div className="pt-3 border-t border-border/60 flex items-center justify-between text-2xs text-muted-foreground">
-                <span>Total: {formatCurrency(summaryData.totalExpenses)}</span>
+                <span>Total: <strong className="text-foreground">{formatCurrency(summaryData.totalExpenses)}</strong></span>
                 <Link to="/finance-input" className="font-semibold text-foreground hover:underline">
                   Edit →
                 </Link>
@@ -566,7 +671,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* FINSCORE VITALITY DIAL CARD */}
+          {/* FINSCORE & HEALTH SCORE DUAL BENTO DIAL CARD */}
           <FinScoreGauge finances={finances} />
 
           {/* AI EXECUTIVE BRIEFING HERO */}
@@ -578,6 +683,7 @@ export default function Dashboard() {
             cacheInfo={cacheInfo}
             onRefresh={handleRefreshAdvice}
             onOpenFullAdvice={() => setIsDrawerOpen(true)}
+            showHealthScore={false}
           />
 
           {/* FULL FINANCIAL ANALYSIS REPORT (Embedded) */}
@@ -593,170 +699,182 @@ export default function Dashboard() {
 
         </div>
 
-        {/* RIGHT COLUMN (4 cols): STRATEGIC RECOMMENDATIONS PANEL (Matching Reference 2) */}
-        <div className="xl:col-span-4 space-y-6">
-          
-          <div className="bg-card rounded-3xl border border-border/80 p-6 shadow-card space-y-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-base font-bold text-foreground flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-foreground" />
-                  Strategic Guidance
-                </h2>
-                <p className="text-2xs text-muted-foreground mt-0.5">High-impact optimizations</p>
+        {/* RIGHT COLUMN: STRATEGIC RECOMMENDATIONS PANEL (Collapsible) */}
+        {showStrategicGuidance && (
+          <div className="xl:col-span-4 space-y-6 animate-in fade-in duration-300">
+            
+            <div className="bg-card rounded-3xl border border-border/80 p-6 shadow-card space-y-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-foreground" />
+                    Strategic Guidance
+                  </h2>
+                  <p className="text-2xs text-muted-foreground mt-0.5">High-impact optimizations</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
+                    Live
+                  </span>
+                  <button
+                    onClick={handleToggleGuidance}
+                    className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
+                    title="Hide Strategic Guidance"
+                    aria-label="Hide Strategic Guidance"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
-                Live
-              </span>
+
+              {/* Recommendations List */}
+              <div className="space-y-3">
+                {/* Item 1: Tax Optimization */}
+                <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 hover:bg-muted/50 transition-all space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Tax Architecture
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
+                      Optimized
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-bold text-foreground">
+                    New Tax Regime + 80CCD(1B)
+                  </h4>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Save ₹38,400 net taxes this year by claiming NPS Tier-1 deductions.
+                  </p>
+                  <div className="pt-1 flex items-center justify-between text-2xs">
+                    <span className="font-bold text-foreground">₹38,400 / savings</span>
+                    <Link
+                      to="/scenarios"
+                      className="font-semibold text-foreground hover:underline flex items-center gap-0.5"
+                    >
+                      <span>Simulate</span>
+                      <ArrowUpRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Item 2: Subscription Leak Radar */}
+                <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 hover:bg-muted/50 transition-all space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Cashflow Radar
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
+                      Active
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-bold text-foreground">
+                    Trim Unused OTT & Micro-Leaks
+                  </h4>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    3 recurring streaming subscriptions detected. Redirect to index SIPs.
+                  </p>
+                  <div className="pt-1 flex items-center justify-between text-2xs">
+                    <span className="font-bold text-foreground">₹5,200 / mo found</span>
+                    <Link
+                      to="/analytics"
+                      className="font-semibold text-foreground hover:underline flex items-center gap-0.5"
+                    >
+                      <span>Inspect</span>
+                      <ArrowUpRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Item 3: Loan Prepayment vs SIP */}
+                <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 hover:bg-muted/50 transition-all space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Debt Strategy
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
+                      Alpha
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-bold text-foreground">
+                    Deploy Surplus to Nifty SIP
+                  </h4>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    At 8.4% home loan ROI, equity compounding beats prepayment by ₹18.6L.
+                  </p>
+                  <div className="pt-1 flex items-center justify-between text-2xs">
+                    <span className="font-bold text-foreground">+₹18.6L Alpha</span>
+                    <Link
+                      to="/scenarios"
+                      className="font-semibold text-foreground hover:underline flex items-center gap-0.5"
+                    >
+                      <span>Review</span>
+                      <ArrowUpRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Item 4: Emergency Cushion */}
+                <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 hover:bg-muted/50 transition-all space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Liquidity Cushion
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
+                      In Progress
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-bold text-foreground">
+                    6-Month Emergency Runway
+                  </h4>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Maintain liquid funds in high-yield flexi-deposit before high equity bets.
+                  </p>
+                  <div className="pt-1 flex items-center justify-between text-2xs">
+                    <span className="font-bold text-foreground">6.2 Mos Runway</span>
+                    <Link
+                      to="/finance-input"
+                      className="font-semibold text-foreground hover:underline flex items-center gap-0.5"
+                    >
+                      <span>Update</span>
+                      <ArrowUpRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* View All Actions Pill Button */}
+              <div className="pt-2">
+                <button
+                  onClick={() => setIsDrawerOpen(true)}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-full text-xs font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-2xs transition-all cursor-pointer"
+                >
+                  <span>View Full AI Strategy</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
 
-            {/* Recommendations List */}
-            <div className="space-y-3">
-              {/* Item 1: Tax Optimization */}
-              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 hover:bg-muted/50 transition-all space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Tax Architecture
-                  </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
-                    Optimized
-                  </span>
+            {/* Quick Stats Pill Bento Card */}
+            <div className="bg-card rounded-3xl border border-border/80 p-6 shadow-card space-y-4">
+              <h3 className="text-sm font-bold text-foreground">Key Financial Ratios</h3>
+              <div className="space-y-2.5 text-xs">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/60">
+                  <span className="text-muted-foreground">Savings Velocity</span>
+                  <span className="font-bold text-foreground">{(savingsRate ?? 0).toFixed(1)}%</span>
                 </div>
-                <h4 className="text-xs font-bold text-foreground">
-                  New Tax Regime + 80CCD(1B)
-                </h4>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Save ₹38,400 net taxes this year by claiming NPS Tier-1 deductions.
-                </p>
-                <div className="pt-1 flex items-center justify-between text-2xs">
-                  <span className="font-bold text-foreground">₹38,400 / savings</span>
-                  <Link
-                    to="/scenarios"
-                    className="font-semibold text-foreground hover:underline flex items-center gap-0.5"
-                  >
-                    <span>Simulate</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </Link>
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/60">
+                  <span className="text-muted-foreground">Debt-to-Income</span>
+                  <span className="font-bold text-foreground">{(summaryData?.debtToIncomeRatio ?? 0).toFixed(1)}%</span>
                 </div>
-              </div>
-
-              {/* Item 2: Subscription Leak Radar */}
-              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 hover:bg-muted/50 transition-all space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Cashflow Radar
-                  </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
-                    Active
-                  </span>
-                </div>
-                <h4 className="text-xs font-bold text-foreground">
-                  Trim Unused OTT & Micro-Leaks
-                </h4>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  3 recurring streaming subscriptions detected. Redirect to index SIPs.
-                </p>
-                <div className="pt-1 flex items-center justify-between text-2xs">
-                  <span className="font-bold text-foreground">₹5,200 / mo found</span>
-                  <Link
-                    to="/analytics"
-                    className="font-semibold text-foreground hover:underline flex items-center gap-0.5"
-                  >
-                    <span>Inspect</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Item 3: Loan Prepayment vs SIP */}
-              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 hover:bg-muted/50 transition-all space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Debt Strategy
-                  </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
-                    Alpha
-                  </span>
-                </div>
-                <h4 className="text-xs font-bold text-foreground">
-                  Deploy Surplus to Nifty SIP
-                </h4>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  At 8.4% home loan ROI, equity compounding beats prepayment by ₹18.6L.
-                </p>
-                <div className="pt-1 flex items-center justify-between text-2xs">
-                  <span className="font-bold text-foreground">+₹18.6L Alpha</span>
-                  <Link
-                    to="/scenarios"
-                    className="font-semibold text-foreground hover:underline flex items-center gap-0.5"
-                  >
-                    <span>Review</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Item 4: Emergency Cushion */}
-              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 hover:bg-muted/50 transition-all space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Liquidity Cushion
-                  </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-foreground border border-border/70">
-                    In Progress
-                  </span>
-                </div>
-                <h4 className="text-xs font-bold text-foreground">
-                  6-Month Emergency Runway
-                </h4>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Maintain liquid funds in high-yield flexi-deposit before high equity bets.
-                </p>
-                <div className="pt-1 flex items-center justify-between text-2xs">
-                  <span className="font-bold text-foreground">6.2 Mos Runway</span>
-                  <Link
-                    to="/finance-input"
-                    className="font-semibold text-foreground hover:underline flex items-center gap-0.5"
-                  >
-                    <span>Update</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </Link>
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/60">
+                  <span className="text-muted-foreground">Total Invested</span>
+                  <span className="font-bold text-foreground">{formatCurrency(summaryData.totalInvestments)}</span>
                 </div>
               </div>
             </div>
 
-            {/* View All Actions Pill Button */}
-            <div className="pt-2">
-              <button
-                onClick={() => setIsDrawerOpen(true)}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-full text-xs font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-2xs transition-all cursor-pointer"
-              >
-                <span>View Full AI Strategy</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
           </div>
-
-          {/* Quick Stats Pill Bento Card */}
-          <div className="bg-card rounded-3xl border border-border/80 p-6 shadow-card space-y-4">
-            <h3 className="text-sm font-bold text-foreground">Key Financial Ratios</h3>
-            <div className="space-y-2.5 text-xs">
-              <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/60">
-                <span className="text-muted-foreground">Savings Velocity</span>
-                <span className="font-bold text-foreground">{(savingsRate ?? 0).toFixed(1)}%</span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/60">
-                <span className="text-muted-foreground">Debt-to-Income</span>
-                <span className="font-bold text-foreground">{(summaryData?.debtToIncomeRatio ?? 0).toFixed(1)}%</span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/60">
-                <span className="text-muted-foreground">Total Invested</span>
-                <span className="font-bold text-foreground">{formatCurrency(summaryData.totalInvestments)}</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
+        )}
 
       </div>
 
