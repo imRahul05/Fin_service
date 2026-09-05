@@ -98,20 +98,20 @@ export default function ReceiptScannerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-150">
+      <div className="bg-card rounded-3xl border border-border/80 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-blue-600 text-white shadow-xs">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-muted/20">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-foreground text-background shadow-xs">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-base font-bold text-foreground">
                 AI Smart Receipt & UPI Parser
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-muted-foreground">
                 Upload bills, receipts, or Google Pay/PhonePe screenshots
               </p>
             </div>
@@ -121,16 +121,16 @@ export default function ReceiptScannerModal({
               handleReset();
               onClose();
             }}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content Area */}
         <div className="p-6 overflow-y-auto space-y-4 flex-1">
           {error && (
-            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+            <div className="p-3.5 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -140,7 +140,7 @@ export default function ReceiptScannerModal({
             /* Upload Dropzone */
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl p-8 text-center cursor-pointer transition bg-slate-50/50 dark:bg-slate-800/30 group"
+              className="border-2 border-dashed border-border hover:border-foreground/40 rounded-3xl p-8 text-center cursor-pointer transition bg-muted/20 group"
             >
               <input
                 type="file"
@@ -149,20 +149,20 @@ export default function ReceiptScannerModal({
                 accept="image/*"
                 className="hidden"
               />
-              <div className="mx-auto w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <div className="mx-auto w-12 h-12 rounded-2xl bg-muted text-foreground flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                 <UploadCloud className="w-6 h-6" />
               </div>
-              <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+              <p className="text-sm font-bold text-foreground">
                 Click or drag & drop receipt or UPI screenshot
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Supports JPG, PNG, WEBP, PhonePe/GPay/Paytm screenshots
               </p>
             </div>
           ) : (
             /* Image Preview & Scan Action */
             <div className="space-y-4">
-              <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-950 flex items-center justify-center max-h-52">
+              <div className="relative rounded-2xl overflow-hidden border border-border bg-muted/30 flex items-center justify-center max-h-52">
                 <img
                   src={previewUrl}
                   alt="Receipt Preview"
@@ -170,7 +170,7 @@ export default function ReceiptScannerModal({
                 />
                 <button
                   onClick={handleReset}
-                  className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 text-white hover:bg-slate-900 transition"
+                  className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 text-foreground hover:bg-background transition cursor-pointer shadow-xs"
                   title="Choose another image"
                 >
                   <X className="w-4 h-4" />
@@ -181,7 +181,7 @@ export default function ReceiptScannerModal({
                 <button
                   onClick={handleScan}
                   disabled={isParsing}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-md transition disabled:opacity-60"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-full bg-foreground hover:opacity-90 text-background text-xs font-semibold shadow-xs transition disabled:opacity-60 cursor-pointer"
                 >
                   {isParsing ? (
                     <>
@@ -201,73 +201,73 @@ export default function ReceiptScannerModal({
 
           {/* Parsed Result Form */}
           {parsedData && (
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3 animate-in fade-in slide-in-from-bottom-2">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
-                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" />
+            <div className="p-5 rounded-3xl bg-muted/30 border border-border space-y-4 animate-in fade-in slide-in-from-bottom-2">
+              <div className="flex items-center justify-between pb-3 border-b border-border">
+                <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   Successfully Extracted ({parsedData.confidence || "High"} Confidence)
                 </span>
-                <span className="text-sm font-extrabold text-slate-900 dark:text-white">
+                <span className="text-sm font-black text-foreground">
                   {formatCurrency(parsedData.amount)}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
-                  <label className="block text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase">
+                  <label className="block text-muted-foreground text-2xs font-semibold uppercase">
                     Merchant / Payee
                   </label>
                   <input
                     type="text"
                     value={parsedData.merchant || ""}
                     onChange={(e) => setParsedData({ ...parsedData, merchant: e.target.value })}
-                    className="w-full mt-1 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-medium"
+                    className="w-full mt-1 px-3 py-2 rounded-2xl border border-border bg-background text-foreground font-medium text-xs focus:outline-none focus:ring-1 focus:ring-foreground"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase">
+                  <label className="block text-muted-foreground text-2xs font-semibold uppercase">
                     Amount (₹)
                   </label>
                   <input
                     type="number"
                     value={parsedData.amount || ""}
                     onChange={(e) => setParsedData({ ...parsedData, amount: Number(e.target.value) })}
-                    className="w-full mt-1 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-medium"
+                    className="w-full mt-1 px-3 py-2 rounded-2xl border border-border bg-background text-foreground font-medium text-xs focus:outline-none focus:ring-1 focus:ring-foreground"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase">
+                  <label className="block text-muted-foreground text-2xs font-semibold uppercase">
                     Category
                   </label>
                   <input
                     type="text"
                     value={parsedData.category || ""}
                     onChange={(e) => setParsedData({ ...parsedData, category: e.target.value })}
-                    className="w-full mt-1 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-medium"
+                    className="w-full mt-1 px-3 py-2 rounded-2xl border border-border bg-background text-foreground font-medium text-xs focus:outline-none focus:ring-1 focus:ring-foreground"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase">
+                  <label className="block text-muted-foreground text-2xs font-semibold uppercase">
                     Payment Mode
                   </label>
                   <input
                     type="text"
                     value={parsedData.paymentMode || ""}
                     onChange={(e) => setParsedData({ ...parsedData, paymentMode: e.target.value })}
-                    className="w-full mt-1 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-medium"
+                    className="w-full mt-1 px-3 py-2 rounded-2xl border border-border bg-background text-foreground font-medium text-xs focus:outline-none focus:ring-1 focus:ring-foreground"
                   />
                 </div>
               </div>
 
               {parsedData.description && (
                 <div>
-                  <label className="block text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase">
+                  <label className="block text-muted-foreground text-2xs font-semibold uppercase">
                     Description / Items
                   </label>
-                  <p className="text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700 mt-1">
+                  <p className="text-xs text-foreground bg-background p-3 rounded-2xl border border-border mt-1">
                     {parsedData.description}
                   </p>
                 </div>
@@ -275,7 +275,7 @@ export default function ReceiptScannerModal({
 
               <button
                 onClick={handleConfirmAdd}
-                className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition"
+                className="w-full mt-2 flex items-center justify-center gap-2 py-3 px-5 rounded-full bg-foreground hover:opacity-90 text-background text-xs font-semibold shadow-xs transition cursor-pointer"
               >
                 <span>Confirm & Log Transaction</span>
                 <ArrowRight className="w-3.5 h-3.5" />

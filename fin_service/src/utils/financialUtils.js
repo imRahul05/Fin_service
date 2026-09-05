@@ -4,18 +4,30 @@
 
 // Calculate monthly savings
 export const calculateMonthlySavings = (income, expenses) => {
-  return income - expenses;
+  const inc = Number(income);
+  const exp = Number(expenses);
+  return (Number.isFinite(inc) ? inc : 0) - (Number.isFinite(exp) ? exp : 0);
 };
 
 // Calculate debt-to-income ratio
 export const calculateDebtToIncomeRatio = (monthlyDebtPayments, grossMonthlyIncome) => {
-  return (monthlyDebtPayments / grossMonthlyIncome) * 100;
+  const income = Number(grossMonthlyIncome);
+  if (!Number.isFinite(income) || income <= 0) return 0;
+  const debt = Number(monthlyDebtPayments);
+  if (!Number.isFinite(debt) || debt <= 0) return 0;
+  return (debt / income) * 100;
 };
 
 // Calculate net worth
-export const calculateNetWorth = (assets, liabilities) => {
-  const totalAssets = Object.values(assets).reduce((sum, value) => sum + value, 0);
-  const totalLiabilities = Object.values(liabilities).reduce((sum, value) => sum + value, 0);
+export const calculateNetWorth = (assets = {}, liabilities = {}) => {
+  const totalAssets = Object.values(assets || {}).reduce((sum, value) => {
+    const num = Number(value);
+    return sum + (Number.isFinite(num) ? num : 0);
+  }, 0);
+  const totalLiabilities = Object.values(liabilities || {}).reduce((sum, value) => {
+    const num = Number(value);
+    return sum + (Number.isFinite(num) ? num : 0);
+  }, 0);
   return totalAssets - totalLiabilities;
 };
 
@@ -24,7 +36,7 @@ export const calculateNetWorth = (assets, liabilities) => {
  * Centralizes aggregation calculations across the entire application (DRY compliance).
  */
 export const aggregateFinancials = (finances) => {
-  if (!finances) {
+  if (!finances || typeof finances !== "object") {
     return {
       totalIncome: 0,
       income: 0,
@@ -51,30 +63,40 @@ export const aggregateFinancials = (finances) => {
     };
   }
 
-  const totalIncome = Object.values(finances.income || {}).reduce((sum, val) => sum + Number(val || 0), 0);
-  const totalFixedExpenses = Object.values(finances.fixedExpenses || {}).reduce((sum, val) => sum + Number(val || 0), 0);
-  const totalVariableExpenses = Object.values(finances.variableExpenses || {}).reduce((sum, val) => sum + Number(val || 0), 0);
-  const totalInvestments = Object.values(finances.investments || {}).reduce((sum, val) => sum + Number(val || 0), 0);
-  const totalLoans = Object.values(finances.loans || {}).reduce((sum, val) => sum + Number(val || 0), 0);
+  const sumSafe = (obj) => {
+    if (!obj || typeof obj !== "object") return 0;
+    return Object.values(obj).reduce((sum, val) => {
+      const num = Number(val);
+      return sum + (Number.isFinite(num) ? num : 0);
+    }, 0);
+  };
+
+  const totalIncome = sumSafe(finances.income);
+  const totalFixedExpenses = sumSafe(finances.fixedExpenses);
+  const totalVariableExpenses = sumSafe(finances.variableExpenses);
+  const totalInvestments = sumSafe(finances.investments);
+  const totalLoans = sumSafe(finances.loans);
   
   const totalExpenses = totalFixedExpenses + totalVariableExpenses;
-  const monthlySavings = totalIncome - totalExpenses;
+  const monthlySavings = calculateMonthlySavings(totalIncome, totalExpenses);
   const savingsRate = totalIncome > 0 ? (monthlySavings / totalIncome) * 100 : 0;
-  const debtToIncomeRatio = totalIncome > 0 ? (totalLoans / totalIncome) * 100 : 0;
+  const debtToIncomeRatio = calculateDebtToIncomeRatio(totalLoans, totalIncome);
   const netWorth = totalInvestments - totalLoans;
 
   const incomeSources = finances.income || {};
   const expenseCategories = {};
 
-  if (finances.fixedExpenses) {
+  if (finances.fixedExpenses && typeof finances.fixedExpenses === "object") {
     Object.entries(finances.fixedExpenses).forEach(([category, amount]) => {
-      if (Number(amount) > 0) expenseCategories[`Fixed: ${category}`] = Number(amount);
+      const num = Number(amount);
+      if (Number.isFinite(num) && num > 0) expenseCategories[`Fixed: ${category}`] = num;
     });
   }
 
-  if (finances.variableExpenses) {
+  if (finances.variableExpenses && typeof finances.variableExpenses === "object") {
     Object.entries(finances.variableExpenses).forEach(([category, amount]) => {
-      if (Number(amount) > 0) expenseCategories[`Variable: ${category}`] = Number(amount);
+      const num = Number(amount);
+      if (Number.isFinite(num) && num > 0) expenseCategories[`Variable: ${category}`] = num;
     });
   }
 
@@ -91,9 +113,9 @@ export const aggregateFinancials = (finances) => {
     loansTotal: totalLoans,
     monthlySavings,
     savings: monthlySavings,
-    savingsRate,
-    debtToIncomeRatio,
-    netWorth,
+    savingsRate: Number.isFinite(savingsRate) ? savingsRate : 0,
+    debtToIncomeRatio: Number.isFinite(debtToIncomeRatio) ? debtToIncomeRatio : 0,
+    netWorth: Number.isFinite(netWorth) ? netWorth : 0,
     incomeSources,
     expenseCategories,
     expenseBreakdown: {

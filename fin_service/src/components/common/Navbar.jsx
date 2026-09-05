@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
+import { Menu, X, UserPlus, LogOut, Settings, Wallet, ArrowRight } from "lucide-react";
 
 function Navbar() {
   const { currentUser, isGuestMode, logout } = useAuth();
@@ -43,326 +44,292 @@ function Navbar() {
     return location.pathname === path;
   };
 
-  const linkClass = (path) =>
-    `${
+  const navPillClass = (path) =>
+    `rounded-full px-3.5 py-1.5 text-xs font-medium transition-all ${
       isActive(path)
-        ? "border-slate-900 dark:border-white text-slate-900 dark:text-white font-semibold"
-        : "border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700 hover:text-slate-800 dark:hover:text-slate-200"
-    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors`;
+        ? "bg-foreground text-background font-semibold shadow-2xs"
+        : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
+    }`;
 
-  const mobileLinkClass = (path) =>
-    `${
+  const mobileNavClass = (path) =>
+    `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
       isActive(path)
-        ? "bg-slate-100 dark:bg-slate-800 border-slate-900 dark:border-white text-slate-900 dark:text-white font-semibold"
-        : "border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:text-slate-800 dark:hover:text-slate-200"
-    } block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors`;
+        ? "bg-foreground text-background font-semibold"
+        : "text-foreground hover:bg-muted"
+    }`;
 
   return (
-    <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-2xs transition-colors duration-200 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
-                <span>FinSage</span>
-                <span className="h-1.5 w-1.5 rounded-full bg-slate-900 dark:bg-white inline-block"></span>
-              </Link>
-            </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link to="/" className={linkClass("/")}>
-                Home
-              </Link>
-
-              {currentUser && (
-                <>
-                  <Link to="/dashboard" className={linkClass("/dashboard")}>
-                    Dashboard
-                  </Link>
-                  <Link to="/analytics" className={linkClass("/analytics")}>
-                    Analytics
-                  </Link>
-                  <Link to="/scenarios" className={linkClass("/scenarios")}>
-                    What-If Scenarios
-                  </Link>
-                  <Link to="/finance-input" className={linkClass("/finance-input")}>
-                    Update Finances
-                  </Link>
-                  <Link to="/advisor" className={linkClass("/advisor")}>
-                    AI Advisor
-                  </Link>
-                </>
-              )}
-            </div>
+    <header className="sticky top-3 z-50 w-full px-3 sm:px-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="bg-card/85 dark:bg-card/85 backdrop-blur-xl border border-border/80 shadow-card rounded-full px-4 sm:px-5 py-2 flex items-center justify-between transition-all">
+          {/* Brand Logo */}
+          <div className="flex items-center gap-2">
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-foreground font-bold tracking-tight text-sm sm:text-base group"
+            >
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background font-black text-xs group-hover:scale-105 transition-transform">
+                F
+              </span>
+              <span className="tracking-tight">FinSage</span>
+              <span className="relative flex h-1.5 w-1.5 ml-0.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              </span>
+            </Link>
           </div>
 
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-3">
-            {/* Theme Toggle Button */}
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center space-x-1">
+            <Link to="/" className={navPillClass("/")}>
+              Overview
+            </Link>
+            <Link to="/scenarios" className={navPillClass("/scenarios")}>
+              Scenarios
+            </Link>
+            <Link to="/advisor" className={navPillClass("/advisor")}>
+              AI Copilot
+            </Link>
+            {currentUser && (
+              <>
+                <Link to="/dashboard" className={navPillClass("/dashboard")}>
+                  Dashboard
+                </Link>
+                <Link to="/analytics" className={navPillClass("/analytics")}>
+                  Analytics
+                </Link>
+              </>
+            )}
+            <Link to="/contact" className={navPillClass("/contact")}>
+              Contact
+            </Link>
+          </nav>
+
+          {/* Right Action Bar */}
+          <div className="flex items-center space-x-2">
             <ThemeToggle />
 
             {isGuestMode && (
               <Link
                 to="/register"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border border-border bg-muted/60 hover:bg-muted text-foreground transition"
               >
+                <UserPlus className="w-3 h-3" />
                 <span>Claim Plan</span>
               </Link>
             )}
 
             {currentUser ? (
-              <div className="ml-3 relative" ref={profileRef}>
-                <div>
-                  <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="bg-white dark:bg-slate-800 rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-white"
-                    id="user-menu"
-                    aria-expanded={isProfileOpen}
-                    aria-haspopup="true"
-                  >
-                    <span className="sr-only">Open user menu</span>
-                    <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-400 transition-all">
-                      <span className="text-xs font-bold leading-none text-slate-800 dark:text-slate-200">
-                        {currentUser.email &&
-                          (() => {
-                            const username = currentUser.email.split("@")[0];
-                            return (
-                              username.charAt(0).toUpperCase() +
-                              username.charAt(username.length - 1)
-                            );
-                          })()}
-                      </span>
+              <div className="relative" ref={profileRef}>
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  id="user-menu"
+                  aria-expanded={isProfileOpen}
+                  aria-haspopup="true"
+                >
+                  <span className="sr-only">Open user menu</span>
+                  <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-muted border border-border/80 hover:border-foreground/40 transition-all">
+                    <span className="text-xs font-bold leading-none text-foreground">
+                      {currentUser.email &&
+                        (() => {
+                          const username = currentUser.email.split("@")[0];
+                          return (
+                            username.charAt(0).toUpperCase() +
+                            username.charAt(username.length - 1)
+                          );
+                        })()}
                     </span>
-                  </button>
-                </div>
+                  </span>
+                </button>
+
                 {isProfileOpen && (
                   <div
-                    className="origin-top-right absolute right-0 mt-2 w-52 rounded-xl shadow-lg py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 ring-1 ring-black/5 focus:outline-none z-50 animate-in fade-in zoom-in-95 duration-100"
+                    className="origin-top-right absolute right-0 mt-2.5 w-56 rounded-2xl shadow-card p-1.5 bg-card border border-border/80 focus:outline-none z-50 animate-in fade-in zoom-in-95 duration-100"
                     role="menu"
                     aria-orientation="vertical"
-                    aria-labelledby="user-menu"
                   >
-                    <div className="block px-4 py-2.5 text-xs text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                      Signed in as
-                      <div className="font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
+                    <div className="px-3 py-2 text-xs border-b border-border/60 mb-1">
+                      <span className="text-muted-foreground block text-2xs">Signed in as</span>
+                      <div className="font-semibold text-foreground truncate mt-0.5">
                         {currentUser.email}
                       </div>
                     </div>
+
+                    <Link
+                      to="/dashboard"
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-foreground hover:bg-muted rounded-xl transition"
+                      role="menuitem"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <Wallet className="w-3.5 h-3.5 text-muted-foreground" />
+                      Dashboard
+                    </Link>
+
                     <Link
                       to="/profile"
-                      className="block px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-foreground hover:bg-muted rounded-xl transition"
                       role="menuitem"
                       onClick={() => setIsProfileOpen(false)}
                     >
+                      <Settings className="w-3.5 h-3.5 text-muted-foreground" />
                       Profile Settings
                     </Link>
-                    <Link
-                      to="/finance-input"
-                      className="block px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
-                      role="menuitem"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      Your Finances
-                    </Link>
-                    <div className="border-t border-slate-100 dark:border-slate-800 my-1"></div>
+
+                    <div className="border-t border-border/60 my-1"></div>
+
                     <button
                       onClick={() => {
                         setIsProfileOpen(false);
                         handleLogout();
                       }}
-                      className="block w-full text-left px-4 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 rounded-xl transition cursor-pointer"
                       role="menuitem"
                     >
+                      <LogOut className="w-3.5 h-3.5" />
                       Sign out
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex space-x-2.5">
+              <div className="flex items-center space-x-1.5">
                 <Link
                   to="/login"
-                  className="inline-flex items-center px-3.5 py-1.5 border border-slate-200 dark:border-slate-700 text-xs font-semibold rounded-lg text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                  className="rounded-full px-3.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/70 transition"
                 >
                   Log in
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center px-3.5 py-1.5 border border-transparent text-xs font-semibold rounded-lg text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 shadow-xs transition"
+                  className="rounded-full px-4 py-1.5 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs inline-flex items-center gap-1.5 group transition-all"
                 >
-                  Sign up
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span>Start Free Trial</span>
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile menu hamburger button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden inline-flex items-center justify-center p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none cursor-pointer"
+              aria-expanded={isMenuOpen}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile menu dropdown */}
+        {isMenuOpen && (
+          <div className="md:hidden mt-2 rounded-2xl bg-card/95 backdrop-blur-xl border border-border/80 shadow-card p-3 space-y-1 animate-in fade-in zoom-in-95 duration-100">
+            <Link
+              to="/"
+              className={mobileNavClass("/")}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Overview
+              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+            </Link>
+            <Link
+              to="/scenarios"
+              className={mobileNavClass("/scenarios")}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              What-If Scenarios
+              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+            </Link>
+            <Link
+              to="/advisor"
+              className={mobileNavClass("/advisor")}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              AI Copilot
+              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+            </Link>
+
+            {currentUser ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className={mobileNavClass("/dashboard")}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Dashboard
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+                <Link
+                  to="/analytics"
+                  className={mobileNavClass("/analytics")}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Analytics
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+                <Link
+                  to="/finance-input"
+                  className={mobileNavClass("/finance-input")}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Update Finances
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+                <Link
+                  to="/profile"
+                  className={mobileNavClass("/profile")}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Profile Settings
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+
+                <div className="border-t border-border/60 pt-2 mt-2">
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition"
+                  >
+                    <span>Sign out</span>
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/60 mt-2">
+                <Link
+                  to="/login"
+                  className="w-full text-center py-2 px-3 rounded-full text-xs font-semibold border border-border bg-card hover:bg-muted text-foreground"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/register"
+                  className="w-full text-center py-2 px-3 rounded-full text-xs font-semibold bg-primary text-primary-foreground shadow-2xs"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Start Free
                 </Link>
               </div>
             )}
           </div>
+        )}
 
-          <div className="-mr-2 flex items-center space-x-2 sm:hidden">
-            <ThemeToggle />
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none"
-              aria-expanded={isMenuOpen}
-            >
-              <span className="sr-only">Open main menu</span>
-              {/* Menu icon */}
-              <svg
-                className={`${isMenuOpen ? "hidden" : "block"} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-              {/* Close icon */}
-              <svg
-                className={`${isMenuOpen ? "block" : "hidden"} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      <div className={`${isMenuOpen ? "block" : "hidden"} sm:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900`}>
-        <div className="pt-2 pb-3 space-y-1">
-          <Link
-            to="/"
-            className={mobileLinkClass("/")}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Home
-          </Link>
-
-          {currentUser && (
-            <>
-              <Link
-                to="/dashboard"
-                className={mobileLinkClass("/dashboard")}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/analytics"
-                className={mobileLinkClass("/analytics")}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Analytics
-              </Link>
-              <Link
-                to="/scenarios"
-                className={mobileLinkClass("/scenarios")}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                What-If Scenarios
-              </Link>
-              <Link
-                to="/finance-input"
-                className={mobileLinkClass("/finance-input")}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Update Finances
-              </Link>
-              <Link
-                to="/advisor"
-                className={mobileLinkClass("/advisor")}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                AI Advisor
-              </Link>
-              <Link
-                to="/profile"
-                className={mobileLinkClass("/profile")}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Profile Settings
-              </Link>
-            </>
-          )}
-        </div>
-
-        {/* Mobile menu account section */}
-        {currentUser ? (
-          <div className="pt-4 pb-3 border-t border-slate-200 dark:border-slate-800">
-            <div className="flex items-center px-4">
-              <div className="flex-shrink-0">
-                <span className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                  <span className="text-sm font-semibold leading-none text-slate-800 dark:text-slate-200">
-                    {currentUser.email &&
-                      currentUser.email.charAt(0).toUpperCase()}
-                  </span>
-                </span>
-              </div>
-              <div className="ml-3">
-                <div className="text-base font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">
-                  {currentUser.displayName || "User"}
-                </div>
-                <div className="text-sm font-medium text-slate-500 dark:text-slate-400 truncate max-w-[200px]">
-                  {currentUser.email}
-                </div>
-              </div>
-            </div>
-            <div className="mt-3 space-y-1 px-2">
-              <button
-                onClick={() => {
-                  handleLogout();
-                  setIsMenuOpen(false);
-                }}
-                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
-              >
-                Sign out
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="pt-4 pb-3 border-t border-slate-200 dark:border-slate-800">
-            <div className="flex flex-col space-y-2 px-4">
-              <Link
-                to="/login"
-                className="block text-center w-full py-2 px-4 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Log in
-              </Link>
-              <Link
-                to="/register"
-                className="block text-center w-full py-2 px-4 border border-transparent rounded-lg text-sm font-semibold text-white bg-slate-900 dark:bg-white dark:text-slate-900 shadow-xs"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Sign up
-              </Link>
-            </div>
+        {/* Error notification */}
+        {error && (
+          <div className="mt-2 text-center text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-full py-1.5 px-4">
+            {error}
           </div>
         )}
       </div>
-
-      {/* Display error message */}
-      {error && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-3 rounded-md text-sm">
-            {error}
-          </div>
-        </div>
-      )}
-    </nav>
+    </header>
   );
 }
 

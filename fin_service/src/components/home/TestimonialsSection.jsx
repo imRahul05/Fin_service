@@ -29,60 +29,60 @@ const TESTIMONIALS = [
 
 export default function TestimonialsSection() {
   return (
-    <section className="py-20 sm:py-24 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 sm:py-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-semibold uppercase tracking-wider mb-3 border border-blue-200 dark:border-blue-900">
-            <MessageSquare className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-card border border-border/80 text-foreground text-xs font-semibold uppercase tracking-wider mb-4 shadow-2xs">
+            <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
             <span>User Reviews</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
             Loved by Smart Indian Investors
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-400">
+          <p className="mt-3 text-base sm:text-lg text-muted-foreground">
             Real professionals taking control of their taxes, investments, and life milestones.
           </p>
         </div>
 
         {/* Testimonials Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t) => (
             <div
               key={t.name}
-              className="rounded-2xl p-6 sm:p-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-500/50 shadow-md transition-all flex flex-col justify-between"
+              className="rounded-3xl p-7 sm:p-8 bg-card border border-border/80 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between"
             >
               <div>
                 {/* Stars and Tag */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex text-amber-400 gap-0.5">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex text-foreground gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400" />
+                      <Star key={i} className="w-3.5 h-3.5 fill-foreground text-foreground" />
                     ))}
                   </div>
-                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                  <span className="text-2xs font-semibold px-3 py-1 rounded-full bg-muted text-foreground border border-border/70">
                     {t.tag}
                   </span>
                 </div>
 
                 {/* Quote Text */}
-                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   "{t.quote}"
                 </p>
               </div>
 
               {/* User Profile */}
-              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+              <div className="mt-8 pt-4 border-t border-border/70 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center font-bold text-xs shadow-2xs">
                   {t.avatar}
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">{t.name}</h4>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <h4 className="text-sm font-bold text-foreground">{t.name}</h4>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-muted-foreground">
                     {t.role} • {t.location}
                   </p>
                 </div>

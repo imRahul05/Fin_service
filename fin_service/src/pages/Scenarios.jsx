@@ -131,16 +131,16 @@ function Scenarios() {
         {
           label: 'Current Career - Annual Income',
           data: currentPath,
-          borderColor: '#64748b',
-          backgroundColor: 'rgba(100, 116, 139, 0.1)',
+          borderColor: isDark ? '#71717A' : '#64748B',
+          backgroundColor: isDark ? 'rgba(113, 113, 122, 0.08)' : 'rgba(100, 116, 139, 0.05)',
           fill: true,
           tension: 0.2
         },
         {
           label: 'New Career - Annual Income',
           data: newPath,
-          borderColor: '#0f766e',
-          backgroundColor: 'rgba(15, 118, 110, 0.1)',
+          borderColor: isDark ? '#FAFAFA' : '#0F172A',
+          backgroundColor: isDark ? 'rgba(250, 250, 250, 0.08)' : 'rgba(15, 23, 42, 0.05)',
           fill: true,
           tension: 0.2
         }
@@ -153,16 +153,16 @@ function Scenarios() {
         {
           label: 'Current Career - Cumulative Savings',
           data: currentSavings,
-          borderColor: '#475569',
-          backgroundColor: 'rgba(71, 85, 105, 0.1)',
+          borderColor: isDark ? '#71717A' : '#64748B',
+          backgroundColor: isDark ? 'rgba(113, 113, 122, 0.08)' : 'rgba(71, 85, 105, 0.05)',
           fill: true,
           tension: 0.2
         },
         {
           label: 'New Career - Cumulative Savings',
           data: newSavings,
-          borderColor: '#0f766e',
-          backgroundColor: 'rgba(15, 118, 110, 0.1)',
+          borderColor: isDark ? '#FAFAFA' : '#0F172A',
+          backgroundColor: isDark ? 'rgba(250, 250, 250, 0.08)' : 'rgba(15, 23, 42, 0.05)',
           fill: true,
           tension: 0.2
         }
@@ -178,7 +178,7 @@ function Scenarios() {
         fiveYearSavingsDifference: newSavings[yearsToSimulate] - currentSavings[yearsToSimulate]
       }
     };
-  }, [careerParams, finances]);
+  }, [careerParams, finances, isDark]);
   
   // Investment strategy simulation
   const simulateInvestmentChange = useCallback(() => {
@@ -223,16 +223,16 @@ function Scenarios() {
         {
           label: `${currentStrategy.toUpperCase()} Returns`,
           data: currentStrategyReturns,
-          borderColor: '#64748b',
-          backgroundColor: 'rgba(100, 116, 139, 0.1)',
+          borderColor: isDark ? '#71717A' : '#64748B',
+          backgroundColor: isDark ? 'rgba(113, 113, 122, 0.08)' : 'rgba(100, 116, 139, 0.05)',
           fill: true,
           tension: 0.2
         },
         {
           label: `${newStrategy.toUpperCase()} Returns`,
           data: newStrategyReturns,
-          borderColor: '#0f766e',
-          backgroundColor: 'rgba(15, 118, 110, 0.1)',
+          borderColor: isDark ? '#FAFAFA' : '#0F172A',
+          backgroundColor: isDark ? 'rgba(250, 250, 250, 0.08)' : 'rgba(15, 23, 42, 0.05)',
           fill: true,
           tension: 0.2
         }
@@ -252,7 +252,7 @@ function Scenarios() {
         }
       }
     };
-  }, [investmentParams]);
+  }, [investmentParams, isDark]);
   
   // Purchase simulation
   const simulatePurchase = useCallback(() => {
@@ -292,16 +292,16 @@ function Scenarios() {
         {
           label: 'Cumulative Cost of Buying',
           data: buyingCosts,
-          borderColor: '#b45309',
-          backgroundColor: 'rgba(180, 83, 9, 0.1)',
+          borderColor: isDark ? '#FAFAFA' : '#0F172A',
+          backgroundColor: isDark ? 'rgba(250, 250, 250, 0.08)' : 'rgba(15, 23, 42, 0.05)',
           fill: true,
           tension: 0.2
         },
         {
           label: 'Cumulative Cost of Renting',
           data: rentingCosts,
-          borderColor: '#475569',
-          backgroundColor: 'rgba(71, 85, 105, 0.1)',
+          borderColor: isDark ? '#71717A' : '#64748B',
+          backgroundColor: isDark ? 'rgba(113, 113, 122, 0.08)' : 'rgba(71, 85, 105, 0.05)',
           fill: true,
           tension: 0.2
         }
@@ -333,7 +333,7 @@ function Scenarios() {
         breakEvenYear: buyingCosts.findIndex((cost, index) => cost <= rentingCosts[index])
       }
     };
-  }, [purchaseParams, finances]);
+  }, [purchaseParams, finances, isDark]);
 
   // Run simulation based on scenario type
   const runSimulation = async (forceRefresh = false) => {
@@ -411,22 +411,23 @@ function Scenarios() {
   };
 
   const lineChartOptions = useMemo(() => {
-    const textColor = isDark ? '#9ca3af' : '#6b7280';
-    const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+    const textColor = isDark ? '#A1A1AA' : '#64748B';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)';
 
     return {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
         x: {
-          ticks: { color: textColor },
+          ticks: { color: textColor, font: { size: 11 } },
           grid: { color: gridColor }
         },
         y: {
           ticks: {
             color: textColor,
+            font: { size: 11 },
             callback: function(value) {
-              return '₹' + value.toLocaleString('en-IN');
+              return '₹' + Number(value).toLocaleString('en-IN');
             }
           },
           grid: { color: gridColor }
@@ -435,18 +436,51 @@ function Scenarios() {
       plugins: {
         legend: {
           position: 'top',
-          labels: { color: textColor }
+          labels: { color: textColor, font: { size: 11 }, boxWidth: 12 }
         },
         tooltip: {
+          backgroundColor: isDark ? '#18181B' : '#0F172A',
+          titleColor: '#FAFAFA',
+          bodyColor: '#D4D4D8',
+          cornerRadius: 12,
+          padding: 10,
           callbacks: {
             label: function(context) {
-              return context.dataset.label + ': ₹' + Number(context.raw).toLocaleString('en-IN');
+              return ' ' + context.dataset.label + ': ₹' + Number(context.raw).toLocaleString('en-IN');
             }
           }
         }
       },
     };
   }, [isDark]);
+
+  const displayChartData = useMemo(() => {
+    if (!simulationResult?.chartData) return null;
+    return {
+      ...simulationResult.chartData,
+      datasets: simulationResult.chartData.datasets.map((ds, index) => ({
+        ...ds,
+        borderColor: index === 0 ? (isDark ? '#71717A' : '#64748B') : (isDark ? '#FAFAFA' : '#0F172A'),
+        backgroundColor: index === 0 
+          ? (isDark ? 'rgba(113, 113, 122, 0.08)' : 'rgba(100, 116, 139, 0.05)')
+          : (isDark ? 'rgba(250, 250, 250, 0.08)' : 'rgba(15, 23, 42, 0.05)')
+      }))
+    };
+  }, [simulationResult, isDark]);
+
+  const displaySavingsChartData = useMemo(() => {
+    if (!simulationResult?.savingsChartData) return null;
+    return {
+      ...simulationResult.savingsChartData,
+      datasets: simulationResult.savingsChartData.datasets.map((ds, index) => ({
+        ...ds,
+        borderColor: index === 0 ? (isDark ? '#71717A' : '#64748B') : (isDark ? '#FAFAFA' : '#0F172A'),
+        backgroundColor: index === 0 
+          ? (isDark ? 'rgba(113, 113, 122, 0.08)' : 'rgba(71, 85, 105, 0.05)')
+          : (isDark ? 'rgba(250, 250, 250, 0.08)' : 'rgba(15, 23, 42, 0.05)')
+      }))
+    };
+  }, [simulationResult, isDark]);
 
   const handleCareerParamChange = (e) => {
     const { name, value } = e.target;
@@ -475,7 +509,7 @@ function Scenarios() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-border border-t-foreground"></div>
       </div>
     );
   }
@@ -484,69 +518,37 @@ function Scenarios() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="md:flex md:items-center md:justify-between mb-8">
         <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:text-3xl sm:truncate">
+          <h2 className="text-2xl font-bold leading-7 text-foreground sm:text-3xl sm:truncate">
             "What If" Scenarios
           </h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             Simulate different financial decisions and see how they affect your future.
           </p>
         </div>
       </div>
 
-      {/* Scenario Type Selection */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40 rounded-xl mb-8 overflow-hidden transition-colors">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-            Choose a Scenario to Simulate
-          </h3>
-        </div>
-        <div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
+      {/* Scenario Type Selection - Clean Pill Switcher */}
+      <div className="flex justify-start mb-8 overflow-x-auto pb-2">
+        <div className="inline-flex p-1.5 bg-muted/60 dark:bg-muted/40 rounded-full border border-border/60">
+          {[
+            { id: "career", label: "Career Growth" },
+            { id: "investment", label: "Investments" },
+            { id: "purchase", label: "Major Purchase" },
+            { id: "tax", label: "Tax Optimizer" },
+          ].map((tab) => (
             <button
+              key={tab.id}
               type="button"
-              onClick={() => setScenarioType("career")}
-              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                scenarioType === "career" 
-                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs" 
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+              onClick={() => setScenarioType(tab.id)}
+              className={`px-5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                scenarioType === tab.id
+                  ? "bg-foreground text-background shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Career Growth
+              {tab.label}
             </button>
-            <button
-              type="button"
-              onClick={() => setScenarioType("investment")}
-              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                scenarioType === "investment" 
-                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs" 
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-              }`}
-            >
-              Investments
-            </button>
-            <button
-              type="button"
-              onClick={() => setScenarioType("purchase")}
-              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                scenarioType === "purchase" 
-                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs" 
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-              }`}
-            >
-              Major Purchase
-            </button>
-            <button
-              type="button"
-              onClick={() => setScenarioType("tax")}
-              className={`px-4 py-3 rounded-xl text-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                scenarioType === "tax" 
-                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs" 
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-              }`}
-            >
-              Tax Optimizer
-            </button>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -558,93 +560,84 @@ function Scenarios() {
       {/* Parameters Form */}
       {scenarioType !== "tax" && (
         <>
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40 rounded-xl mb-8 overflow-hidden transition-colors">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-            {scenarioType === "career" ? "Career Change Parameters" : 
-             scenarioType === "investment" ? "Investment Strategy Parameters" : 
-             "Major Purchase Parameters"}
-          </h3>
-        </div>
-        <div className="px-4 py-5 sm:p-6">
-          {/* Career Change Form */}
-          {scenarioType === "career" && (
-            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="currentSalary" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Current Monthly Salary (₹)
-                </label>
-                <div className="mt-1">
+        <div className="bg-card border border-border/80 shadow-card rounded-3xl mb-8 overflow-hidden transition-colors">
+          <div className="px-6 py-5 border-b border-border">
+            <h3 className="text-base font-bold text-foreground">
+              {scenarioType === "career" ? "Career Change Parameters" : 
+               scenarioType === "investment" ? "Investment Strategy Parameters" : 
+               "Major Purchase Parameters"}
+            </h3>
+          </div>
+          <div className="p-6">
+            {/* Career Change Form */}
+            {scenarioType === "career" && (
+              <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="currentSalary" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Current Monthly Salary (₹)
+                  </label>
                   <input
                     type="number"
                     name="currentSalary"
                     id="currentSalary"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={careerParams.currentSalary}
                     onChange={handleCareerParamChange}
                   />
                 </div>
-              </div>
-              <div>
-                <label htmlFor="newSalary" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  New Monthly Salary (₹)
-                </label>
-                <div className="mt-1">
+                <div>
+                  <label htmlFor="newSalary" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    New Monthly Salary (₹)
+                  </label>
                   <input
                     type="number"
                     name="newSalary"
                     id="newSalary"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={careerParams.newSalary}
                     onChange={handleCareerParamChange}
                   />
                 </div>
-              </div>
-              <div>
-                <label htmlFor="yearsToSimulate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Years to Simulate
-                </label>
-                <div className="mt-1">
+                <div>
+                  <label htmlFor="yearsToSimulate" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Years to Simulate
+                  </label>
                   <input
                     type="number"
                     name="yearsToSimulate"
                     id="yearsToSimulate"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={careerParams.yearsToSimulate}
                     onChange={handleCareerParamChange}
                   />
                 </div>
-              </div>
-              <div>
-                <label htmlFor="annualGrowthRate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Annual Growth Rate (%)
-                </label>
-                <div className="mt-1">
+                <div>
+                  <label htmlFor="annualGrowthRate" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Annual Growth Rate (%)
+                  </label>
                   <input
                     type="number"
                     name="annualGrowthRate"
                     id="annualGrowthRate"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={careerParams.annualGrowthRate}
                     onChange={handleCareerParamChange}
                   />
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Investment Strategy Form */}
-          {scenarioType === "investment" && (
-            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="currentStrategy" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Current Investment Strategy
-                </label>
-                <div className="mt-1">
+            {/* Investment Strategy Form */}
+            {scenarioType === "investment" && (
+              <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="currentStrategy" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Current Investment Strategy
+                  </label>
                   <select
                     name="currentStrategy"
                     id="currentStrategy"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={investmentParams.currentStrategy}
                     onChange={handleInvestmentParamChange}
                   >
@@ -657,16 +650,14 @@ function Scenarios() {
                     <option value="realestate">Real Estate (9% p.a.)</option>
                   </select>
                 </div>
-              </div>
-              <div>
-                <label htmlFor="newStrategy" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  New Investment Strategy
-                </label>
-                <div className="mt-1">
+                <div>
+                  <label htmlFor="newStrategy" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    New Investment Strategy
+                  </label>
                   <select
                     name="newStrategy"
                     id="newStrategy"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={investmentParams.newStrategy}
                     onChange={handleInvestmentParamChange}
                   >
@@ -679,52 +670,46 @@ function Scenarios() {
                     <option value="realestate">Real Estate (9% p.a.)</option>
                   </select>
                 </div>
-              </div>
-              <div>
-                <label htmlFor="monthlyAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Monthly Investment Amount (₹)
-                </label>
-                <div className="mt-1">
+                <div>
+                  <label htmlFor="monthlyAmount" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Monthly Investment Amount (₹)
+                  </label>
                   <input
                     type="number"
                     name="monthlyAmount"
                     id="monthlyAmount"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={investmentParams.monthlyAmount}
                     onChange={handleInvestmentParamChange}
                   />
                 </div>
-              </div>
-              <div>
-                <label htmlFor="yearsToSimulate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Years to Simulate
-                </label>
-                <div className="mt-1">
+                <div>
+                  <label htmlFor="yearsToSimulate" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Years to Simulate
+                  </label>
                   <input
                     type="number"
                     name="yearsToSimulate"
                     id="yearsToSimulate"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={investmentParams.yearsToSimulate}
                     onChange={handleInvestmentParamChange}
                   />
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Major Purchase Form */}
-          {scenarioType === "purchase" && (
-            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="itemType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Purchase Type
-                </label>
-                <div className="mt-1">
+            {/* Major Purchase Form */}
+            {scenarioType === "purchase" && (
+              <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="itemType" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Purchase Type
+                  </label>
                   <select
                     name="itemType"
                     id="itemType"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={purchaseParams.itemType}
                     onChange={handlePurchaseParamChange}
                   >
@@ -734,200 +719,178 @@ function Scenarios() {
                     <option value="other">Other</option>
                   </select>
                 </div>
-              </div>
-              <div>
-                <label htmlFor="itemCost" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Total Cost (₹)
-                </label>
-                <div className="mt-1">
+                <div>
+                  <label htmlFor="itemCost" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Total Cost (₹)
+                  </label>
                   <input
                     type="number"
                     name="itemCost"
                     id="itemCost"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={purchaseParams.itemCost}
                     onChange={handlePurchaseParamChange}
                   />
                 </div>
-              </div>
-              <div>
-                <label htmlFor="downPayment" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Down Payment (₹)
-                </label>
-                <div className="mt-1">
+                <div>
+                  <label htmlFor="downPayment" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Down Payment (₹)
+                  </label>
                   <input
                     type="number"
                     name="downPayment"
                     id="downPayment"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={purchaseParams.downPayment}
                     onChange={handlePurchaseParamChange}
                   />
                 </div>
-              </div>
-              <div>
-                <label htmlFor="loanTenureYears" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Loan Tenure (Years)
-                </label>
-                <div className="mt-1">
+                <div>
+                  <label htmlFor="loanTenureYears" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Loan Tenure (Years)
+                  </label>
                   <input
                     type="number"
                     name="loanTenureYears"
                     id="loanTenureYears"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={purchaseParams.loanTenureYears}
                     onChange={handlePurchaseParamChange}
                   />
                 </div>
-              </div>
-              <div>
-                <label htmlFor="interestRate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Annual Interest Rate (%)
-                </label>
-                <div className="mt-1">
+                <div>
+                  <label htmlFor="interestRate" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                    Annual Interest Rate (%)
+                  </label>
                   <input
                     type="number"
                     name="interestRate"
                     id="interestRate"
-                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                    className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                     value={purchaseParams.interestRate}
                     onChange={handlePurchaseParamChange}
                   />
                 </div>
-              </div>
-              {purchaseParams.itemType === "property" && (
-                <div>
-                  <label htmlFor="monthlyRent" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Monthly Rent (for Buy vs Rent) (₹)
-                  </label>
-                  <div className="mt-1">
+                {purchaseParams.itemType === "property" && (
+                  <div>
+                    <label htmlFor="monthlyRent" className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                      Monthly Rent (for Buy vs Rent) (₹)
+                    </label>
                     <input
                       type="number"
                       name="monthlyRent"
                       id="monthlyRent"
-                      className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md p-2 border"
+                      className="block w-full text-xs font-semibold rounded-2xl border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground p-3 transition"
                       value={purchaseParams.monthlyRent}
                       onChange={handlePurchaseParamChange}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                onClick={runSimulation}
+                className="inline-flex justify-center py-2.5 px-6 shadow-xs text-xs font-semibold rounded-full text-background bg-foreground hover:opacity-90 focus:outline-none transition cursor-pointer"
+              >
+                Run Simulation
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Simulation Results */}
+        {simulationResult && (
+          <div className="mt-8 space-y-6">
+            <h3 className="text-lg font-bold text-foreground">Simulation Results</h3>
+            
+            {/* Charts */}
+            <div className="grid grid-cols-1 gap-6">
+              <div className="bg-card border border-border/80 rounded-3xl shadow-card p-6 transition-colors">
+                <h4 className="text-sm font-bold text-foreground mb-4">
+                  {simulationResult.type === "career" ? "Income Comparison" : 
+                   simulationResult.type === "investment" ? "Investment Growth" : 
+                   "Buying vs Renting Costs"}
+                </h4>
+                <div className="h-80">
+                  <Line
+                    data={displayChartData}
+                    options={lineChartOptions}
+                  />
+                </div>
+              </div>
+
+              {simulationResult.type === "career" && displaySavingsChartData && (
+                <div className="bg-card border border-border/80 rounded-3xl shadow-card p-6 transition-colors">
+                  <h4 className="text-sm font-bold text-foreground mb-4">Cumulative Savings Comparison</h4>
+                  <div className="h-80">
+                    <Line
+                      data={displaySavingsChartData}
+                      options={lineChartOptions}
                     />
                   </div>
                 </div>
               )}
             </div>
-          )}
 
-          <div className="mt-6 flex justify-end">
-            <button
-              type="button"
-              onClick={runSimulation}
-              className="inline-flex justify-center py-2.5 px-6 border border-transparent shadow-xs text-xs font-semibold rounded-xl text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 focus:outline-none transition cursor-pointer"
-            >
-              Run Simulation
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Simulation Results */}
-      {simulationResult && (
-        <div className="mt-8">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Simulation Results</h3>
-          
-          {/* Charts */}
-          <div className="grid grid-cols-1 gap-8 mb-8">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-gray-950/40 px-5 py-6 transition-colors">
-              <h4 className="text-base font-medium text-gray-900 dark:text-white mb-4">
-                {simulationResult.type === "career" ? "Income Comparison" : 
-                 simulationResult.type === "investment" ? "Investment Growth" : 
-                 "Buying vs Renting Costs"}
-              </h4>
-              <div className="h-80">
-                <Line
-                  data={simulationResult.chartData}
-                  options={lineChartOptions}
-                />
-              </div>
-            </div>
-
-            {simulationResult.type === "career" && simulationResult.savingsChartData && (
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm dark:shadow-gray-950/40 px-5 py-6 transition-colors">
-                <h4 className="text-base font-medium text-gray-900 dark:text-white mb-4">Cumulative Savings Comparison</h4>
-                <div className="h-80">
-                  <Line
-                    data={simulationResult.savingsChartData}
-                    options={lineChartOptions}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-            {simulationResult.type === "career" && (
-              <>
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-                  <div className="px-4 py-5 sm:p-6">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Income Difference (After {careerParams.yearsToSimulate} years)</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {simulationResult.type === "career" && (
+                <>
+                  <div className="bg-card border border-border/80 shadow-card rounded-3xl p-6 transition-colors">
+                    <dt className="text-2xs font-bold uppercase tracking-wider text-muted-foreground truncate">Income Difference (After {careerParams.yearsToSimulate} years)</dt>
+                    <dd className="mt-2 text-2xl sm:text-3xl font-black text-foreground">
                       {formatCurrency(simulationResult.summary.fiveYearIncomeDifference)}
                     </dd>
-                    <dd className="mt-2 text-sm text-gray-500 dark:text-gray-400">Annual difference in year {careerParams.yearsToSimulate}</dd>
+                    <dd className="mt-1 text-2xs text-muted-foreground">Annual difference in year {careerParams.yearsToSimulate}</dd>
                   </div>
-                </div>
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-                  <div className="px-4 py-5 sm:p-6">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Savings Difference (After {careerParams.yearsToSimulate} years)</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-green-600 dark:text-green-400">
+                  <div className="bg-card border border-border/80 shadow-card rounded-3xl p-6 transition-colors">
+                    <dt className="text-2xs font-bold uppercase tracking-wider text-muted-foreground truncate">Savings Difference (After {careerParams.yearsToSimulate} years)</dt>
+                    <dd className="mt-2 text-2xl sm:text-3xl font-black text-foreground">
                       {formatCurrency(simulationResult.summary.fiveYearSavingsDifference)}
                     </dd>
-                    <dd className="mt-2 text-sm text-gray-500 dark:text-gray-400">Cumulative savings difference</dd>
+                    <dd className="mt-1 text-2xs text-muted-foreground">Cumulative savings difference</dd>
                   </div>
-                </div>
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-                  <div className="px-4 py-5 sm:p-6">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Monthly Income Change</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-blue-600 dark:text-blue-400">
+                  <div className="bg-card border border-border/80 shadow-card rounded-3xl p-6 transition-colors">
+                    <dt className="text-2xs font-bold uppercase tracking-wider text-muted-foreground truncate">Monthly Income Change</dt>
+                    <dd className="mt-2 text-2xl sm:text-3xl font-black text-foreground">
                       {formatCurrency(careerParams.newSalary - careerParams.currentSalary)}
                     </dd>
-                    <dd className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <dd className="mt-1 text-2xs text-muted-foreground">
                       {((careerParams.newSalary - careerParams.currentSalary) / (careerParams.currentSalary || 1) * 100).toFixed(2)}% change
                     </dd>
                   </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
 
-            {simulationResult.type === "investment" && (
-              <>
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-                  <div className="px-4 py-5 sm:p-6">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Final Amount Difference</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-green-600 dark:text-green-400">
+              {simulationResult.type === "investment" && (
+                <>
+                  <div className="bg-card border border-border/80 shadow-card rounded-3xl p-6 transition-colors">
+                    <dt className="text-2xs font-bold uppercase tracking-wider text-muted-foreground truncate">Final Amount Difference</dt>
+                    <dd className="mt-2 text-2xl sm:text-3xl font-black text-foreground">
                       {formatCurrency(simulationResult.summary.finalAmountDifference)}
                     </dd>
-                    <dd className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <dd className="mt-1 text-2xs text-muted-foreground">
                       After {investmentParams.yearsToSimulate} years
                     </dd>
                   </div>
-                </div>
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-                  <div className="px-4 py-5 sm:p-6">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">{investmentParams.currentStrategy.toUpperCase()} Final Amount</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
+                  <div className="bg-card border border-border/80 shadow-card rounded-3xl p-6 transition-colors">
+                    <dt className="text-2xs font-bold uppercase tracking-wider text-muted-foreground truncate">{investmentParams.currentStrategy.toUpperCase()} Final Amount</dt>
+                    <dd className="mt-2 text-2xl sm:text-3xl font-black text-foreground">
                       {formatCurrency(simulationResult.summary.currentFinalAmount)}
                     </dd>
-                    <dd className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <dd className="mt-1 text-2xs text-muted-foreground">
                       Total investment: {formatCurrency(investmentParams.monthlyAmount * 12 * investmentParams.yearsToSimulate)}
                     </dd>
                   </div>
-                </div>
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-                  <div className="px-4 py-5 sm:p-6">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">{investmentParams.newStrategy.toUpperCase()} Final Amount</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
+                  <div className="bg-card border border-border/80 shadow-card rounded-3xl p-6 transition-colors">
+                    <dt className="text-2xs font-bold uppercase tracking-wider text-muted-foreground truncate">{investmentParams.newStrategy.toUpperCase()} Final Amount</dt>
+                    <dd className="mt-2 text-2xl sm:text-3xl font-black text-foreground">
                       {formatCurrency(simulationResult.summary.newFinalAmount)}
                     </dd>
-                    <dd className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <dd className="mt-1 text-2xs text-muted-foreground">
                       {investmentParams.newStrategy === 'elss' || investmentParams.newStrategy === 'nps' ? 
                         `Annual tax benefit: ${formatCurrency(
                           investmentParams.newStrategy === 'elss' ? 
@@ -938,46 +901,40 @@ function Scenarios() {
                       }
                     </dd>
                   </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
 
-            {simulationResult.type === "purchase" && (
-              <>
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-                  <div className="px-4 py-5 sm:p-6">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Monthly EMI</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-blue-600 dark:text-blue-400">
+              {simulationResult.type === "purchase" && (
+                <>
+                  <div className="bg-card border border-border/80 shadow-card rounded-3xl p-6 transition-colors">
+                    <dt className="text-2xs font-bold uppercase tracking-wider text-muted-foreground truncate">Monthly EMI</dt>
+                    <dd className="mt-2 text-2xl sm:text-3xl font-black text-foreground">
                       {formatCurrency(simulationResult.summary.monthlyEMI)}
                     </dd>
-                    <dd className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <dd className="mt-1 text-2xs text-muted-foreground">
                       For {purchaseParams.loanTenureYears} years
                     </dd>
                   </div>
-                </div>
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-                  <div className="px-4 py-5 sm:p-6">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Monthly Savings Impact</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-red-600 dark:text-red-400">
+                  <div className="bg-card border border-border/80 shadow-card rounded-3xl p-6 transition-colors">
+                    <dt className="text-2xs font-bold uppercase tracking-wider text-muted-foreground truncate">Monthly Savings Impact</dt>
+                    <dd className="mt-2 text-2xl sm:text-3xl font-black text-foreground">
                       {formatCurrency(-simulationResult.summary.savingsReduction)}
                     </dd>
-                    <dd className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <dd className="mt-1 text-2xs text-muted-foreground">
                       From {formatCurrency(simulationResult.summary.currentMonthlySavings)} to {formatCurrency(simulationResult.summary.newMonthlySavings)}
                     </dd>
                   </div>
-                </div>
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-950/40 rounded-xl transition-colors">
-                  <div className="px-4 py-5 sm:p-6">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  <div className="bg-card border border-border/80 shadow-card rounded-3xl p-6 transition-colors">
+                    <dt className="text-2xs font-bold uppercase tracking-wider text-muted-foreground truncate">
                       {purchaseParams.itemType === "property" ? "Buy vs Rent Difference" : "Total Interest Paid"}
                     </dt>
-                    <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
+                    <dd className="mt-2 text-2xl sm:text-3xl font-black text-foreground">
                       {purchaseParams.itemType === "property" 
                         ? formatCurrency(simulationResult.summary.costDifference)
                         : formatCurrency(simulationResult.summary.totalInterestPaid)
                       }
                     </dd>
-                    <dd className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <dd className="mt-1 text-2xs text-muted-foreground">
                       {purchaseParams.itemType === "property" 
                         ? (simulationResult.summary.breakEvenYear >= 0 
                             ? `Break-even at year ${simulationResult.summary.breakEvenYear}` 
@@ -986,62 +943,59 @@ function Scenarios() {
                       }
                     </dd>
                   </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Scenario Analysis */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs overflow-hidden transition-colors">
-            <div className="px-4 py-4 sm:px-6 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                    Scenario Insights & Strategy
-                  </h3>
-                </div>
-                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                  Personalized projections and analysis for this scenario
-                </p>
-              </div>
-              <div className="flex items-center gap-2 self-start sm:self-auto">
-                {cacheInfo?.cached && cacheInfo?.formattedTime && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800/60">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Cached ({cacheInfo.formattedTime})
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => runSimulation(true)}
-                  disabled={aiLoading}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors cursor-pointer"
-                >
-                  <RotateCcw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin text-slate-900 dark:text-white" : ""}`} />
-                  {aiLoading ? "Regenerating..." : "Re-analyze"}
-                </button>
-              </div>
-            </div>
-            <div className="px-4 py-5 sm:p-6">
-              {aiLoading ? (
-                <div className="flex flex-col justify-center items-center h-40 space-y-2">
-                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-200 border-t-slate-900 dark:border-slate-800 dark:border-t-white"></div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Generating scenario analysis...</p>
-                </div>
-              ) : aiAnalysis ? (
-                <div className="prose dark:prose-invert max-w-none text-slate-800 dark:text-slate-200 leading-relaxed text-xs">
-                  <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
-                </div>
-              ) : (
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  No analysis available for this simulation.
-                </p>
+                </>
               )}
             </div>
+
+            {/* Scenario Analysis */}
+            <div className="bg-card border border-border/80 rounded-3xl shadow-card overflow-hidden transition-colors">
+              <div className="px-6 py-5 bg-muted/20 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">
+                    Scenario Insights & Strategy
+                  </h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Personalized projections and analysis for this scenario
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  {cacheInfo?.cached && cacheInfo?.formattedTime && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 text-2xs font-semibold bg-muted text-foreground rounded-full border border-border">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                      Cached ({cacheInfo.formattedTime})
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => runSimulation(true)}
+                    disabled={aiLoading}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 border border-border rounded-full text-xs font-semibold text-foreground bg-card hover:bg-muted disabled:opacity-50 transition-colors cursor-pointer"
+                  >
+                    <RotateCcw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
+                    {aiLoading ? "Regenerating..." : "Re-analyze"}
+                  </button>
+                </div>
+              </div>
+              <div className="p-6">
+                {aiLoading ? (
+                  <div className="flex flex-col justify-center items-center h-40 space-y-3">
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-border border-t-foreground"></div>
+                    <p className="text-xs text-muted-foreground font-medium">Generating scenario analysis...</p>
+                  </div>
+                ) : aiAnalysis ? (
+                  <div className="prose dark:prose-invert max-w-none text-foreground leading-relaxed text-xs">
+                    <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    No analysis available for this simulation.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
-      </>
+        )}
+        </>
       )}
     </div>
   );

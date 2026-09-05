@@ -160,18 +160,21 @@ export default function Profile() {
   };
   
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <div className="container mx-auto py-8 sm:py-12 px-4 max-w-6xl">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 text-transparent bg-clip-text">Profile Settings</h1>
-        <p className="text-gray-500 dark:text-gray-400">Manage your account settings, preferences, and security</p>
+        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border/70 mb-3">
+          Account & Security
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">Profile Settings</h1>
+        <p className="text-muted-foreground mt-1.5 text-sm sm:text-base">Manage your account profile, risk appetite, and security preferences</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Profile Summary Card */}
-        <Card className="md:col-span-1 border-t-4 border-t-blue-500 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
-          <CardHeader className="flex flex-col items-center text-center">
+        <Card className="md:col-span-1 rounded-3xl bg-card border border-border/80 shadow-card">
+          <CardHeader className="flex flex-col items-center text-center pb-2">
             <div className="relative mb-4 group">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500/20 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700">
+              <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-2 border-border/80 bg-muted/50 flex items-center justify-center">
                 {photoURL ? (
                   <img 
                     src={photoURL} 
@@ -179,16 +182,17 @@ export default function Profile() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-blue-50 dark:bg-gray-700">
-                    <FiUser className="w-16 h-16 text-blue-500/60 dark:text-blue-400" />
+                  <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
+                    <FiUser className="w-14 h-14" />
                   </div>
                 )}
               </div>
               <button 
                 type="button"
                 onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute bottom-0 right-0 bg-foreground text-background p-2.5 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 cursor-pointer"
                 disabled={loading || !editMode}
+                title="Change photo"
               >
                 <FiCamera className="w-4 h-4" />
               </button>
@@ -201,55 +205,59 @@ export default function Profile() {
                 disabled={loading || !editMode}
               />
             </div>
-            <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">{displayName || "User"}</CardTitle>
-            <CardDescription className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400">
-              <FiMail className="text-blue-500 dark:text-blue-400" /> {email}
+            <CardTitle className="text-xl font-bold text-foreground">{displayName || "User"}</CardTitle>
+            <CardDescription className="flex items-center justify-center gap-2 text-muted-foreground mt-1 text-xs">
+              <FiMail className="text-muted-foreground" /> {email}
             </CardDescription>
-            <Badge variant="outline" className="mt-2 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
+            <Badge variant="secondary" className="mt-3 rounded-full px-3 py-0.5 text-xs font-medium bg-muted text-foreground border border-border/60">
               {financialPreferences.riskTolerance === "conservative" && "Conservative Investor"}
               {financialPreferences.riskTolerance === "moderate" && "Balanced Investor"}
               {financialPreferences.riskTolerance === "aggressive" && "Growth Investor"}
             </Badge>
           </CardHeader>
-          <CardContent className="text-center">
+          <CardContent className="text-center pt-2">
             <div className="grid grid-cols-2 gap-2 mb-4">
               <Button 
-                variant={editMode ? "secondary" : "outline"} 
-                className="w-full border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200"
+                variant="outline" 
+                className="w-full rounded-full border-border/80 text-foreground hover:bg-muted font-medium text-xs"
                 onClick={() => setEditMode(!editMode)}
               >
                 {editMode ? (
                   <>
-                    <FiRefreshCw className="mr-1" /> Cancel
+                    <FiRefreshCw className="mr-1.5 w-3.5 h-3.5" /> Cancel
                   </>
                 ) : (
                   <>
-                    <FiEdit className="mr-1" /> Edit Profile
+                    <FiEdit className="mr-1.5 w-3.5 h-3.5" /> Edit Profile
                   </>
                 )}
               </Button>
               <Button 
                 variant={editMode ? "default" : "destructive"}
-                className="w-full"
+                className={`w-full rounded-full text-xs font-medium ${
+                  editMode 
+                    ? "bg-foreground text-background hover:bg-foreground/90 shadow-sm" 
+                    : "rounded-full"
+                }`}
                 onClick={editMode ? handleSaveProfile : handleLogout}
                 disabled={loading}
               >
                 {editMode ? (
                   <>
-                    <FiSave className="mr-1" /> Save
+                    <FiSave className="mr-1.5 w-3.5 h-3.5" /> Save
                   </>
                 ) : (
                   "Sign Out"
                 )}
               </Button>
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
-              <p className="flex items-center justify-center gap-2 mb-1">
-                <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
+            <div className="text-xs text-muted-foreground bg-muted/40 p-3.5 rounded-2xl border border-border/60 space-y-1.5">
+              <p className="flex items-center justify-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
                 Member since: {currentUser?.metadata?.creationTime ? new Date(currentUser.metadata.creationTime).toLocaleDateString() : "Unknown"}
               </p>
               <p className="flex items-center justify-center gap-2">
-                <span className="flex h-2 w-2 rounded-full bg-blue-500"></span>
+                <span className="flex h-2 w-2 rounded-full bg-foreground/60"></span>
                 Last signed in: {currentUser?.metadata?.lastSignInTime ? new Date(currentUser.metadata.lastSignInTime).toLocaleDateString() : "Unknown"}
               </p>
             </div>
@@ -257,39 +265,39 @@ export default function Profile() {
         </Card>
         
         {/* Profile Details Card */}
-        <Card className="md:col-span-2 border-t-4 border-t-indigo-500 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-950/40">
+        <Card className="md:col-span-2 rounded-3xl bg-card border border-border/80 shadow-card">
           <CardHeader className="pb-3">
             <Tabs defaultValue="personal" className="w-full">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">Your Profile</CardTitle>
-                <TabsList className="grid w-full sm:max-w-md grid-cols-3 bg-gray-100 dark:bg-gray-700/60 p-1 border border-gray-200 dark:border-gray-700">
-                  <TabsTrigger value="personal" className="text-xs sm:text-sm">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-2">
+                <CardTitle className="text-xl font-bold text-foreground">Your Profile</CardTitle>
+                <TabsList className="grid w-full sm:w-auto grid-cols-3 bg-muted/60 p-1 rounded-full border border-border/60">
+                  <TabsTrigger value="personal" className="rounded-full text-xs font-medium data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                     <FiUser className="mr-1 hidden sm:inline" /> Personal
                   </TabsTrigger>
-                  <TabsTrigger value="financial" className="text-xs sm:text-sm">
+                  <TabsTrigger value="financial" className="rounded-full text-xs font-medium data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                     <FiDollarSign className="mr-1 hidden sm:inline" /> Financial
                   </TabsTrigger>
-                  <TabsTrigger value="security" className="text-xs sm:text-sm">
+                  <TabsTrigger value="security" className="rounded-full text-xs font-medium data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                     <FiShield className="mr-1 hidden sm:inline" /> Settings
                   </TabsTrigger>
                 </TabsList>
               </div>
               
               <TabsContent value="personal" className="pt-4">
-                <CardDescription className="mb-4 text-gray-500 dark:text-gray-400">Update your personal details</CardDescription>
+                <CardDescription className="mb-4 text-muted-foreground text-xs sm:text-sm">Update your personal account details</CardDescription>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="displayName" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                      <FiUser className="text-blue-500" /> Display Name
+                    <Label htmlFor="displayName" className="flex items-center gap-2 text-foreground text-xs font-medium">
+                      <FiUser className="text-muted-foreground" /> Display Name
                     </Label>
                     <div className="relative">
                       <input
                         id="displayName"
                         type="text"
-                        className={`w-full p-2.5 rounded-md border text-sm transition-colors ${
+                        className={`w-full p-3 rounded-2xl border text-sm transition-colors ${
                           editMode 
-                            ? 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500' 
-                            : 'bg-gray-100 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                            ? 'bg-background border-border/80 text-foreground focus:ring-2 focus:ring-foreground/20 focus:outline-none' 
+                            : 'bg-muted/40 border-border/50 text-muted-foreground cursor-not-allowed'
                         }`}
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
@@ -298,13 +306,13 @@ export default function Profile() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                      <FiMail className="text-blue-500" /> Email
+                    <Label htmlFor="email" className="flex items-center gap-2 text-foreground text-xs font-medium">
+                      <FiMail className="text-muted-foreground" /> Email Address
                     </Label>
                     <input
                       id="email"
                       type="email"
-                      className="w-full p-2.5 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 text-sm cursor-not-allowed"
+                      className="w-full p-3 rounded-2xl border border-border/50 bg-muted/40 text-muted-foreground text-sm cursor-not-allowed"
                       value={email}
                       disabled={true}
                     />
@@ -313,19 +321,19 @@ export default function Profile() {
               </TabsContent>
               
               <TabsContent value="financial" className="pt-4">
-                <CardDescription className="mb-4 text-gray-500 dark:text-gray-400">Set your financial preferences</CardDescription>
+                <CardDescription className="mb-4 text-muted-foreground text-xs sm:text-sm">Configure your investment risk appetite and target savings rate</CardDescription>
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="riskTolerance" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <FiTarget className="text-indigo-500" /> Risk Tolerance
+                      <Label htmlFor="riskTolerance" className="flex items-center gap-2 text-foreground text-xs font-medium">
+                        <FiTarget className="text-muted-foreground" /> Risk Tolerance
                       </Label>
                       <select
                         id="riskTolerance"
-                        className={`w-full p-2.5 rounded-md border text-sm transition-colors ${
+                        className={`w-full p-3 rounded-2xl border text-sm transition-colors ${
                           editMode 
-                            ? 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500' 
-                            : 'bg-gray-100 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                            ? 'bg-background border-border/80 text-foreground focus:ring-2 focus:ring-foreground/20 focus:outline-none' 
+                            : 'bg-muted/40 border-border/50 text-muted-foreground cursor-not-allowed'
                         }`}
                         value={financialPreferences.riskTolerance}
                         onChange={handleRiskToleranceChange}
@@ -337,15 +345,15 @@ export default function Profile() {
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="investmentGoals" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <FiTrello className="text-indigo-500" /> Investment Goals
+                      <Label htmlFor="investmentGoals" className="flex items-center gap-2 text-foreground text-xs font-medium">
+                        <FiTrello className="text-muted-foreground" /> Primary Goal
                       </Label>
                       <select
                         id="investmentGoals"
-                        className={`w-full p-2.5 rounded-md border text-sm transition-colors ${
+                        className={`w-full p-3 rounded-2xl border text-sm transition-colors ${
                           editMode 
-                            ? 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500' 
-                            : 'bg-gray-100 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                            ? 'bg-background border-border/80 text-foreground focus:ring-2 focus:ring-foreground/20 focus:outline-none' 
+                            : 'bg-muted/40 border-border/50 text-muted-foreground cursor-not-allowed'
                         }`}
                         value={financialPreferences.investmentGoals}
                         onChange={handleInvestmentGoalsChange}
@@ -359,20 +367,20 @@ export default function Profile() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="savingsTarget" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                      <FiCreditCard className="text-indigo-500" /> Monthly Savings Target (₹)
+                    <Label htmlFor="savingsTarget" className="flex items-center gap-2 text-foreground text-xs font-medium">
+                      <FiCreditCard className="text-muted-foreground" /> Monthly Savings Target (₹)
                     </Label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500 dark:text-gray-400">₹</span>
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <span className="text-muted-foreground text-sm font-medium">₹</span>
                       </div>
                       <input
                         id="savingsTarget"
                         type="number"
-                        className={`w-full pl-8 p-2.5 rounded-md border text-sm transition-colors ${
+                        className={`w-full pl-9 p-3 rounded-2xl border text-sm transition-colors ${
                           editMode 
-                            ? 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500' 
-                            : 'bg-gray-100 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                            ? 'bg-background border-border/80 text-foreground focus:ring-2 focus:ring-foreground/20 focus:outline-none' 
+                            : 'bg-muted/40 border-border/50 text-muted-foreground cursor-not-allowed'
                         }`}
                         value={financialPreferences.savingsTarget}
                         onChange={handleSavingsTargetChange}
@@ -380,103 +388,102 @@ export default function Profile() {
                         min="0"
                       />
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Your annual savings goal: <span className="font-semibold text-indigo-600 dark:text-indigo-400">₹{(financialPreferences.savingsTarget * 12).toLocaleString('en-IN')}</span>
+                    <div className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5">
+                      <span>Projected annual savings:</span>
+                      <span className="font-semibold text-foreground">₹{(financialPreferences.savingsTarget * 12).toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                 </div>
               </TabsContent>
               
               <TabsContent value="security" className="pt-4">
-                <CardDescription className="mb-4 text-gray-500 dark:text-gray-400">Manage security and application appearance</CardDescription>
+                <CardDescription className="mb-4 text-muted-foreground text-xs sm:text-sm">Manage security controls and interface appearance</CardDescription>
                 <div className="space-y-6">
                   {/* Theme Selector Section */}
-                  <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-                    <Label className="block font-medium text-gray-900 dark:text-white mb-2">
+                  <div className="bg-muted/30 p-4 sm:p-5 rounded-2xl border border-border/60">
+                    <Label className="block font-medium text-foreground mb-1 text-sm">
                       Appearance Theme
                     </Label>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                      Choose your preferred interface theme
+                    <p className="text-xs text-muted-foreground mb-4">
+                      Select light, dark, or system preference
                     </p>
                     <div className="grid grid-cols-3 gap-3">
                       <button
                         type="button"
                         onClick={() => setTheme("light")}
-                        className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-sm font-medium transition-all ${
+                        className={`flex items-center justify-center gap-2 p-3 rounded-full border text-xs font-semibold transition-all cursor-pointer ${
                           theme === "light"
-                            ? "bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-600 dark:text-blue-400 shadow-sm"
-                            : "bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            ? "bg-foreground text-background border-foreground shadow-sm"
+                            : "bg-card border-border/80 text-muted-foreground hover:text-foreground hover:bg-muted"
                         }`}
                       >
-                        <FiSun className="w-4 h-4 text-amber-500" /> Light
+                        <FiSun className="w-4 h-4" /> Light
                       </button>
                       <button
                         type="button"
                         onClick={() => setTheme("dark")}
-                        className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-sm font-medium transition-all ${
+                        className={`flex items-center justify-center gap-2 p-3 rounded-full border text-xs font-semibold transition-all cursor-pointer ${
                           theme === "dark"
-                            ? "bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-600 dark:text-blue-400 shadow-sm"
-                            : "bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            ? "bg-foreground text-background border-foreground shadow-sm"
+                            : "bg-card border-border/80 text-muted-foreground hover:text-foreground hover:bg-muted"
                         }`}
                       >
-                        <FiMoon className="w-4 h-4 text-blue-400" /> Dark
+                        <FiMoon className="w-4 h-4" /> Dark
                       </button>
                       <button
                         type="button"
                         onClick={() => setTheme("system")}
-                        className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-sm font-medium transition-all ${
+                        className={`flex items-center justify-center gap-2 p-3 rounded-full border text-xs font-semibold transition-all cursor-pointer ${
                           theme === "system"
-                            ? "bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-600 dark:text-blue-400 shadow-sm"
-                            : "bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            ? "bg-foreground text-background border-foreground shadow-sm"
+                            : "bg-card border-border/80 text-muted-foreground hover:text-foreground hover:bg-muted"
                         }`}
                       >
-                        <FiMonitor className="w-4 h-4 text-gray-500 dark:text-gray-400" /> System
+                        <FiMonitor className="w-4 h-4" /> System
                       </button>
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 rounded-xl p-4">
-                    <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1 flex items-center gap-2">
-                      <FiClipboard className="text-blue-600 dark:text-blue-400" /> Security Status
+                  <div className="bg-muted/40 border border-border/70 rounded-2xl p-4">
+                    <h4 className="font-semibold text-foreground text-xs sm:text-sm mb-1 flex items-center gap-2">
+                      <FiClipboard className="text-muted-foreground" /> Security Status
                     </h4>
-                    <p className="text-sm text-blue-600 dark:text-blue-300">
-                      Your account has {twoFactorEnabled ? 'enhanced' : 'basic'} security. 
-                      {!twoFactorEnabled && ' We recommend enabling two-factor authentication.'}
+                    <p className="text-xs text-muted-foreground">
+                      Your account has {twoFactorEnabled ? 'enhanced' : 'standard'} protection. 
+                      {!twoFactorEnabled && ' Enable two-factor authentication for extra protection on financial data.'}
                     </p>
                   </div>
                   
-                  <Separator className="border-gray-200 dark:border-gray-700" />
+                  <Separator className="border-border/60" />
                   
-                  <div className="space-y-4 pt-2">
-                    <div className="flex items-center justify-between bg-white dark:bg-gray-800 p-3.5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="space-y-3 pt-1">
+                    <div className="flex items-center justify-between bg-muted/30 p-4 rounded-2xl border border-border/60">
                       <div>
-                        <Label htmlFor="twoFactor" className="block font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                          <FiShield className="text-violet-500" /> Two-factor Authentication
+                        <Label htmlFor="twoFactor" className="block font-medium text-foreground text-xs sm:text-sm flex items-center gap-2">
+                          <FiShield className="text-muted-foreground" /> Two-Factor Authentication
                         </Label>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Add an extra layer of security to your account</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Prompt verification code upon login</p>
                       </div>
                       <Switch
                         id="twoFactor"
                         checked={twoFactorEnabled}
                         onCheckedChange={setTwoFactorEnabled}
                         disabled={!editMode || loading}
-                        className="data-[state=checked]:bg-violet-600"
                       />
                     </div>
                     
-                    <div className="flex items-center justify-between bg-white dark:bg-gray-800 p-3.5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between bg-muted/30 p-4 rounded-2xl border border-border/60">
                       <div>
-                        <Label htmlFor="emailNotifications" className="block font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                          <FiMail className="text-violet-500" /> Email Notifications
+                        <Label htmlFor="emailNotifications" className="block font-medium text-foreground text-xs sm:text-sm flex items-center gap-2">
+                          <FiMail className="text-muted-foreground" /> Email Alerts & Weekly Digest
                         </Label>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Receive important financial updates and reports</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Receive monthly tax optimizations and anomalies</p>
                       </div>
                       <Switch
                         id="emailNotifications"
                         checked={emailNotifications}
                         onCheckedChange={setEmailNotifications}
                         disabled={!editMode || loading}
-                        className="data-[state=checked]:bg-violet-600"
                       />
                     </div>
                   </div>
@@ -484,16 +491,16 @@ export default function Profile() {
               </TabsContent>
             </Tabs>
           </CardHeader>
-          <CardFooter className="flex justify-end pt-0">
+          <CardFooter className="flex justify-end pt-2 pb-6 px-6">
             {editMode && (
               <Button
                 onClick={handleSaveProfile}
                 disabled={loading}
-                className="ml-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+                className="ml-auto rounded-full bg-foreground text-background hover:bg-foreground/90 font-semibold px-6 py-2.5 shadow-sm text-xs"
               >
                 {loading ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>

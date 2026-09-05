@@ -18,24 +18,42 @@ export const FINSCORE_TIERS = {
  * @returns {Object} Full score breakdown with sub-scores, tier, and milestone badges
  */
 export function calculateFinScore(finances = {}) {
-  if (!finances) {
+  if (!finances || typeof finances !== "object") {
     return {
       totalScore: 0,
       tier: FINSCORE_TIERS.CRITICAL,
-      subScores: { savings: 0, emergency: 0, debt: 0, diversification: 0 },
-      metrics: { savingsRate: 0, emergencyMonths: 0, dtiRatio: 0, assetClassesCount: 0 },
+      subScores: { savings: 0, emergency: 0, debt: 0, diversification: 0, investments: 0 },
+      metrics: {
+        savingsRate: 0,
+        emergencyMonths: 0,
+        dtiRatio: 0,
+        debtRatio: 0,
+        investmentRate: 0,
+        assetClassesCount: 0,
+        totalIncome: 0,
+        totalExpenses: 0,
+        netWorth: 0,
+      },
       badges: [],
       strengths: [],
       improvements: [],
     };
   }
 
-  const income = Object.values(finances.income || {}).reduce((sum, val) => sum + Number(val || 0), 0);
-  const fixedExpenses = Object.values(finances.fixedExpenses || {}).reduce((sum, val) => sum + Number(val || 0), 0);
-  const variableExpenses = Object.values(finances.variableExpenses || {}).reduce((sum, val) => sum + Number(val || 0), 0);
+  const sumSafe = (obj) => {
+    if (!obj || typeof obj !== "object") return 0;
+    return Object.values(obj).reduce((sum, val) => {
+      const num = Number(val);
+      return sum + (Number.isFinite(num) ? num : 0);
+    }, 0);
+  };
+
+  const income = sumSafe(finances.income);
+  const fixedExpenses = sumSafe(finances.fixedExpenses);
+  const variableExpenses = sumSafe(finances.variableExpenses);
   const totalExpenses = fixedExpenses + variableExpenses;
-  const totalInvestments = Object.values(finances.investments || {}).reduce((sum, val) => sum + Number(val || 0), 0);
-  const totalLoans = Object.values(finances.loans || {}).reduce((sum, val) => sum + Number(val || 0), 0);
+  const totalInvestments = sumSafe(finances.investments);
+  const totalLoans = sumSafe(finances.loans);
 
   // 1. Savings Rate Score (0 - 300 pts) [30% Weight]
   const netSavings = income > 0 ? income - totalExpenses : 0;
@@ -51,9 +69,14 @@ export function calculateFinScore(finances = {}) {
 
   // 2. Emergency Buffer Score (0 - 250 pts) [25% Weight]
   // Estimate liquid funds = Fixed Deposits + 20% of Mutual Funds + 6mo monthly savings
-  const liquidEstimate = (finances.investments?.fd || 0) + (finances.investments?.ppf ? finances.investments.ppf * 0.1 : 0) + Math.max(0, netSavings * 4);
+  const fd = Number(finances.investments?.fd);
+  const ppf = Number(finances.investments?.ppf);
+  const liquidEstimate = (Number.isFinite(fd) ? Math.max(0, fd) : 0) +
+                         (Number.isFinite(ppf) ? Math.max(0, ppf) * 0.1 : 0) +
+                         Math.max(0, netSavings * 4);
   const monthlyBurn = totalExpenses > 0 ? totalExpenses : 1;
-  const emergencyMonths = Number((liquidEstimate / monthlyBurn).toFixed(1));
+  const emergencyMonthsRaw = liquidEstimate / monthlyBurn;
+  const emergencyMonths = Number.isFinite(emergencyMonthsRaw) ? Number(emergencyMonthsRaw.toFixed(1)) : 0;
 
   let emergencyScore = 0;
   if (emergencyMonths >= 6) emergencyScore = 250;
@@ -62,12 +85,17 @@ export function calculateFinScore(finances = {}) {
   else emergencyScore = Math.max(0, emergencyMonths * 80);
 
   // 3. Debt-to-Income Health Score (0 - 250 pts) [25% Weight]
-  // Estimated monthly debt service: ~1% of total loan balance as monthly obligation
-  const estimatedMonthlyDebt = (finances.loans?.home ? finances.loans.home * 0.0085 : 0) +
-                               (finances.loans?.car ? finances.loans.car * 0.02 : 0) +
-                               (finances.loans?.personal ? finances.loans.personal * 0.025 : 0) +
-                               (finances.loans?.education ? finances.loans.education * 0.012 : 0) +
-                               (finances.loans?.credit_card ? finances.loans.credit_card * 0.05 : 0);
+  const homeLoan = Number(finances.loans?.home);
+  const carLoan = Number(finances.loans?.car);
+  const personalLoan = Number(finances.loans?.personal);
+  const educationLoan = Number(finances.loans?.education);
+  const ccLoan = Number(finances.loans?.credit_card);
+
+  const estimatedMonthlyDebt = (Number.isFinite(homeLoan) ? Math.max(0, homeLoan) * 0.0085 : 0) +
+                               (Number.isFinite(carLoan) ? Math.max(0, carLoan) * 0.02 : 0) +
+                               (Number.isFinite(personalLoan) ? Math.max(0, personalLoan) * 0.025 : 0) +
+                               (Number.isFinite(educationLoan) ? Math.max(0, educationLoan) * 0.012 : 0) +
+                               (Number.isFinite(ccLoan) ? Math.max(0, ccLoan) * 0.05 : 0);
 
   const dtiRatio = income > 0 ? Number(((estimatedMonthlyDebt / income) * 100).toFixed(1)) : (totalLoans > 0 ? 100 : 0);
 
@@ -81,7 +109,10 @@ export function calculateFinScore(finances = {}) {
 
   // 4. Asset Diversification Score (0 - 200 pts) [20% Weight]
   const assetKeys = ["equity", "mutual_funds", "fd", "ppf", "epf", "nps", "gold", "real_estate", "crypto"];
-  const activeAssets = assetKeys.filter(k => (finances.investments?.[k] || 0) > 10000);
+  const activeAssets = assetKeys.filter(k => {
+    const val = Number(finances.investments?.[k]);
+    return Number.isFinite(val) && val > 10000;
+  });
   const assetClassesCount = activeAssets.length;
 
   let diversificationScore = 0;
@@ -92,7 +123,8 @@ export function calculateFinScore(finances = {}) {
   else if (assetClassesCount === 1) diversificationScore = 50;
   else diversificationScore = 0;
 
-  const totalScore = Math.min(1000, Math.round(savingsScore + emergencyScore + debtScore + diversificationScore));
+  const rawTotalScore = savingsScore + emergencyScore + debtScore + diversificationScore;
+  const totalScore = Number.isFinite(rawTotalScore) ? Math.min(1000, Math.max(0, Math.round(rawTotalScore))) : 0;
 
   // Determine Tier
   let tier = FINSCORE_TIERS.CRITICAL;
@@ -139,23 +171,29 @@ export function calculateFinScore(finances = {}) {
   if (assetClassesCount >= 3) strengths.push(`Diversified across ${assetClassesCount} asset classes`);
   else improvements.push(`Diversify into additional asset classes like Index SIPs, Gold, or PPF`);
 
+  const rawInvestmentRate = income > 0 ? (totalInvestments / income) * 100 : 0;
+  const investmentRate = Number.isFinite(rawInvestmentRate) ? Number(rawInvestmentRate.toFixed(1)) : 0;
+
   return {
     totalScore,
     tier,
     subScores: {
-      savings: Math.round(savingsScore),
-      emergency: Math.round(emergencyScore),
-      debt: Math.round(debtScore),
-      diversification: Math.round(diversificationScore),
+      savings: Number.isFinite(savingsScore) ? Math.round(savingsScore) : 0,
+      emergency: Number.isFinite(emergencyScore) ? Math.round(emergencyScore) : 0,
+      debt: Number.isFinite(debtScore) ? Math.round(debtScore) : 0,
+      diversification: Number.isFinite(diversificationScore) ? Math.round(diversificationScore) : 0,
+      investments: Number.isFinite(diversificationScore) ? Math.round(diversificationScore) : 0,
     },
     metrics: {
-      savingsRate: Number(savingsRate.toFixed(1)),
-      emergencyMonths,
-      dtiRatio,
-      assetClassesCount,
-      totalIncome: income,
-      totalExpenses,
-      netWorth: totalInvestments - totalLoans,
+      savingsRate: Number.isFinite(savingsRate) ? Number(savingsRate.toFixed(1)) : 0,
+      emergencyMonths: Number.isFinite(emergencyMonths) ? Number(emergencyMonths) : 0,
+      dtiRatio: Number.isFinite(dtiRatio) ? Number(dtiRatio) : 0,
+      debtRatio: Number.isFinite(dtiRatio) ? Number(dtiRatio) : 0,
+      investmentRate,
+      assetClassesCount: Number.isFinite(assetClassesCount) ? Number(assetClassesCount) : 0,
+      totalIncome: Number.isFinite(income) ? income : 0,
+      totalExpenses: Number.isFinite(totalExpenses) ? totalExpenses : 0,
+      netWorth: Number.isFinite(totalInvestments - totalLoans) ? totalInvestments - totalLoans : 0,
     },
     badges,
     strengths,
