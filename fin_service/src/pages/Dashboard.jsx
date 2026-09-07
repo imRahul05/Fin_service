@@ -241,20 +241,10 @@ export default function Dashboard() {
       doughnut: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '68%',
+        cutout: '72%',
         plugins: {
           legend: {
-            position: 'right',
-            align: 'center',
-            labels: {
-              color: textColor,
-              font: { size: 11, weight: '500' },
-              boxWidth: 8,
-              boxHeight: 8,
-              padding: 8,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
+            display: false
           },
           tooltip: {
             backgroundColor: isDark ? '#18181B' : '#0F172A',
@@ -324,8 +314,8 @@ export default function Dashboard() {
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
   }, [finances]);
 
-  const expensesData = useMemo(() => {
-    const palette = isDark ? [
+  const expensePalette = useMemo(() => (
+    isDark ? [
       '#FAFAFA',
       '#D4D4D8',
       '#A1A1AA',
@@ -343,33 +333,47 @@ export default function Dashboard() {
       '#CBD5E1',
       '#E2E8F0',
       '#F1F5F9'
-    ];
+    ]
+  ), [isDark]);
 
-    if (expenseEntries.length === 0) {
-      return { labels: [], datasets: [] };
-    }
-
-    // Limit to top 5 categories, group the remainder into 'Other' to prevent legend cramp/clipping
-    let displayEntries = expenseEntries;
-    if (expenseEntries.length > 6) {
+  // Group remainder into 'Other' if more than 5 categories to maintain clean, uncramped presentation
+  const displayExpenseEntries = useMemo(() => {
+    if (expenseEntries.length === 0) return [];
+    if (expenseEntries.length > 5) {
       const top5 = expenseEntries.slice(0, 5);
       const remaining = expenseEntries.slice(5);
       const remainingTotal = remaining.reduce((sum, [, amt]) => sum + amt, 0);
-      displayEntries = [...top5, [`Other (${remaining.length} items)`, remainingTotal]];
+      return [...top5, [`Other (${remaining.length} items)`, remainingTotal]];
+    }
+    return expenseEntries;
+  }, [expenseEntries]);
+
+  const expensesData = useMemo(() => {
+    if (displayExpenseEntries.length === 0) {
+      return { labels: [], datasets: [] };
     }
 
     return {
-      labels: displayEntries.map(([category]) => category),
+      labels: displayExpenseEntries.map(([category]) => category),
       datasets: [
         {
-          data: displayEntries.map(([, amount]) => amount),
-          backgroundColor: displayEntries.map((_, i) => palette[i % palette.length]),
+          data: displayExpenseEntries.map(([, amount]) => amount),
+          backgroundColor: displayExpenseEntries.map((_, i) => expensePalette[i % expensePalette.length]),
           borderWidth: 2,
           borderColor: isDark ? '#121214' : '#FFFFFF'
         }
       ]
     };
-  }, [expenseEntries, isDark]);
+  }, [displayExpenseEntries, expensePalette, isDark]);
+
+  const formatCompactCurrency = (amount) => {
+    const num = Number(amount);
+    if (!Number.isFinite(num) || num === 0) return '₹0';
+    if (Math.abs(num) >= 10000000) return `₹${(num / 10000000).toFixed(1)}Cr`;
+    if (Math.abs(num) >= 100000) return `₹${(num / 100000).toFixed(1)}L`;
+    if (Math.abs(num) >= 1000) return `₹${(num / 1000).toFixed(1)}k`;
+    return `₹${num.toLocaleString('en-IN')}`;
+  };
 
   if (financesLoading) {
     return (
@@ -475,16 +479,10 @@ export default function Dashboard() {
         </div>
 
         <div className="flex items-center gap-2.5">
-          {/* Strategic Guidance Toggle Button */}
+          {/* Strategic Guidance Toggle Button (Desktop: toggles right panel) */}
           <button
-            onClick={() => {
-              if (typeof window !== "undefined" && window.innerWidth < 1280) {
-                setIsDrawerOpen(true);
-              } else {
-                handleToggleGuidance();
-              }
-            }}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs font-semibold shadow-2xs transition-all cursor-pointer ${
+            onClick={handleToggleGuidance}
+            className={`hidden xl:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs font-semibold shadow-2xs transition-all cursor-pointer ${
               showStrategicGuidance
                 ? "bg-foreground text-background border-foreground hover:bg-foreground/90"
                 : "bg-card text-foreground border-border/80 hover:bg-muted"
@@ -494,7 +492,7 @@ export default function Dashboard() {
           >
             <Sparkles className={`w-3.5 h-3.5 ${showStrategicGuidance ? "text-background" : "text-amber-500"}`} />
             <span>Strategic Guidance</span>
-            <span className={`hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+            <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
               showStrategicGuidance
                 ? "bg-background/20 text-background"
                 : "bg-muted text-muted-foreground border border-border/70"
@@ -503,20 +501,24 @@ export default function Dashboard() {
             </span>
           </button>
 
+          {/* Strategy Drawer Trigger Button (Mobile/Tablet < xl) */}
+          <button
+            onClick={() => setIsDrawerOpen(true)}
+            className="xl:hidden inline-flex items-center gap-1.5 px-3.5 py-2 border border-border/80 rounded-full shadow-2xs text-xs font-semibold text-foreground bg-card hover:bg-muted transition cursor-pointer"
+            title="Open AI Strategy Drawer"
+            aria-label="Open AI Strategy Drawer"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span>Strategic Guidance</span>
+          </button>
+
+          {/* Export Dossier Button */}
           <button
             onClick={() => setIsDossierOpen(true)}
             className="inline-flex items-center gap-1.5 px-4 py-2 border border-border/80 rounded-full shadow-2xs text-xs font-semibold text-foreground bg-card hover:bg-muted transition cursor-pointer"
           >
             <FileText className="w-3.5 h-3.5 text-muted-foreground" />
             <span>Export Dossier</span>
-          </button>
-
-          <button
-            onClick={() => setIsDrawerOpen(true)}
-            className="xl:hidden inline-flex items-center gap-1.5 px-4 py-2 border border-border/80 rounded-full shadow-2xs text-xs font-semibold text-foreground bg-card hover:bg-muted transition cursor-pointer"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
-            <span>Strategy</span>
           </button>
         </div>
       </div>
@@ -528,11 +530,14 @@ export default function Dashboard() {
         <div className={`${showStrategicGuidance ? "xl:col-span-8" : "xl:col-span-12"} space-y-6 transition-all duration-300 min-w-0`}>
           
           {/* OVERVIEW BENTO CARD (Streamlined & Compact Height) */}
-          <div className="bg-card rounded-3xl border border-border/80 p-4 sm:p-5 shadow-card space-y-3.5">
+          <div className="bg-card rounded-3xl border border-border/80 p-4 sm:p-4.5 shadow-card space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h2 className="text-sm sm:text-base font-bold text-foreground">Overview</h2>
-                <span className="text-2xs text-muted-foreground">Live telemetry</span>
+                <h2 className="text-sm font-bold text-foreground">Overview</h2>
+                <span className="inline-flex items-center gap-1 text-2xs text-muted-foreground">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live telemetry
+                </span>
               </div>
 
               {/* Timeframe selector pill */}
@@ -543,74 +548,74 @@ export default function Dashboard() {
             </div>
 
             {/* Dual Bold Metric Cards (Compact) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {/* Monthly Savings Card */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-muted/30 border border-border/60 flex flex-col justify-between">
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Monthly Savings
                     </span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-muted text-foreground border border-border/70">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-muted text-foreground border border-border/70">
                       {savingsRate > 0 ? `+${savingsRate.toFixed(1)}%` : `${savingsRate.toFixed(1)}%`}
                     </span>
                   </div>
-                  <div className="mt-1">
-                    <span className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
+                  <div className="my-1">
+                    <span className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
                       {formatCurrency(summaryData.monthlySavings)}
                     </span>
                   </div>
                 </div>
-                <p className="text-2xs text-muted-foreground mt-1.5">
+                <p className="text-2xs text-muted-foreground">
                   Cushion: {(summaryData.monthlySavings > 0 && summaryData.totalExpenses > 0 ? (summaryData.monthlySavings * 6 / summaryData.totalExpenses).toFixed(1) : "0")} months expenses
                 </p>
               </div>
 
               {/* Net Worth Card */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-muted/30 border border-border/60 flex flex-col justify-between">
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Estimated Net Worth
                     </span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-muted text-foreground border border-border/70">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-muted text-foreground border border-border/70">
                       Optimal
                     </span>
                   </div>
-                  <div className="mt-1">
-                    <span className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
+                  <div className="my-1">
+                    <span className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
                       {formatCurrency(summaryData.netWorth)}
                     </span>
                   </div>
                 </div>
-                <p className="text-2xs text-muted-foreground mt-1.5">
+                <p className="text-2xs text-muted-foreground">
                   Assets minus recorded debts
                 </p>
               </div>
             </div>
 
-            {/* Avatar Stack & Insight Message (Compact) */}
-            <div className="flex items-center justify-between pt-2.5 border-t border-border/60">
-              <div className="flex items-center gap-2.5">
-                <div className="flex -space-x-1.5 overflow-hidden">
-                  <div className="inline-flex h-5.5 w-5.5 rounded-full bg-foreground text-background text-[9px] font-bold items-center justify-center ring-1.5 ring-card">
+            {/* Avatar Stack & Insight Message (Compact Strip) */}
+            <div className="flex items-center justify-between pt-2 border-t border-border/60 text-2xs">
+              <div className="flex items-center gap-2">
+                <div className="flex -space-x-1 overflow-hidden">
+                  <div className="inline-flex h-5 w-5 rounded-full bg-foreground text-background text-[8px] font-bold items-center justify-center ring-1 ring-card">
                     AI
                   </div>
-                  <div className="inline-flex h-5.5 w-5.5 rounded-full bg-muted text-foreground text-[9px] font-bold items-center justify-center ring-1.5 ring-card border border-border">
+                  <div className="inline-flex h-5 w-5 rounded-full bg-muted text-foreground text-[8px] font-bold items-center justify-center ring-1 ring-card border border-border">
                     CA
                   </div>
-                  <div className="inline-flex h-5.5 w-5.5 rounded-full bg-muted text-foreground text-[9px] font-bold items-center justify-center ring-1.5 ring-card border border-border">
+                  <div className="inline-flex h-5 w-5 rounded-full bg-muted text-foreground text-[8px] font-bold items-center justify-center ring-1 ring-card border border-border">
                     FS
                   </div>
                 </div>
-                <span className="text-2xs sm:text-xs font-semibold text-foreground">
+                <span className="font-semibold text-foreground">
                   857 active insights computed today
                 </span>
               </div>
 
               <Link
                 to="/analytics"
-                className="inline-flex items-center gap-1 text-2xs sm:text-xs font-semibold text-foreground hover:underline"
+                className="inline-flex items-center gap-0.5 font-semibold text-foreground hover:underline"
               >
                 <span>Full Ledger</span>
                 <ChevronRight className="w-3 h-3" />
@@ -621,7 +626,7 @@ export default function Dashboard() {
           {/* CASH FLOW & EXPENSES BENTO SECTION */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Monthly Cash Flow Rounded Bar Chart */}
-            <div className={`${showStrategicGuidance ? "lg:col-span-7" : "lg:col-span-6"} bg-card rounded-3xl border border-border/80 p-5 sm:p-6 shadow-card min-w-0 transition-all duration-300`}>
+            <div className="lg:col-span-6 bg-card rounded-3xl border border-border/80 p-5 sm:p-6 shadow-card min-w-0 transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-sm font-bold text-foreground">Monthly Cash Flow</h3>
@@ -641,29 +646,78 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Expense Distribution Doughnut */}
-            <div className={`${showStrategicGuidance ? "lg:col-span-5" : "lg:col-span-6"} bg-card rounded-3xl border border-border/80 p-5 sm:p-6 shadow-card flex flex-col justify-between min-w-0 transition-all duration-300`}>
+            {/* Expense Distribution Doughnut with Center Total & Crisp HTML Legend */}
+            <div className="lg:col-span-6 bg-card rounded-3xl border border-border/80 p-5 sm:p-6 shadow-card flex flex-col justify-between min-w-0 transition-all duration-300">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-sm font-bold text-foreground">Expense Breakdown</h3>
-                  {expenseEntries.length > 6 && (
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">Expense Breakdown</h3>
+                    <p className="text-2xs text-muted-foreground">Categorized monthly outflow</p>
+                  </div>
+                  {expenseEntries.length > 5 && (
                     <span className="text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full border border-border/60">
                       Top 5 + Other
                     </span>
                   )}
                 </div>
-                <p className="text-2xs text-muted-foreground mb-3">Categorized monthly outflow</p>
-                <div className="h-48 sm:h-52 flex items-center justify-center min-w-0">
-                  {expenseEntries.length > 0 ? (
-                    <Doughnut data={expensesData} options={chartOptions.doughnut} />
-                  ) : (
-                    <div className="text-xs text-muted-foreground">No expenses recorded</div>
-                  )}
-                </div>
+
+                {displayExpenseEntries.length > 0 ? (
+                  <div className="mt-3 flex flex-col sm:flex-row items-center gap-4 min-w-0">
+                    {/* Doughnut Chart Canvas with Center Readout */}
+                    <div className="relative w-36 h-36 sm:w-40 sm:h-40 shrink-0 flex items-center justify-center">
+                      <Doughnut data={expensesData} options={chartOptions.doughnut} />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                        <span className="text-[9px] uppercase font-bold tracking-wider text-muted-foreground">
+                          Total
+                        </span>
+                        <span className="text-xs sm:text-sm font-black text-foreground">
+                          {formatCompactCurrency(summaryData.totalExpenses)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Crisp HTML Legend (Never Truncated, Always Legible) */}
+                    <div className="flex-1 w-full space-y-1.5 overflow-y-auto max-h-44 pr-1 min-w-0">
+                      {displayExpenseEntries.map(([category, amount], idx) => {
+                        const pct = summaryData.totalExpenses > 0 
+                          ? ((amount / summaryData.totalExpenses) * 100).toFixed(1) 
+                          : "0.0";
+                        return (
+                          <div key={category} className="flex items-center justify-between text-xs py-0.5 gap-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span
+                                className="w-2.5 h-2.5 rounded-full shrink-0"
+                                style={{ backgroundColor: expensePalette[idx % expensePalette.length] }}
+                              />
+                              <span
+                                className="text-foreground font-medium truncate text-2xs sm:text-xs"
+                                title={category}
+                              >
+                                {category}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className="font-semibold text-foreground text-2xs sm:text-xs">
+                                {formatCurrency(amount)}
+                              </span>
+                              <span className="text-[10px] font-bold text-muted-foreground w-11 text-right">
+                                {pct}%
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-44 flex items-center justify-center text-xs text-muted-foreground">
+                    No expenses recorded
+                  </div>
+                )}
               </div>
 
               <div className="pt-3 border-t border-border/60 flex items-center justify-between text-2xs text-muted-foreground">
-                <span>Total: <strong className="text-foreground">{formatCurrency(summaryData.totalExpenses)}</strong></span>
+                <span>Total Outflow: <strong className="text-foreground">{formatCurrency(summaryData.totalExpenses)}</strong></span>
                 <Link to="/finance-input" className="font-semibold text-foreground hover:underline">
                   Edit →
                 </Link>
@@ -699,9 +753,9 @@ export default function Dashboard() {
 
         </div>
 
-        {/* RIGHT COLUMN: STRATEGIC RECOMMENDATIONS PANEL (Collapsible) */}
+        {/* RIGHT COLUMN: STRATEGIC RECOMMENDATIONS PANEL (Desktop Collapsible) */}
         {showStrategicGuidance && (
-          <div className="xl:col-span-4 space-y-6 animate-in fade-in duration-300">
+          <div className="hidden xl:block xl:col-span-4 space-y-6 animate-in fade-in duration-300">
             
             <div className="bg-card rounded-3xl border border-border/80 p-6 shadow-card space-y-5">
               <div className="flex items-center justify-between">
